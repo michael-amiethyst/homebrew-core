@@ -1,3 +1,6 @@
+# Generated files
+/target/**
+
 # Compiled class file
 *.class
 
