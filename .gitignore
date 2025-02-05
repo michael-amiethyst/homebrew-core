@@ -1,3 +1,7 @@
+.gradle/**
+
+composeApp/build/**
+
 # Compiled class file
 *.class
 
