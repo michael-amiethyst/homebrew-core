@@ -1,4 +1,4 @@
-package org.example
+package org.bashpile.core
 
 fun main() {
     println("Hello World!")
