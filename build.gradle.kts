@@ -3,8 +3,8 @@ plugins {
     application
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "org.bashpile.core"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
