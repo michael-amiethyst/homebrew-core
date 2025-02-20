@@ -25,5 +25,5 @@ kotlin {
 }
 
 application {
-    mainClass = "org.bashpile.core.MainKt"
+    mainClass = "org.bashpile.core.Main"
 }

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-class MainKtTest {
+class MainTest {
     private lateinit var byteArrayOutputStream: ByteArrayOutputStream
 
     @BeforeEach
@@ -23,7 +23,7 @@ class MainKtTest {
 
     @Test
     fun mainWorks() {
-        main()
+        Main.main(arrayOf())
 
         val output = byteArrayOutputStream.toString()
         assertEquals("Hello World!\n", output)
