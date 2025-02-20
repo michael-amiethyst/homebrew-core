@@ -28,4 +28,12 @@ class MainTest {
         val output = byteArrayOutputStream.toString()
         assertEquals("Hello World!\n", output)
     }
+
+    @Test
+    fun mainWithArgumentWorks() {
+        Main.main(arrayOf("Jordi"))
+
+        val output = byteArrayOutputStream.toString()
+        assertEquals("Hello Jordi!\n", output)
+    }
 }

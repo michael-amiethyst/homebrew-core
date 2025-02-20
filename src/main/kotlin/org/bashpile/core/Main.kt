@@ -4,7 +4,8 @@ class Main {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            println("Hello World!")
+            val name = if (args.isNotEmpty()) args[0] else "World"
+            println("Hello $name!")
         }
     }
 }
