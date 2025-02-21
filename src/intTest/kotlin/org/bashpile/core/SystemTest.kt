@@ -27,8 +27,7 @@ class SystemTest {
 
     @Test
     fun systemWorks() {
-        val output = "sdk use java 21.0.5-graal; build/untar/bin/bashpile-core"
-            .runCommand()
+        val output = "build/untar/bin/bashpile-core".runCommand()
         assertEquals("Hello World!\n", output)
     }
 
@@ -41,7 +40,7 @@ class SystemTest {
         assertEquals("Hello Jordi!\n", output)
     }
 
-    fun String.runCommand(workingDir: File? = null): String {
+    private fun String.runCommand(workingDir: File? = null): String {
         try {
             val cwd = System.getProperty("user.dir")
             val proc = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
