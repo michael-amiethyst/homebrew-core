@@ -40,10 +40,20 @@ application {
 ////////
 
 tasks.register<Exec>("untar") {
+    group = "verification"
     workingDir = File("build/distributions")
     commandLine = listOf("tar", "-xf", "bashpile-core-$version.tar")
     shouldRunAfter("test", "assemble")
     dependsOn("test", "assemble")
+}
+
+// create build/untar directory
+tasks.register<Exec>("mv") {
+    group = "verification"
+    workingDir = File("build")
+    commandLine = listOf("mv", "-f", "distributions/bashpile-core-$version", "untar")
+    shouldRunAfter("untar")
+    dependsOn("untar")
 }
 
 ///////////////
@@ -75,8 +85,8 @@ val integrationTest = task<Test>("integrationTest") {
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
-    shouldRunAfter("untar")
-    dependsOn("untar")
+    shouldRunAfter("mv")
+    dependsOn("mv")
 
     useJUnitPlatform()
 
