@@ -11,6 +11,9 @@ import java.io.PrintStream
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 
+/**
+ * Overall System integration test for [Main].
+ */
 class SystemTest {
     private lateinit var byteArrayOutputStream: ByteArrayOutputStream
 
@@ -33,10 +36,7 @@ class SystemTest {
 
     @Test
     fun systemWithArgumentWorks() {
-        // TODO update to use systemworks() style
-        Main.main(arrayOf("Jordi"))
-
-        val output = byteArrayOutputStream.toString()
+        val output = "build/untar/bin/bashpile-core --name Jordi".runCommand()
         assertEquals("Hello Jordi!\n", output)
     }
 

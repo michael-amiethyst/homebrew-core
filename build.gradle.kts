@@ -18,6 +18,13 @@ repositories {
 }
 
 dependencies {
+
+    // clikt
+    implementation("com.github.ajalt.clikt:clikt:5.0.1")
+    // optional support for rendering markdown in help messages
+    implementation("com.github.ajalt.clikt:clikt-markdown:5.0.1")
+
+    // tests
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
 
@@ -32,7 +39,7 @@ kotlin {
 }
 
 application {
-    mainClass = "org.bashpile.core.Main"
+    mainClass = "org.bashpile.core.MainKt"
 }
 
 ////////

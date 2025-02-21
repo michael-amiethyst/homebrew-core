@@ -1,39 +1,20 @@
 package org.bashpile.core
 
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import com.github.ajalt.clikt.testing.test
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 
 class MainTest {
-    private lateinit var byteArrayOutputStream: ByteArrayOutputStream
-
-    @BeforeEach
-    fun setUp() {
-        byteArrayOutputStream = ByteArrayOutputStream()
-        System.setOut(PrintStream(byteArrayOutputStream))
-    }
-
-    @AfterEach
-    fun tearDown() {
-        System.setOut(System.out)
-    }
 
     @Test
     fun mainWorks() {
-        Main.main(arrayOf())
-
-        val output = byteArrayOutputStream.toString()
+        val output = Main().test(arrayOf()).stdout
         assertEquals("Hello World!\n", output)
     }
 
     @Test
     fun mainWithArgumentWorks() {
-        Main.main(arrayOf("Jordi"))
-
-        val output = byteArrayOutputStream.toString()
+        val output = Main().test(arrayOf("--name", "Jordi")).stdout
         assertEquals("Hello Jordi!\n", output)
     }
 }
