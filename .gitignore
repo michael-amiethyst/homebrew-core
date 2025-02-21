@@ -1,6 +1,3 @@
-# ignore unzipped/untared directories
-bashpile-core-*/**
-
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

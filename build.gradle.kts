@@ -1,3 +1,7 @@
+//////////////
+// Main Config
+//////////////
+
 val junitVersion = "5.12.0-M1"
 
 plugins {
@@ -31,7 +35,20 @@ application {
     mainClass = "org.bashpile.core.Main"
 }
 
+////////
+// Untar - for integration tests
+////////
+
+tasks.register<Exec>("untar") {
+    workingDir = File("build/distributions")
+    commandLine = listOf("tar", "-xf", "bashpile-core-$version.tar")
+    shouldRunAfter("test", "assemble")
+    dependsOn("test", "assemble")
+}
+
+///////////////
 // system tests - integration tests for the whole system
+///////////////
 
 sourceSets {
     create("intTest") {
@@ -58,7 +75,8 @@ val integrationTest = task<Test>("integrationTest") {
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
-    shouldRunAfter("test")
+    shouldRunAfter("untar")
+    dependsOn("untar")
 
     useJUnitPlatform()
 
