@@ -1,1 +1,1 @@
-* 0.1.0 - Hello World and skeleton of documentation
+* 0.1.0 - Hello World, skeleton of documentation and clikt integration

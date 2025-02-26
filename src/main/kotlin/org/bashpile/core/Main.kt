@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.options.option
 
 fun main(args: Array<String>) = Main().main(args)
 
+/** See `SystemTest` in `src/intTest/kotlin` for systems integration tests */
 class Main : CliktCommand() {
 
     private val script by argument(help = "The script to compile")
