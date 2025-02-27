@@ -2,6 +2,10 @@
 
 YOUR Bash wizard!
 
+See [user_docs](user_docs/overview.md) for a language reference.
+
+See [Contributing](contributing/contributing.md) for helping with the project. 
+
 ## Differences from previous version
 
 A rewrite from scratch was justified for a few reasons:
