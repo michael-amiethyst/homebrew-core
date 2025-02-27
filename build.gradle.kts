@@ -2,7 +2,9 @@
 // Main Config
 //////////////
 
+// gradle version specified at gradle/wrapper/gradle-wrapper.properties
 val junitVersion = "5.12.0-M1"
+val cliktVersion = "5.0.1"
 
 plugins {
     // kotlin version in plugins must be literal
@@ -11,7 +13,7 @@ plugins {
 }
 
 group = "org.bashpile.core"
-version = "0.1.0"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -20,9 +22,9 @@ repositories {
 dependencies {
 
     // clikt
-    implementation("com.github.ajalt.clikt:clikt:5.0.1")
+    implementation("com.github.ajalt.clikt:clikt:$cliktVersion")
     // optional support for rendering markdown in help messages
-    implementation("com.github.ajalt.clikt:clikt-markdown:5.0.1")
+    implementation("com.github.ajalt.clikt:clikt-markdown:$cliktVersion")
 
     // tests
     testImplementation(kotlin("test"))
