@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 //////////////
 // Main Config
 //////////////
@@ -5,8 +7,10 @@
 // gradle version specified at gradle/wrapper/gradle-wrapper.properties
 val junitVersion = "5.12.0-M1"
 val cliktVersion = "5.0.1"
+val antlrVersion = "4.13.2"
 
 plugins {
+    antlr
     // kotlin version in plugins must be literal
     kotlin("jvm") version "2.1.10"
     application
@@ -26,6 +30,9 @@ dependencies {
     // optional support for rendering markdown in help messages
     implementation("com.github.ajalt.clikt:clikt-markdown:$cliktVersion")
 
+    // antlr
+    antlr("org.antlr:antlr4:$antlrVersion")
+
     // tests
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
@@ -42,6 +49,32 @@ kotlin {
 
 application {
     mainClass = "org.bashpile.core.MainKt"
+}
+
+// antlr integration
+
+val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr"
+
+tasks.generateGrammarSource {
+    // set output directory to some arbitrary location in `/build` directory.
+    // by convention `/build/generated/sources/main/java/<generator name>` is often used
+    outputDirectory = file(generatedOutputFilename)
+
+    // pass -package to make generator put code in not default space
+    arguments = listOf("-package", "org.bashpile.core")
+}
+
+// workaround for antlr bug, should be fixed after 4.13.2
+tasks.withType<KotlinCompile>().configureEach {
+    dependsOn(tasks.withType<AntlrTask>())
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(generatedOutputFilename)
+        }
+    }
 }
 
 ////////

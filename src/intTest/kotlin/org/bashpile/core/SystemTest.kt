@@ -1,37 +1,62 @@
 package org.bashpile.core
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
+import java.io.PrintStream
+import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
 
 /**
  * Overall System integration test for [Main].
  */
-// TODO change to test the nativeCompile
 class SystemTest {
-    private val bashpileFilename = "build/untar/bin/bashpile"
+    private lateinit var byteArrayOutputStream: ByteArrayOutputStream
 
-    @Test
-    fun system_withBadFilename_printsHelp() {
-        val output = "$bashpileFilename BAD_FILENAME".runCommand()
-        assertNotEquals(SCRIPT_SUCCESS, output.second)
-        assertTrue(output.first.stripFirstLine().startsWith("Usage:"))
+    @BeforeEach
+    fun setUp() {
+        byteArrayOutputStream = ByteArrayOutputStream()
+        System.setOut(PrintStream(byteArrayOutputStream))
+    }
+
+    @AfterEach
+    fun tearDown() {
+        System.setOut(System.out)
     }
 
     @Test
     fun systemWorks() {
-        val output = "$bashpileFilename '${MainTest.HELLO_FILENAME}'".runCommand()
-        assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals("Hello Bashpile!\n", output.first.stripFirstLine())
+        val output = "build/untar/bin/bashpile-core ''".runCommand()
+        assertEquals("Hello World!\n", output)
     }
 
     @Test
-    fun system_withVerbose_works() {
-        val output = "$bashpileFilename --verbose true '${MainTest.HELLO_FILENAME}'".runCommand()
-        assertEquals(SCRIPT_SUCCESS, output.second)
-        assertTrue(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE))
-        assertTrue(output.first.endsWith("Hello Bashpile!\n"))
+    fun systemWithArgumentWorks() {
+        val output = "build/untar/bin/bashpile-core --name Jordi ''".runCommand()
+        assertEquals("Hello Jordi!\n", output)
     }
 
-    /** Strip initial logging line */
-    private fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
+    private fun String.runCommand(workingDir: File? = null): String {
+        try {
+            val cwd = System.getProperty("user.dir")
+            val proc = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
+                .directory(workingDir ?: File(cwd))
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectErrorStream(true)
+                .start()
+
+            proc.waitFor(10, TimeUnit.SECONDS)
+
+            // strip out blank lines and lines from sdkman, add newline back
+            val text = proc.inputStream.bufferedReader().readText().split("\n")
+            return text.stream()
+                .filter { !it.contains("Using java version") }.collect(Collectors.joining()) + "\n"
+        } catch(e: IOException) {
+            return e.stackTraceToString()
+        }
+    }
 }
