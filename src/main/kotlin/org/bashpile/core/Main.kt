@@ -4,6 +4,9 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
+import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -15,6 +18,32 @@ class Main : CliktCommand() {
     private val name by option("-n", "--name", help = "Your name")
 
     override fun run() {
-        echo("Hello ${name ?: "World"}!", true)
+        var propName = name
+        if (script.isNotEmpty()) {
+            val charStream = readSampleFile()
+            val lexer = PropertiesLexer(charStream)
+            val tokens = CommonTokenStream(lexer)
+            val parser = PropertiesParser(tokens)
+
+            while (parser.currentToken.type != PropertiesParser.EOF) {
+                val nextLine = parser.line()
+                val kw = nextLine.keyValue()
+                val key = kw.key().text
+                val value = kw.separatorAndValue().chars()
+                    .joinToString(separator = "") { it.text }
+
+                if (key == "name") {
+                    propName = value
+                }
+            }
+        }
+        echo("Hello ${propName ?: "World"}!", true)
+    }
+
+    private fun readSampleFile(): CharStream {
+        val contextClassLoader = Thread.currentThread().contextClassLoader
+        return contextClassLoader.getResourceAsStream("sample.properties").use {  input ->
+            CharStreams.fromStream(input)
+        }
     }
 }
