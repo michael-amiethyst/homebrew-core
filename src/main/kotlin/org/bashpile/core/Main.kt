@@ -29,7 +29,7 @@ class Main : CliktCommand() {
             parser.removeErrorListeners()
             parser.addErrorListener(ThrowingErrorListener())
             val propertiesAst = parser.parse()
-            val bast = BashpileVisitor(propertiesAst)
+            val bast = BashpileVisitor().visitParse(propertiesAst)
             propName = bast.render()
         }
         echo("Hello ${propName ?: "World"}!", true)
