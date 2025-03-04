@@ -22,20 +22,15 @@ class Main : CliktCommand() {
         if (script.isNotEmpty()) {
             val charStream = readSampleFile()
             val lexer = PropertiesLexer(charStream)
+            lexer.removeErrorListeners()
+            lexer.addErrorListener(ThrowingErrorListener())
             val tokens = CommonTokenStream(lexer)
             val parser = PropertiesParser(tokens)
-
-            while (parser.currentToken.type != PropertiesParser.EOF) {
-                val nextLine = parser.line()
-                val kw = nextLine.keyValue()
-                val key = kw.key().text
-                val value = kw.separatorAndValue().chars()
-                    .joinToString(separator = "") { it.text }
-
-                if (key == "name") {
-                    propName = value
-                }
-            }
+            parser.removeErrorListeners()
+            parser.addErrorListener(ThrowingErrorListener())
+            val propertiesAst = parser.parse()
+            val bast = BashpileVisitor(propertiesAst)
+            propName = bast.render()
         }
         echo("Hello ${propName ?: "World"}!", true)
     }
