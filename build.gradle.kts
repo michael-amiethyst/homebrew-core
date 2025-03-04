@@ -61,7 +61,7 @@ tasks.generateGrammarSource {
     outputDirectory = file(generatedOutputFilename)
 
     // pass -package to make generator put code in not default space
-    arguments = listOf("-package", "org.bashpile.core")
+    arguments = listOf("-package", "org.bashpile.core", "-no-listener", "-visitor")
 }
 
 // workaround for antlr bug, should be fixed after 4.13.2
