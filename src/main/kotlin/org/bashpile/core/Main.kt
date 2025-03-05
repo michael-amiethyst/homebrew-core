@@ -37,8 +37,6 @@ class Main : CliktCommand() {
 
     private fun readSampleFile(): CharStream {
         val contextClassLoader = Thread.currentThread().contextClassLoader
-        return contextClassLoader.getResourceAsStream("sample.properties").use {  input ->
-            CharStreams.fromStream(input)
-        }
+        return contextClassLoader.getResourceAsStream("sample.properties").use { CharStreams.fromStream(it) }
     }
 }
