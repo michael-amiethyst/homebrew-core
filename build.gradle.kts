@@ -51,7 +51,9 @@ application {
     mainClass = "org.bashpile.core.MainKt"
 }
 
+////////////////////
 // antlr integration
+////////////////////
 
 val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr"
 
@@ -77,9 +79,9 @@ sourceSets {
     }
 }
 
-////////
+////////////////////////////////
 // Untar - for integration tests
-////////
+////////////////////////////////
 
 tasks.register<Exec>("untar") {
     group = "verification"
@@ -98,9 +100,9 @@ tasks.register<Exec>("mv") {
     dependsOn("untar")
 }
 
-///////////////
+////////////////////////////////////////////////////////
 // system tests - integration tests for the whole system
-///////////////
+////////////////////////////////////////////////////////
 
 sourceSets {
     create("intTest") {
