@@ -9,13 +9,13 @@ class MainTest {
 
     @Test
     fun mainWorks() {
-        val output = Main().test(arrayOf("script.bps")).stdout
+        val output = Main().test(arrayOf("")).stdout
         assertEquals("Hello World!\n", output)
     }
 
     @Test
     fun mainWithOptionWorks() {
-        val output = Main().test(arrayOf("--name", "Jordi", "script.bps")).stdout
+        val output = Main().test(arrayOf("--name", "Jordi", "")).stdout
         assertEquals("Hello Jordi!\n", output)
     }
 
@@ -25,6 +25,6 @@ class MainTest {
         if (output.statusCode != 0) {
             fail(output.stderr)
         }
-        assertEquals("Hello Bashpile\n", output.stdout)
+        assertEquals("Hello Bashpile!\n", output.stdout)
     }
 }
