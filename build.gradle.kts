@@ -17,7 +17,7 @@ plugins {
 }
 
 group = "org.bashpile.core"
-version = "0.2.0"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
@@ -32,6 +32,7 @@ dependencies {
 
     // antlr
     antlr("org.antlr:antlr4:$antlrVersion")
+    implementation("com.yuvalshavit:antlr-denter:1.1")
 
     // tests
     testImplementation(kotlin("test"))
