@@ -32,7 +32,16 @@ dependencies {
 
     // antlr
     antlr("org.antlr:antlr4:$antlrVersion")
+    antlr("org.antlr:antlr4-runtime:$antlrVersion")
     implementation("com.yuvalshavit:antlr-denter:1.1")
+
+    // other depdencies
+    implementation("org.apache.logging.log4j:log4j-api:2.11.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.11.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("commons-io:commons-io:2.14.0")
+    implementation("com.google.guava:guava:32.0.1-jre")
+//    implementation("com.google.code.findbugs:jsr305:3.0.2")
 
     // tests
     testImplementation(kotlin("test"))
@@ -56,7 +65,7 @@ application {
 // antlr integration
 ////////////////////
 
-val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr"
+val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr/org/bashpile/core"
 
 tasks.generateGrammarSource {
     // set output directory to some arbitrary location in `/build` directory.

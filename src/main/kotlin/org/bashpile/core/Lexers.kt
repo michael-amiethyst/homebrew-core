@@ -16,6 +16,7 @@ import java.util.regex.Pattern
 /**
  * Helper class for BashpileLexer.
  */
+// TODO find out why bpc target/bpr.bps runs "type -t commandString:" (trailing colon is incorrect)
 class Lexers {
     companion object {
         /**
@@ -134,9 +135,9 @@ class Lexers {
                     val results = "type -t $command".runCommand()
 
                     // exclude keywords like 'function'
-                    val typeResults: String = results.first.trim()
-                    val ret = results.second == SCRIPT_SUCCESS
-                            && COMMAND_TYPES.contains(typeResults) && !BASHPILE_KEYWORDS.contains(command)
+                    val typeResults: String = results.trim()
+                    // TODO add back: results.exitCode() === ExecutionResults.SUCCESS
+                    val ret = COMMAND_TYPES.contains(typeResults) && !BASHPILE_KEYWORDS.contains(command)
                     COMMAND_TO_VALIDITY_CACHE[command] = ret
                     return ret
                 } else if (FILE_PATTERN.matcher(command).matches() && !BASHPILE_KEYWORDS.contains(command)) {
