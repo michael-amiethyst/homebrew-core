@@ -2,7 +2,6 @@ package org.bashpile.core
 
 /** Created by [BashpileVisitor] */
 class BashpileAst(private val antlrAst: BashpileParser.ProgramContext) {
-    // TODO change sample.properties to actual Bashpile script
     // TODO move antlr logic into BashpileVisitor
     fun render(): String? {
         val firstStatementText = if (antlrAst.statement().isNotEmpty()) antlrAst.statement(0).text else null
