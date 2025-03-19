@@ -10,7 +10,12 @@ import org.antlr.v4.runtime.CommonTokenStream
 
 fun main(args: Array<String>) = Main().main(args)
 
-/** See `SystemTest` in `src/intTest/kotlin` for systems integration tests */
+/**
+ * Main entry point for the Bashpile compiler.
+ * This is a simple command line interface (CLI) that takes a Bashpile script as input and outputs a Bash script.
+ * This class is primarily responsible for parsing command line arguments.
+ * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
+ */
 class Main : CliktCommand() {
 
     private val script by argument(help = "The script to compile")
@@ -18,25 +23,25 @@ class Main : CliktCommand() {
     private val name by option("-n", "--name", help = "Your name")
 
     override fun run() {
-        var propName = name
+        var bashTranslation = name
         if (script.isNotEmpty()) {
-            val charStream = readSampleFile()
-            val lexer = BashpileLexer(charStream)
+            val charStream = readFileAsAntlrStream("helloWorld.bps")
+            val lexer = org.bashpile.core.BashpileLexer(charStream)
             lexer.removeErrorListeners()
             lexer.addErrorListener(ThrowingErrorListener())
             val tokens = CommonTokenStream(lexer)
-            val parser = BashpileParser(tokens)
+            val parser = org.bashpile.core.BashpileParser(tokens)
             parser.removeErrorListeners()
             parser.addErrorListener(ThrowingErrorListener())
             val antlrAst = parser.program()
             val bast = BashpileVisitor().visitProgram(antlrAst)
-            propName = bast.render()
+            bashTranslation = bast.render()
         }
-        echo("Hello ${propName ?: "World"}!", true)
+        echo(bashTranslation, true)
     }
 
-    private fun readSampleFile(): CharStream {
+    private fun readFileAsAntlrStream(filename: String): CharStream {
         val contextClassLoader = Thread.currentThread().contextClassLoader
-        return contextClassLoader.getResourceAsStream("sample.properties").use { CharStreams.fromStream(it) }
+        return contextClassLoader.getResourceAsStream(filename).use { CharStreams.fromStream(it) }
     }
 }

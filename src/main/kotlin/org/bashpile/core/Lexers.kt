@@ -16,7 +16,6 @@ import java.util.regex.Pattern
 /**
  * Helper class for BashpileLexer.
  */
-// TODO find out why bpc target/bpr.bps runs "type -t commandString:" (trailing colon is incorrect)
 class Lexers {
     companion object {
         /**
