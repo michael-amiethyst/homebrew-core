@@ -70,8 +70,8 @@ Multiply: '*';
 Divide  : '/';
 Add     : '+';
 Minus   : '-';
-Isset   : 'isset'; // TODO change to exits and notExists
-Unset   : 'unset';
+Exists   : 'exists';
+DoesNotExist   : 'doesNotExist';
 IsEmpty   : 'isEmpty';
 NotEmpty: 'isNotEmpty';
 FileExists: 'fileExists';
