@@ -1,30 +1,31 @@
 package org.bashpile.core
 
 import com.github.ajalt.clikt.testing.test
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import kotlin.test.DefaultAsserter.fail
 
 class MainTest {
 
     @Test
-    fun mainWorks() {
-        val output = Main().test(arrayOf("")).stdout
-        assertEquals("Hello World!\n", output)
+    fun main_withoutScript_printsHelp() {
+        val output = Main().test(arrayOf(""))
+        // TODO should be not equals
+        assertEquals(0, output.statusCode)
+        assertTrue(output.stdout.startsWith("Usage:"))
     }
 
     @Test
-    fun mainWithOptionWorks() {
-        val output = Main().test(arrayOf("--name", "Jordi", "")).stdout
-        assertEquals("Hello Jordi!\n", output)
+    fun main_withoutScriptWithOption_printsHelp() {
+        val output = Main().test(arrayOf("--name", "Jordi", ""))
+        assertEquals(0, output.statusCode)
+        assertTrue(output.stdout.startsWith("Usage:"))
     }
 
     @Test
-    fun mainWithArgumentWorks() {
+    fun main_withScript_works() {
+        println(System.getProperty("user.dir"))
         val output = Main().test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
-        if (output.statusCode != 0) {
-            fail(output.stderr)
-        }
+        assertEquals(0, output.statusCode)
         assertEquals("Hello Bashpile!\n", output.stdout)
     }
 }

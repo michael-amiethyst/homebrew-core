@@ -1,12 +1,15 @@
 package org.bashpile.core
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import java.nio.file.Files
+import java.nio.file.Path
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -22,10 +25,15 @@ class Main : CliktCommand() {
 
     private val name by option("-n", "--name", help = "Your name")
 
+    /**
+     * The main entry point for the Bashpile compiler.
+     * This method is called by the `main` function by Clikt.
+     * If we want to have an exitCode other than 0 on bad input we can override "parse" instead for manual control.
+     */
     override fun run() {
-        var bashTranslation = name
+        var bashTranslation: String
         if (script.isNotEmpty()) {
-            val charStream = readFileAsAntlrStream("helloWorld.bps")
+            val charStream = readFileAsAntlrStream(script)
             val lexer = org.bashpile.core.BashpileLexer(charStream)
             lexer.removeErrorListeners()
             lexer.addErrorListener(ThrowingErrorListener())
@@ -36,12 +44,15 @@ class Main : CliktCommand() {
             val antlrAst = parser.program()
             val bast = BashpileVisitor().visitProgram(antlrAst)
             bashTranslation = bast.render()
+        } else {
+            throw PrintHelpMessage(this.currentContext)
         }
         echo(bashTranslation, true)
     }
 
+    /** Reads from FileSystem, use getResourceAsStream to read from classpath */
     private fun readFileAsAntlrStream(filename: String): CharStream {
-        val contextClassLoader = Thread.currentThread().contextClassLoader
-        return contextClassLoader.getResourceAsStream(filename).use { CharStreams.fromStream(it) }
+        val stream = Files.newInputStream(Path.of(filename))
+        return stream.use { CharStreams.fromStream(it) }
     }
 }
