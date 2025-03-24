@@ -5,11 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.IOException
 import java.io.PrintStream
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 
 /**
  * Overall System integration test for [Main].
@@ -30,13 +26,13 @@ class SystemTest {
 
     @Test
     fun systemWorks() {
-        val output = "build/untar/bin/bashpile-core ''".runCommand()
-        assertEquals("Hello World!\n", output)
+        val output = "build/untar/bin/bashpile-core '${MainTest.HELLO_FILENAME}'".runCommand()
+        assertEquals("Hello Bashpile!\n", output)
     }
 
     @Test
     fun systemWithArgumentWorks() {
-        val output = "build/untar/bin/bashpile-core --name Jordi ''".runCommand()
-        assertEquals("Hello Jordi!\n", output)
+        val output = "build/untar/bin/bashpile-core --name Jordi '${MainTest.HELLO_FILENAME}'".runCommand()
+        assertEquals("Hello Bashpile!\n", output)
     }
 }
