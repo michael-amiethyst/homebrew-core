@@ -4,7 +4,11 @@ import com.github.ajalt.clikt.testing.test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
+
 class MainTest {
+    companion object {
+        const val HELLO_FILENAME = "src/test/resources/bpsScripts/hello.bps"
+    }
 
     @Test
     fun main_withoutScript_printsHelp() {
@@ -24,7 +28,7 @@ class MainTest {
     @Test
     fun main_withScript_works() {
         println(System.getProperty("user.dir"))
-        val output = Main().test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
+        val output = Main().test(arrayOf(HELLO_FILENAME))
         assertEquals(0, output.statusCode)
         assertEquals("Hello Bashpile!\n", output.stdout)
     }

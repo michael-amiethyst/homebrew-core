@@ -1,8 +1,13 @@
 package org.bashpile.core.bast
 
-class PrintBastNode(children: List<BashpileAst>) : BashpileAst(children) {
+import org.bashpile.core.BashpileAst
 
+class PrintBastNode(private val firstStatementText: String) : BashpileAst(null) {
+
+    // TODO have child text node
     override fun render(): String {
-        return children.map { it.render() }.joinToString("") + "\n"
+        return firstStatementText.replace("newline", "")
+            .removePrefix("print(\"")
+            .removeSuffix("\")")
     }
 }
