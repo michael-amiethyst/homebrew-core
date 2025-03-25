@@ -1,6 +1,6 @@
-package org.bashpile.core
+package org.bashpile.core.bast
 
-import org.bashpile.core.bast.PrintBastNode
+import org.bashpile.core.BashpileVisitor
 
 /** Created by [BashpileVisitor] */
 abstract class BashpileAst(protected val children: PrintBastNode?) {

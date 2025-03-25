@@ -30,24 +30,29 @@ class Main : CliktCommand() {
      * This method is called by the `main` function by Clikt.
      * If we want to have an exitCode other than 0 on bad input we can override "parse" instead for manual control.
      */
+    // TODO add exit code
     override fun run() {
-        var bashTranslation: String
+        // TODO check if script exists
         if (script.isNotEmpty()) {
+            // setup lexer
             val charStream = readFileAsAntlrStream(script)
             val lexer = org.bashpile.core.BashpileLexer(charStream)
             lexer.removeErrorListeners()
             lexer.addErrorListener(ThrowingErrorListener())
+
+            // setup parser
             val tokens = CommonTokenStream(lexer)
             val parser = org.bashpile.core.BashpileParser(tokens)
             parser.removeErrorListeners()
             parser.addErrorListener(ThrowingErrorListener())
+
+            // handle ASTs and render
             val antlrAst = parser.program()
             val bast = BashpileVisitor().visitProgram(antlrAst)
-            bashTranslation = bast.render()
+            echo(bast.render(), false)
         } else {
             throw PrintHelpMessage(this.currentContext)
         }
-        echo(bashTranslation, true)
     }
 
     /** Reads from FileSystem, use getResourceAsStream to read from classpath */
