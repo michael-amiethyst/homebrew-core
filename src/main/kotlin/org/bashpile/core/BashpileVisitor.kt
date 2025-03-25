@@ -1,13 +1,17 @@
 package org.bashpile.core
 
+import org.bashpile.core.bast.BashpileAst
 import org.bashpile.core.bast.PrintBastNode
 
-/** Converts Antlr AST (aast) to Bashpile AST (bast) */
+/**
+ * Converts Antlr AST (aast) to Bashpile AST (bast).
+ * Created by [Main].
+ */
 class BashpileVisitor: BashpileParserBaseVisitor<BashpileAst>() {
+
     // TODO visit children
-    override fun visitProgram(antlrAst: BashpileParser.ProgramContext): BashpileAst {
-        val firstStatementText: String =
-            if (antlrAst.statement().isNotEmpty()) antlrAst.statement(0).text else "Hello World"
-        return PrintBastNode(firstStatementText)
+    override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BashpileAst {
+        // ctx represents a newline as 'newline' instead of '\n'
+        return PrintBastNode(ctx.text.replace("newline$".toRegex(), "\n"))
     }
 }

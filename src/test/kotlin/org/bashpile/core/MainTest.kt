@@ -27,7 +27,6 @@ class MainTest {
 
     @Test
     fun main_withScript_works() {
-        println(System.getProperty("user.dir"))
         val output = Main().test(arrayOf(HELLO_FILENAME))
         assertEquals(0, output.statusCode)
         assertEquals("Hello Bashpile!\n", output.stdout)
