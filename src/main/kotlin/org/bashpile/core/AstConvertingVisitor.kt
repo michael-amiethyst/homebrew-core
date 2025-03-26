@@ -1,6 +1,5 @@
 package org.bashpile.core
 
-import org.bashpile.core.BashpileParser.ExpressionContext
 import org.bashpile.core.bast.BashpileAst
 import org.bashpile.core.bast.LiteralBastNode
 import org.bashpile.core.bast.PrintBastNode
@@ -11,17 +10,11 @@ import org.bashpile.core.bast.PrintBastNode
  */
 class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
 
+    // TODO visit children
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BashpileAst {
-        val nodes = ctx.expressions().map { visit(it) }
-        return PrintBastNode(nodes)
-    }
-    
-    override fun visitLiteral(ctx: BashpileParser.LiteralContext): BashpileAst {
-        return LiteralBastNode(ctx.text)
-    }
-
-    /** Encapsulates Antlr context API */
-    private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
-        return argumentList().expression() // known Law of Demeter violation
+        // ctx represents a newline as 'newline' instead of '\n'
+        val argumentText = ctx.argumentList().expression(0).text
+        val node = LiteralBastNode(argumentText)
+        return PrintBastNode(node)
     }
 }
