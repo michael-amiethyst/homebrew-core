@@ -135,8 +135,8 @@ class Lexers {
 
                     // exclude keywords like 'function'
                     val typeResults: String = results.first.trim()
-                    // TODO add back: results.exitCode() === ExecutionResults.SUCCESS
-                    val ret = COMMAND_TYPES.contains(typeResults) && !BASHPILE_KEYWORDS.contains(command)
+                    val ret = results.second == SUCCESS
+                            && COMMAND_TYPES.contains(typeResults) && !BASHPILE_KEYWORDS.contains(command)
                     COMMAND_TO_VALIDITY_CACHE[command] = ret
                     return ret
                 } else if (FILE_PATTERN.matcher(command).matches() && !BASHPILE_KEYWORDS.contains(command)) {
