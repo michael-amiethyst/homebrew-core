@@ -20,7 +20,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         return LiteralBastNode(ctx.text)
     }
 
+    /** Encapsulates Antlr context API */
     private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
-        return argumentList().expression()
+        return argumentList().expression() // known Law of Demeter violation
     }
 }
