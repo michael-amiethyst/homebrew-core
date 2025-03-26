@@ -48,7 +48,7 @@ class Main : CliktCommand() {
 
             // handle ASTs and render
             val antlrAst = parser.program()
-            val bast = BashpileVisitor().visitProgram(antlrAst)
+            val bast = AstConvertingVisitor().visitProgram(antlrAst)
             echo(bast.render(), false)
         } else {
             throw PrintHelpMessage(this.currentContext)

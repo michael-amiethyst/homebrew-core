@@ -1,8 +1,10 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.BashpileVisitor
+import org.bashpile.core.AstConvertingVisitor
 
-/** Created by [BashpileVisitor] */
-abstract class BashpileAst(protected val children: PrintBastNode?) {
+/**
+ * Converts internal data to Bashpile.  Created by [AstConvertingVisitor].
+ */
+abstract class BashpileAst(protected val children: List<BashpileAst>) {
     abstract fun render(): String
 }
