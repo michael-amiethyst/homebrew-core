@@ -32,27 +32,28 @@ class Main : CliktCommand() {
      */
     // TODO add exit code
     override fun run() {
-        // TODO check if script exists
-        if (script.isNotEmpty()) {
-            // setup lexer
-            val charStream = readFileAsAntlrStream(script)
-            val lexer = org.bashpile.core.BashpileLexer(charStream)
-            lexer.removeErrorListeners()
-            lexer.addErrorListener(ThrowingErrorListener())
-
-            // setup parser
-            val tokens = CommonTokenStream(lexer)
-            val parser = org.bashpile.core.BashpileParser(tokens)
-            parser.removeErrorListeners()
-            parser.addErrorListener(ThrowingErrorListener())
-
-            // handle ASTs and render
-            val antlrAst = parser.program()
-            val bast = AstConvertingVisitor().visitProgram(antlrAst)
-            echo(bast.render(), false)
-        } else {
+        // guard
+        val scriptPath = Path.of(script)
+        if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
             throw PrintHelpMessage(this.currentContext)
         }
+
+        // setup lexer
+        val charStream = readFileAsAntlrStream(script)
+        val lexer = org.bashpile.core.BashpileLexer(charStream)
+        lexer.removeErrorListeners()
+        lexer.addErrorListener(ThrowingErrorListener())
+
+        // setup parser
+        val tokens = CommonTokenStream(lexer)
+        val parser = org.bashpile.core.BashpileParser(tokens)
+        parser.removeErrorListeners()
+        parser.addErrorListener(ThrowingErrorListener())
+
+        // handle ASTs and render
+        val antlrAst = parser.program()
+        val bast = AstConvertingVisitor().visitProgram(antlrAst)
+        echo(bast.render(), false)
     }
 
     /** Reads from FileSystem, use getResourceAsStream to read from classpath */

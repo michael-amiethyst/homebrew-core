@@ -31,4 +31,11 @@ class MainTest {
         assertEquals(SUCCESS, output.statusCode)
         assertEquals("Hello Bashpile!\n", output.stdout)
     }
+
+    @Test
+    fun main_withBadScript_fails() {
+        val output = Main().test(arrayOf("non_existent_script.bps"))
+        assertEquals(SUCCESS, output.statusCode)
+        assertTrue(output.stdout.startsWith("Usage:"))
+    }
 }
