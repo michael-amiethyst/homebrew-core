@@ -17,7 +17,7 @@ plugins {
 }
 
 group = "org.bashpile.core"
-version = "0.2.0"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
@@ -32,6 +32,18 @@ dependencies {
 
     // antlr
     antlr("org.antlr:antlr4:$antlrVersion")
+    antlr("org.antlr:antlr4-runtime:$antlrVersion")
+    implementation("com.yuvalshavit:antlr-denter:1.1")
+
+    // log4j
+    implementation("org.apache.logging.log4j:log4j-api:2.11.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.11.0")
+    runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
+
+    // other depdencies
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("commons-io:commons-io:2.14.0")
+    implementation("com.google.guava:guava:32.0.1-jre")
 
     // tests
     testImplementation(kotlin("test"))
@@ -55,7 +67,7 @@ application {
 // antlr integration
 ////////////////////
 
-val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr"
+val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr/org/bashpile/core"
 
 tasks.generateGrammarSource {
     // set output directory to some arbitrary location in `/build` directory.
@@ -91,13 +103,21 @@ tasks.register<Exec>("untar") {
     dependsOn("test", "assemble")
 }
 
+tasks.register<Exec>("rm-untar-dir") {
+    group = "verification"
+    workingDir = File("build")
+    commandLine = listOf("rm", "-rf", "untar")
+    shouldRunAfter("test", "untar")
+    dependsOn("test", "untar")
+}
+
 // create build/untar directory
 tasks.register<Exec>("mv") {
     group = "verification"
     workingDir = File("build")
     commandLine = listOf("mv", "-f", "distributions/bashpile-core-$version", "untar")
-    shouldRunAfter("untar")
-    dependsOn("untar")
+    shouldRunAfter("rm-untar-dir")
+    dependsOn("rm-untar-dir")
 }
 
 ////////////////////////////////////////////////////////
@@ -107,6 +127,7 @@ tasks.register<Exec>("mv") {
 sourceSets {
     create("intTest") {
         compileClasspath += sourceSets.main.get().output
+        compileClasspath += sourceSets.test.get().output
         runtimeClasspath += sourceSets.main.get().output
     }
 }
