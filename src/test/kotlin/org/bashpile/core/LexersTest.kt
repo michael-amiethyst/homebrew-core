@@ -7,7 +7,7 @@ import java.io.IOException
 import java.nio.file.Path
 
 @Order(3)
-class LexersTest {
+class LexersTest/* : BashpileTest() */{
     private val bashDir = "src/test/resources/bashScripts"
 
     @Test
@@ -48,7 +48,7 @@ class LexersTest {
     fun relativeCommandIsLinuxCommand() {
         val command = "$bashDir/my_ls.bash"
         // must be executable to register as a command
-        assertEquals(SCRIPT_SUCCESS, "chmod +x $command".runCommand().second)
+        assertEquals(0, "chmod +x $command".runCommand().second)
         assertTrue(Lexers.isLinuxCommand(command))
     }
 

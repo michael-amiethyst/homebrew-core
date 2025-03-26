@@ -3,13 +3,13 @@ package org.bashpile.core
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 
 
-fun String.runCommand(workingDir: File? = null): String {
+fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
+    var proc: Process? = null
     try {
         val cwd = System.getProperty("user.dir")
-        val proc = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
+        proc = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
             .directory(workingDir ?: File(cwd))
             .redirectOutput(ProcessBuilder.Redirect.PIPE)
             .redirectErrorStream(true)
@@ -19,9 +19,9 @@ fun String.runCommand(workingDir: File? = null): String {
 
         // strip out blank lines and lines from sdkman, add newline back
         val text = proc.inputStream.bufferedReader().readText().split("\n")
-        return text.stream()
-            .filter { !it.contains("Using java version") }.collect(Collectors.joining()) + "\n"
+        val filteredText = text.filter { !it.contains("Using java version") }.joinToString("") + "\n"
+        return Pair(filteredText, proc.exitValue())
     } catch(e: IOException) {
-        return e.stackTraceToString()
+        return Pair(e.stackTraceToString(), proc?.exitValue() ?: -1)
     }
 }

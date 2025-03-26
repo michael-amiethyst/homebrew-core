@@ -27,12 +27,14 @@ class SystemTest {
     @Test
     fun systemWorks() {
         val output = "build/untar/bin/bashpile-core '${MainTest.HELLO_FILENAME}'".runCommand()
-        assertEquals("Hello Bashpile!\n", output)
+        assertEquals("Hello Bashpile!\n", output.first)
+        assertEquals(0, output.second)
     }
 
     @Test
     fun systemWithArgumentWorks() {
         val output = "build/untar/bin/bashpile-core --name Jordi '${MainTest.HELLO_FILENAME}'".runCommand()
-        assertEquals("Hello Bashpile!\n", output)
+        assertEquals("Hello Bashpile!\n", output.first)
+        assertEquals(0, output.second)
     }
 }
