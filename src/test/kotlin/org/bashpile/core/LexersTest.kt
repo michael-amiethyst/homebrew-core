@@ -7,7 +7,7 @@ import java.io.IOException
 import java.nio.file.Path
 
 @Order(3)
-class LexersTest/* : BashpileTest() */{
+class LexersTest {
     private val bashDir = "src/test/resources/bashScripts"
 
     @Test
