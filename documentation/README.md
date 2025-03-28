@@ -2,9 +2,9 @@
 
 YOUR Bash wizard!
 
-See [user_docs](user_docs/overview.md) for a language reference.
+See [user_docs](user_docs/overview.md) for the quickstart and a language reference.
 
-See [Contributing](contributing/contributing.md) for helping with the project. 
+See [Contributing](contributing/contributing.md) for helping with the project and a technical quickstart 
 
 ## Layer Diagram
 
