@@ -5,9 +5,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //////////////
 
 // gradle version specified at gradle/wrapper/gradle-wrapper.properties
-val junitVersion = "5.12.0-M1"
-val cliktVersion = "5.0.1"
 val antlrVersion = "4.13.2"
+val cliktVersion = "5.0.1"
+val log4jVersion = "2.17.1"
+val junitVersion = "5.12.0-M1"
 
 plugins {
     antlr
@@ -17,7 +18,7 @@ plugins {
 }
 
 group = "org.bashpile.core"
-version = "0.3.0"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
@@ -36,8 +37,8 @@ dependencies {
     implementation("com.yuvalshavit:antlr-denter:1.1")
 
     // log4j
-    implementation("org.apache.logging.log4j:log4j-api:2.11.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.11.0")
+    implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
+    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
 
     // other depdencies

@@ -1,3 +1,4 @@
-1. Homebrew integration
-2. GHA
-3. Caching?
+1. Caching?
+2. String concatenation
+3. Parenthesis handling
+4. Arithmetic
