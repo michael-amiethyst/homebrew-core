@@ -15,7 +15,7 @@ Configuration:
 
     RollingFile:
       - name: LogToRollingFile
-        fileName: target/logs/app.log
+        fileName: build/log4jlogs/app.log
         filePattern: "logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
         PatternLayout:
           pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
@@ -27,11 +27,11 @@ Configuration:
 
   Loggers:
     logger:
-      - name: com.bashpile
+      - name: org.bashpile
         level: debug
-        additivity: false
+        additivity: false # don't inherit logger properties from parent
         AppenderRef:
-          - ref: LogToConsole
+#          - ref: LogToConsole
           - ref: LogToRollingFile
 
     Root:

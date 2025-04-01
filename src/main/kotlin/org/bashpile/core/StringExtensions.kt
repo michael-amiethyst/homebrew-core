@@ -5,7 +5,8 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /** Shell script success (0), all other numbers are errors.  Generally 1-255. */
-const val SUCCESS = 0
+const val SCRIPT_SUCCESS = 0
+const val SCRIPT_GENERIC_ERROR = 1
 
 fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
     var proc: Process? = null

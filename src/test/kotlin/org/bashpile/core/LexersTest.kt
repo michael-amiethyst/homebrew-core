@@ -48,7 +48,7 @@ class LexersTest {
     fun relativeCommandIsLinuxCommand() {
         val command = "$bashDir/my_ls.bash"
         // must be executable to register as a command
-        assertEquals(SUCCESS, "chmod +x $command".runCommand().second)
+        assertEquals(SCRIPT_SUCCESS, "chmod +x $command".runCommand().second)
         assertTrue(Lexers.isLinuxCommand(command))
     }
 
