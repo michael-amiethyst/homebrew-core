@@ -13,29 +13,28 @@ class MainTest {
     @Test
     fun main_withoutScript_printsHelp() {
         val output = Main().test(arrayOf(""))
-        // TODO should be not equals
-        assertEquals(SUCCESS, output.statusCode)
+        assertNotEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stdout.startsWith("Usage:"))
     }
 
     @Test
     fun main_withoutScriptWithOption_printsHelp() {
         val output = Main().test(arrayOf("--name", "Jordi", ""))
-        assertEquals(SUCCESS, output.statusCode)
+        assertNotEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stdout.startsWith("Usage:"))
     }
 
     @Test
     fun main_withScript_works() {
         val output = Main().test(arrayOf(HELLO_FILENAME))
-        assertEquals(SUCCESS, output.statusCode)
+        assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertEquals("Hello Bashpile!\n", output.stdout)
     }
 
     @Test
     fun main_withBadScript_fails() {
         val output = Main().test(arrayOf("non_existent_script.bps"))
-        assertEquals(SUCCESS, output.statusCode)
+        assertNotEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stdout.startsWith("Usage:"))
     }
 }
