@@ -31,7 +31,7 @@ Configuration:
         level: debug
         additivity: false # don't inherit logger properties from parent
         AppenderRef:
-#          - ref: LogToConsole
+          - ref: LogToConsole
           - ref: LogToRollingFile
 
     Root:
