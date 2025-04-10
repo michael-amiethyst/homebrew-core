@@ -4,10 +4,16 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
-import org.antlr.v4.runtime.CharStream
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.boolean
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.config.Configurator
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory
+import org.bashpile.core.bast.BashpileAst
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -24,10 +30,15 @@ fun main(args: Array<String>) = Main().main(args)
  */
 class Main : CliktCommand() {
 
+    companion object {
+        @JvmStatic
+        val VERBOSE_ENABLED_MESSAGE = "Verbose logging enabled"
+    }
+
     private val script by argument(help = "The script to compile")
 
-    // TODO implement -v --verbose option for Log4j logs, update log4j2.yaml to log to console
-//    private val name by option("-n", "--name", help = "Your name")
+    private val verboseLogging: Boolean by
+    option("-v", "--verbose", help = "Enabable verbose (debug) logging").boolean().default(false)
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
@@ -44,8 +55,23 @@ class Main : CliktCommand() {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
+        // configure log4j
+        if (verboseLogging) {
+            val configBuilder = ConfigurationBuilderFactory.newConfigurationBuilder()
+            val configuration = configBuilder.add(configBuilder.newLogger("org.bashpile", Level.TRACE)).build(false)
+            Configurator.reconfigure(configuration)
+            logger.trace(VERBOSE_ENABLED_MESSAGE)
+        }
+
+        // get and render BAST tree
+        val bast = runAntlrProcessing(scriptPath)
+        echo(bast.render(), false)
+    }
+
+    private fun runAntlrProcessing(scriptPath: Path): BashpileAst {
         // setup lexer
-        val charStream = readFileAsAntlrStream(scriptPath)
+        val stream = Files.newInputStream(scriptPath)
+        val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = org.bashpile.core.BashpileLexer(charStream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(ThrowingErrorListener())
@@ -59,12 +85,6 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        echo(bast.render(), false)
-    }
-
-    /** Reads from FileSystem, use getResourceAsStream to read from classpath */
-    private fun readFileAsAntlrStream(scriptPath: Path): CharStream {
-        val stream = Files.newInputStream(scriptPath)
-        return stream.use { CharStreams.fromStream(it) }
+        return bast
     }
 }

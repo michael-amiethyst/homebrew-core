@@ -21,8 +21,11 @@ fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
         proc.waitFor(10, TimeUnit.SECONDS)
 
         // strip out blank lines and lines from sdkman, add newline back
-        val text = proc.inputStream.bufferedReader().readText().split("\n")
-        val filteredText = text.filter { !it.contains("Using java version") }.joinToString("") + "\n"
+        val text = proc.inputStream.bufferedReader().readText().trim()
+        val lines = text.split("\n")
+        val filteredText = lines
+            .filter { !it.contains("Using java version") }
+            .joinToString("\n") + "\n"
         return Pair(filteredText, proc.exitValue())
     } catch(e: IOException) {
         return Pair(e.stackTraceToString(), proc?.exitValue() ?: -1)
