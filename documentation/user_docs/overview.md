@@ -26,18 +26,18 @@ Also, for all of its faults mentioned above it's fast, especially if you are mak
 
 ## Quickstart
 
-1. `brew tap michael-amiethyst/bashpile`
-2. `brew install michael-amiethyst/bashpile/core`
-3. `bashpile --comand "print('Hello World')"`
+1. `brew tap michael-amiethyst/core`
+2. `brew install michael-amiethyst/core`
+3. `echo "print('Hello World')" > /tmp/hello && bashpile /tmp/hello`
 
 ## Script Start
 
 1. Create a script starting with `#!/usr/bin/env bashpile`
 2. $(bashpile SCRIPT)
-3. If errors run `cat /etc/bashpile/error.log`'''
+3. If errors run `cat ~/.bashpile/log.txt`
 
 ## Language Reference
 
 * White space agnostic (except for Python style indentation)
 * `print("Any String here")`, single quotes allowed with no special difference
-* `"string" + "concatination"`
+* `"string" + "concatination"` (soon)

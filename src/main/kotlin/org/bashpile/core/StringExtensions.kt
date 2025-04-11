@@ -11,6 +11,7 @@ const val SCRIPT_GENERIC_ERROR = 1
 fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
     var proc: Process? = null
     try {
+        // TODO see if using an executor service is faster
         val cwd = System.getProperty("user.dir")
         proc = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
             .directory(workingDir ?: File(cwd))
