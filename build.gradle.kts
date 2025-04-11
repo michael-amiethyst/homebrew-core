@@ -99,7 +99,7 @@ sourceSets {
 tasks.register<Exec>("untar") {
     group = "verification"
     workingDir = File("build/distributions")
-    commandLine = listOf("tar", "-xf", "bashpile-core-$version.tar")
+    commandLine = listOf("tar", "-xf", "bashpile-$version.tar")
     shouldRunAfter("test", "assemble")
     dependsOn("test", "assemble")
 }
@@ -116,7 +116,7 @@ tasks.register<Exec>("rm-untar-dir") {
 tasks.register<Exec>("mv") {
     group = "verification"
     workingDir = File("build")
-    commandLine = listOf("mv", "-f", "distributions/bashpile-core-$version", "untar")
+    commandLine = listOf("mv", "-f", "distributions/bashpile-$version", "untar")
     shouldRunAfter("rm-untar-dir")
     dependsOn("rm-untar-dir")
 }
