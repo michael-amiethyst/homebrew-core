@@ -17,6 +17,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 
+// TODO figure out why command is running instead of producing BASH
+
 fun main(args: Array<String>) = Main().main(args)
 
 /**
@@ -52,6 +54,7 @@ class Main : CliktCommand() {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
+        // TODO log to ~/.bashpile/log.txt
         // configure logging
         if (verboseLogging) {
             val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
