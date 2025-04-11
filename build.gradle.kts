@@ -5,19 +5,21 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //////////////
 
 // gradle version specified at gradle/wrapper/gradle-wrapper.properties
-val junitVersion = "5.12.0-M1"
-val cliktVersion = "5.0.1"
 val antlrVersion = "4.13.2"
+val cliktVersion = "5.0.1"
+val junitVersion = "5.12.0-M1"
 
 plugins {
     antlr
     // kotlin version in plugins must be literal
     kotlin("jvm") version "2.1.10"
     application
+    id("org.graalvm.buildtools.native") version "0.10.6"
+    id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
 }
 
 group = "org.bashpile.core"
-version = "0.3.0"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
@@ -35,9 +37,10 @@ dependencies {
     antlr("org.antlr:antlr4-runtime:$antlrVersion")
     implementation("com.yuvalshavit:antlr-denter:1.1")
 
-    // log4j
-    implementation("org.apache.logging.log4j:log4j-api:2.11.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.11.0")
+    // logging
+    implementation("org.apache.logging.log4j:log4j-api:2.17.1")
+    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
+    implementation("ch.qos.logback:logback-classic:1.5.18")
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
 
     // other depdencies
@@ -61,6 +64,17 @@ kotlin {
 
 application {
     mainClass = "org.bashpile.core.MainKt"
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            // more options at https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#configure-native-image
+            imageName.set("bashpile")
+            mainClass.set("org.bashpile.core.MainKt")
+            sharedLibrary.set(false)
+        }
+    }
 }
 
 ////////////////////
@@ -98,7 +112,7 @@ sourceSets {
 tasks.register<Exec>("untar") {
     group = "verification"
     workingDir = File("build/distributions")
-    commandLine = listOf("tar", "-xf", "bashpile-core-$version.tar")
+    commandLine = listOf("tar", "-xf", "bashpile-$version.tar")
     shouldRunAfter("test", "assemble")
     dependsOn("test", "assemble")
 }
@@ -115,7 +129,7 @@ tasks.register<Exec>("rm-untar-dir") {
 tasks.register<Exec>("mv") {
     group = "verification"
     workingDir = File("build")
-    commandLine = listOf("mv", "-f", "distributions/bashpile-core-$version", "untar")
+    commandLine = listOf("mv", "-f", "distributions/bashpile-$version", "untar")
     shouldRunAfter("rm-untar-dir")
     dependsOn("rm-untar-dir")
 }

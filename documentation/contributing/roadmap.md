@@ -1,3 +1,5 @@
-1. Homebrew integration
-2. GHA
-3. Caching?
+1. Change repo names?
+2. GHA, Makefile
+3. String concatenation
+4. Parenthesis handling
+5. Arithmetic
