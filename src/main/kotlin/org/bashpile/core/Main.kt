@@ -17,8 +17,6 @@ import org.bashpile.core.bast.BashpileAst
 import java.nio.file.Files
 import java.nio.file.Path
 
-// project TODOs here
-// TODO generated /build/scripts should be "bashpile", not "bashpile-core"
 
 fun main(args: Array<String>) = Main().main(args)
 
