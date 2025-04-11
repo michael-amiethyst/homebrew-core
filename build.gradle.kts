@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // gradle version specified at gradle/wrapper/gradle-wrapper.properties
 val antlrVersion = "4.13.2"
 val cliktVersion = "5.0.1"
-val log4jVersion = "2.17.1"
 val junitVersion = "5.12.0-M1"
 
 plugins {
@@ -15,6 +14,8 @@ plugins {
     // kotlin version in plugins must be literal
     kotlin("jvm") version "2.1.10"
     application
+    id("org.graalvm.buildtools.native") version "0.10.6"
+    id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
 }
 
 group = "org.bashpile.core"
@@ -36,9 +37,10 @@ dependencies {
     antlr("org.antlr:antlr4-runtime:$antlrVersion")
     implementation("com.yuvalshavit:antlr-denter:1.1")
 
-    // log4j
-    implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
-    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
+    // logging
+    implementation("org.apache.logging.log4j:log4j-api:2.17.1")
+    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
+    implementation("ch.qos.logback:logback-classic:1.5.18")
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
 
     // other depdencies
@@ -62,6 +64,17 @@ kotlin {
 
 application {
     mainClass = "org.bashpile.core.MainKt"
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            // more options at https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#configure-native-image
+            imageName.set("bashpile")
+            mainClass.set("org.bashpile.core.MainKt")
+            sharedLibrary.set(false)
+        }
+    }
 }
 
 ////////////////////

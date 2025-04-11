@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import ch.qos.logback.classic.LoggerContext
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
@@ -9,11 +10,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.core.config.Configurator
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory
 import org.bashpile.core.bast.BashpileAst
+import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -53,11 +52,10 @@ class Main : CliktCommand() {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
-        // configure log4j
+        // configure logging
         if (verboseLogging) {
-            val configBuilder = ConfigurationBuilderFactory.newConfigurationBuilder()
-            val configuration = configBuilder.add(configBuilder.newLogger("org.bashpile", Level.TRACE)).build(false)
-            Configurator.reconfigure(configuration)
+            val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+            context.getLogger("org.bashpile").level = ch.qos.logback.classic.Level.TRACE
             logger.trace(VERBOSE_ENABLED_MESSAGE)
         }
 
