@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 class MainTest {
     companion object {
         const val HELLO_FILENAME = "src/test/resources/bpsScripts/hello.bps"
+        const val HELLO_CONCAT_FILENAME = "src/test/resources/bpsScripts/helloWithConcat.bps"
     }
 
     @Test
@@ -28,14 +29,21 @@ class MainTest {
     fun main_withScript_works() {
         val output = Main().test(arrayOf(HELLO_FILENAME))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
-        assertEquals("Hello Bashpile!\n", output.stdout)
+        assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
+    }
+
+    @Test
+    fun main_withConcatScript_works() {
+        val output = Main().test(arrayOf(HELLO_CONCAT_FILENAME))
+        assertEquals(SCRIPT_SUCCESS, output.statusCode)
+        assertEquals("printf \"Hello Bashpile!\n\"", output.stdout)
     }
 
     @Test
     fun main_withScript_verbose_works() {
         val output = Main().test(arrayOf("--verbose=true", HELLO_FILENAME))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
-        assertTrue(output.stdout.endsWith("Hello Bashpile!\n"), "Output: ${output.stdout}")
+        assertTrue(output.stdout.endsWith("printf \"Hello Bashpile!\\n\""), "Output: ${output.stdout}")
     }
 
     @Test
