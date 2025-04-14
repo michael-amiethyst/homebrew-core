@@ -67,6 +67,7 @@ class Main : CliktCommand() {
 
     private fun runAntlrProcessing(scriptPath: Path): BashpileAst {
         // setup lexer
+        // TODO move next line to main
         val stream = Files.newInputStream(scriptPath)
         val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = org.bashpile.core.BashpileLexer(charStream)

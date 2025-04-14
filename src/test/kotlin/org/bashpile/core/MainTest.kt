@@ -36,7 +36,7 @@ class MainTest {
     fun main_withConcatScript_works() {
         val output = Main().test(arrayOf(HELLO_CONCAT_FILENAME))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
-        assertEquals("printf \"Hello Bashpile!\n\"", output.stdout)
+        assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
     }
 
     @Test
