@@ -20,8 +20,8 @@ class Bashpile < Formula
   depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
 
   def install
-    system "gradle", "clean", "build"
-    bin.install "build/scripts/bashpile"
+    system "gradle", "clean", "nativeCompile", "-x", "test"
+    bin.install "build/native/nativeCompile/bashpile"
     # bin.install "target/bpc"
     # FileUtils.cp "#{bin}/bpc", "#{bin}/bashpilec"
     # bin.install "target/bpr"
@@ -29,10 +29,10 @@ class Bashpile < Formula
     # bin.install "target/bashpile-stdlib"
   end
 
-  # test do
-  #   assert_match "Hello Bash", shell_output("echo \"print('Hello Bash')\" | bpr -c")
-  #   assert_match "6.28", shell_output("echo \"print(3.14 + 3.14)\" | bpr -c")
-  # end
+  test do
+    assert_match "Hello Bash", shell_output("printf \"print('Hello World')\" > /tmp/hello && bashpile /tmp/hello")
+    # assert_match "6.28", shell_output("echo \"print(3.14 + 3.14)\" | bpr -c")
+  end
 
   def caveats
     <<~EOS
