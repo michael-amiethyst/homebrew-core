@@ -8,11 +8,13 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
+import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
 import org.bashpile.core.bast.BashpileAst
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -61,14 +63,15 @@ class Main : CliktCommand() {
         }
 
         // get and render BAST tree
-        val bast = runAntlrProcessing(scriptPath)
+        val scriptStream = Files.newInputStream(scriptPath)
+        val bast = getBast(scriptStream)
         echo(bast.render(), false)
     }
 
-    private fun runAntlrProcessing(scriptPath: Path): BashpileAst {
+    /** Invokes ANTLR to parse the script and convert it to a Bashpile AST (BAST) */
+    @VisibleForTesting
+    internal fun getBast(stream: InputStream): BashpileAst {
         // setup lexer
-        // TODO move next line to main
-        val stream = Files.newInputStream(scriptPath)
         val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = org.bashpile.core.BashpileLexer(charStream)
         lexer.removeErrorListeners()
