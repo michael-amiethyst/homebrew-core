@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Test
 /**
  * Overall System integration test for [Main].
  */
-// TODO change to test the nativeCompile
 class SystemTest {
-    private val bashpileFilename = "build/untar/bin/bashpile"
+    private val bashpileFilename = "build/native/nativeCompile/bashpile"
 
     @Test
     fun system_withBadFilename_printsHelp() {
