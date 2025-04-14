@@ -17,8 +17,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 
-// TODO figure out why command is running instead of producing BASH
-
 fun main(args: Array<String>) = Main().main(args)
 
 /**

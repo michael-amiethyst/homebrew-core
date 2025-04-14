@@ -21,7 +21,7 @@ class SystemTest {
     fun systemWorks() {
         val output = "$bashpileFilename '${MainTest.HELLO_FILENAME}'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals("Hello Bashpile!\n", output.first.stripFirstLine())
+        assertEquals("printf \"Hello Bashpile!\\n\"\n", output.first.stripFirstLine())
     }
 
     @Test
@@ -29,7 +29,7 @@ class SystemTest {
         val output = "$bashpileFilename --verbose true '${MainTest.HELLO_FILENAME}'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE))
-        assertTrue(output.first.endsWith("Hello Bashpile!\n"))
+        assertTrue(output.first.endsWith("printf \"Hello Bashpile!\\n\"\n"))
     }
 
     /** Strip initial logging line */
