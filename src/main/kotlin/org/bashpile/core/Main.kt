@@ -54,7 +54,6 @@ class Main : CliktCommand() {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
-        // TODO log to ~/.bashpile/log.txt
         // configure logging
         if (verboseLogging) {
             val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
