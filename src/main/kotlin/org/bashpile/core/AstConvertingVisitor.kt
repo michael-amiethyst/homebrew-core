@@ -24,4 +24,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
     private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
         return argumentList().expression() // known Law of Demeter violation
     }
+
+    override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BashpileAst {
+        require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
+        require(ctx.children[1].text == "+") { "Only addition is supported" }
+        return BashpileAst(listOf(visit(ctx.children[0]), visit(ctx.children[2])))
+    }
 }
