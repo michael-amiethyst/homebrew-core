@@ -63,4 +63,14 @@ class MainTest {
         val printBool: InputStream = "print(true)".byteInputStream()
         assertEquals("printf \"true\\n\"", fixture.getBast(printBool).render())
     }
+
+    @Test
+    fun getBast_printString_plusBool_fails() {
+        val printStringAndBool: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
+        assertThrows(IllegalArgumentException::class.java) {
+            fixture.getBast(printStringAndBool).render()
+        }
+    }
+
+    // TODO write int + string test
 }
