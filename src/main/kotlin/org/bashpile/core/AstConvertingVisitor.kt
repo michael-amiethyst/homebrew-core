@@ -1,10 +1,7 @@
 package org.bashpile.core
 
 import org.bashpile.core.BashpileParser.ExpressionContext
-import org.bashpile.core.bast.BashpileAst
-import org.bashpile.core.bast.BooleanLiteralBastNode
-import org.bashpile.core.bast.StringLiteralBastNode
-import org.bashpile.core.bast.PrintBastNode
+import org.bashpile.core.bast.*
 
 /**
  * Converts Antlr AST (aast) to Bashpile AST (bast).
@@ -17,12 +14,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         return PrintBastNode(nodes)
     }
 
+    /** Encapsulates Antlr context API */
+    private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
+        return argumentList().expression() // known Law of Demeter violation
+    }
+
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BashpileAst {
         if (ctx.BoolValues() != null) {
             return BooleanLiteralBastNode(ctx.BoolValues().text.toBoolean())
-        } else if (ctx.NumberValues() != null) {
-            // TODO: Implement number literals
-            throw IllegalArgumentException("Number values are not supported yet")
         } else if (ctx.StringValues() != null) {
             return StringLiteralBastNode(ctx.StringValues().text)
         } else {
@@ -30,9 +29,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         }
     }
 
-    /** Encapsulates Antlr context API */
-    private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
-        return argumentList().expression() // known Law of Demeter violation
+    override fun visitNumberExpression(ctx: BashpileParser.NumberExpressionContext): BashpileAst {
+        assert(ctx.NumberValues() != null) { "Number expression must have a number value" }
+        val nodeText = ctx.text
+        return if (nodeText.contains('.')) {
+            FloatLiteralBastNode(nodeText.toBigDecimal())
+        } else {
+            IntLiteralBastNode(nodeText.toBigInteger())
+        }
     }
 
     override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BashpileAst {
