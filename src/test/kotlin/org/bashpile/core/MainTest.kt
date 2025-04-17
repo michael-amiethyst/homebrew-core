@@ -65,6 +65,12 @@ class MainTest {
     }
 
     @Test
+    fun getBast_printFloat_works() {
+        val printBool: InputStream = "print(1.0)".byteInputStream()
+        assertEquals("printf \"1.0\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
     fun getBast_printString_plusBool_fails() {
         val printStringAndBool: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
         assertThrows(IllegalArgumentException::class.java) {

@@ -61,6 +61,13 @@ kotlin {
     jvmToolchain(21)
 }
 
+// for use in bin/tokenize script
+tasks.register("saveClasspath") {
+    doFirst {
+        File("build/classpath.txt").writeText(sourceSets["main"].runtimeClasspath.asPath)
+    }
+}
+
 ////////////////////
 // antlr integration
 ////////////////////

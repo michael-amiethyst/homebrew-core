@@ -8,20 +8,19 @@ statement
     : Import StringValues                       # importStatement
     | ShellLine Newline                         # shellLineStatement
     | While expression Colon indentedStatements # whileStatement
-    | Function Id paramaters (Arrow complexType)?      # functionForwardDeclarationStatement
+    | Function Id paramaters (Arrow complexType)?
+                                                # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)?
                             Colon functionBlock # functionDeclarationStatement
     | Block tags? Colon functionBlock           # anonymousBlockStatement
-    | If expression Colon indentedStatements
-         (elseIfClauses)*
-         (Else Colon indentedStatements)?       # conditionalStatement
-    | Switch expression Colon INDENT
-         (Case expression Colon indentedStatements)+ DEDENT
+    | If expression Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
+                                                # conditionalStatement
+    | Switch expression Colon INDENT (Case expression Colon indentedStatements)+ DEDENT
                                                 # switchStatement
-    | <assoc=right> typedId
-             (Equals expression)? Newline       # assignmentStatement
-    | <assoc=right> (Id | listAccess) assignmentOperator
-                             expression Newline # reassignmentStatement
+    | <assoc=right> typedId (Equals expression)? Newline
+                                                # assignmentStatement
+    | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
+                                                # reassignmentStatement
     | Print OParen argumentList? CParen Newline # printStatement
     | expression Newline                        # expressionStatement
     | Newline                                   # blankStmt
@@ -50,22 +49,22 @@ returnPsudoStatement: Return expression? Newline;
 // in operator precedence order, modeled on Java precedence at https://introcs.cs.princeton.edu/java/11precedence/
 expression
     : listAccess                        # listAccessExpression
-    | expression op=(Increment | Decrement) # unaryPostCrementExpression
+    | expression op=(Increment | Decrement)
+                                        # unaryPostCrementExpression
     | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
-    | <assoc=right> unaryPrimary
-                             expression # unaryPrimaryExpression
+    | <assoc=right> unaryPrimary expression
+                                        # unaryPrimaryExpression
     | expression Colon complexType      # typecastExpression
     | shellString                       # shellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     // operator expressions
     | OParen expression CParen          # parenthesisExpression
-    | expression
-         op=(Multiply|Divide|Add|Minus)
-                             expression # calculationExpression
-    | expression binaryPrimary
-                             expression # binaryPrimaryExpression
-    | expression combiningOperator
-                             expression # combiningExpression
+    | expression op=(Multiply|Divide|Add|Minus) expression
+                                        # calculationExpression
+    | expression binaryPrimary expression
+                                        # binaryPrimaryExpression
+    | expression combiningOperator expression
+                                        # combiningExpression
     | argumentsBuiltin                  # argumentsBuiltinExpression
     | ListOf (OParen CParen | OParen expression (Comma expression)* CParen)
                                         # listOfBuiltinExpression
