@@ -19,6 +19,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 
+// TODO make integration test for bin/tokenize
+
 fun main(args: Array<String>) = Main().main(args)
 
 /**
