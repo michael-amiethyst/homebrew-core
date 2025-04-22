@@ -6,4 +6,4 @@
 export CLASSPATH
 ./gradlew saveClasspath
 CLASSPATH=$(cat build/classpath.txt)
-java -cp "$CLASSPATH" org.antlr.v4.gui.TestRig org.bashpile.core.Bashpile program -tokens "$@"
+java org.antlr.v4.gui.TestRig org.bashpile.core.Bashpile program -tokens "$@"
