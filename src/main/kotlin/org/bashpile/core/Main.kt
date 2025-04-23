@@ -62,9 +62,18 @@ class Main : CliktCommand() {
         }
 
         // get and render BAST tree
-        val scriptStream = Files.newInputStream(scriptPath)
-        val bast = getBast(scriptStream)
+        val script = Files.readString(scriptPath).stripShebang()
+        val bast = getBast(script.byteInputStream())
         echo(bast.render(), false)
+    }
+
+    /** Antlr chokes on Shebang lines.  Removes it if present as a work-around. */
+    private fun String.stripShebang(): String {
+        return if (this.startsWith("#!")) {
+            this.stripFirstLine()
+        } else {
+            this
+        }
     }
 
     /** Invokes ANTLR to parse the script and convert it to a Bashpile AST (BAST) */

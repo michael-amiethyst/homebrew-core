@@ -20,17 +20,20 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BashpileAst {
-        if (ctx.BoolValues() != null) {
-            return BooleanLiteralBastNode(ctx.BoolValues().text.toBoolean())
-        } else if (ctx.StringValues() != null) {
-            return StringLiteralBastNode(ctx.StringValues().text)
+        val boolContext = ctx.BoolValues()
+        val stringContext = ctx.StringValues()
+
+        return if (boolContext != null) {
+            BooleanLiteralBastNode(boolContext.text.toBoolean())
+        } else if (stringContext != null) {
+            StringLiteralBastNode(stringContext.text)
         } else {
-            throw IllegalArgumentException("Unknown literal type")
+            val message = "Unknown literal type.  Numeric values should be handled in visitNumberExpression"
+            throw IllegalArgumentException(message)
         }
     }
 
     override fun visitNumberExpression(ctx: BashpileParser.NumberExpressionContext): BashpileAst {
-        assert(ctx.NumberValues() != null) { "Number expression must have a number value" }
         val nodeText = ctx.text
         return if (nodeText.contains('.')) {
             FloatLiteralBastNode(nodeText.toBigDecimal())
@@ -42,6 +45,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
     override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BashpileAst {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         require(ctx.children[1].text == "+") { "Only addition is supported" }
+        // TODO write BashpileAst.areAllStringLiterals recursive function, write test, use here
         require(visit(ctx.children[0]) is StringLiteralBastNode) { "Left operand must be a string" }
         require(visit(ctx.children[2]) is StringLiteralBastNode) { "Right operand must be a string" }
         return BashpileAst(listOf(visit(ctx.children[0]), visit(ctx.children[2])))

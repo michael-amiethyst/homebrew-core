@@ -12,6 +12,9 @@ const val SCRIPT_GENERIC_ERROR = 1
 
 private val executors = Executors.newFixedThreadPool(8)
 
+/** Strip initial logging line */
+fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
+
 fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
     var proc: Process? = null
     try {
