@@ -40,8 +40,10 @@ class SystemTest {
         val path = Path.of("src/test/resources/bpsScripts/shebang.bps").makeExecutable()
         val output = path.toString().runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals("printf \"Hello Bashpile!\\n\"\n", output.first.stripFirstLine())
+        assertEquals("printf \"Hello Shebang!\\n\"\n", output.first.stripFirstLine())
     }
+
+    // TODO write an immediately execute script
 
     private fun Path.makeExecutable(): Path {
         if (!this.isExecutable()) {
