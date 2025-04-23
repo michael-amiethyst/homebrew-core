@@ -46,8 +46,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         require(ctx.children[1].text == "+") { "Only addition is supported" }
         // TODO write BashpileAst.areAllStringLiterals recursive function, write test, use here
-        require(visit(ctx.children[0]) is StringLiteralBastNode) { "Left operand must be a string" }
-        require(visit(ctx.children[2]) is StringLiteralBastNode) { "Right operand must be a string" }
+        require(visit(ctx.children[0]).areAllStringLiterals()) { "Left operand must be all strings" }
+        require(visit(ctx.children[2]).areAllStringLiterals()) { "Right operand must be all strings" }
         return BashpileAst(listOf(visit(ctx.children[0]), visit(ctx.children[2])))
     }
 }

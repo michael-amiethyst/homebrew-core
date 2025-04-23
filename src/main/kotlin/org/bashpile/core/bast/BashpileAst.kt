@@ -9,4 +9,12 @@ open class BashpileAst(protected val children: List<BashpileAst>) {
     open fun render(): String {
         return children.joinToString("") { it.render() }
     }
+
+    fun areAllStringLiterals(): Boolean {
+        return if (children.isEmpty()) {
+            this is StringLiteralBastNode
+        } else {
+            children.all { it.areAllStringLiterals() }
+        }
+    }
 }
