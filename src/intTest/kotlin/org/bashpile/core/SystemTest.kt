@@ -2,6 +2,10 @@ package org.bashpile.core
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE
+import kotlin.io.path.isExecutable
 
 /**
  * Overall System integration test for [Main].
@@ -31,6 +35,20 @@ class SystemTest {
         assertTrue(output.first.endsWith("printf \"Hello Bashpile!\\n\"\n"))
     }
 
-    /** Strip initial logging line */
-    private fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
+    @Test
+    fun system_shabang_works() {
+        val path = Path.of("src/test/resources/bpsScripts/shebang.bps").makeExecutable()
+        val output = path.toString().runCommand()
+        assertEquals(SCRIPT_SUCCESS, output.second)
+        assertEquals("printf \"Hello Bashpile!\\n\"\n", output.first.stripFirstLine())
+    }
+
+    private fun Path.makeExecutable(): Path {
+        if (!this.isExecutable()) {
+            val perms = Files.getPosixFilePermissions(this)
+            perms.add(OWNER_EXECUTE)
+            Files.setPosixFilePermissions(this, perms)
+        }
+        return this
+    }
 }

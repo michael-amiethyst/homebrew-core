@@ -65,6 +65,13 @@ class MainTest {
     }
 
     @Test
+    fun getBast_printString_tripleConcat_works() {
+        val printBool: InputStream = """
+            print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
+        assertEquals("printf \"Hello Bashpile\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
     fun getBast_printFloat_works() {
         val printBool: InputStream = "print(1.0)".byteInputStream()
         assertEquals("printf \"1.0\\n\"", fixture.getBast(printBool).render())

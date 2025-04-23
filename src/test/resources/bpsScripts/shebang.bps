@@ -1,0 +1,3 @@
+#!/Users/Amiethyst/IdeaProjects/homebrew-core/build/native/nativeCompile/bashpile
+
+print("Hello " "Shabang!")
