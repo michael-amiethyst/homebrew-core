@@ -107,6 +107,8 @@ graalvmNative {
             imageName.set("bashpile")
             mainClass.set("org.bashpile.core.MainKt")
             sharedLibrary.set(false)
+            // TODO try https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
+//            buildArgs.add("-H:IncludeResources=\".*/logback.*\"")
         }
     }
 }
