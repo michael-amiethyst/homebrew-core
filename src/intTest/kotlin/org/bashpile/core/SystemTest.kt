@@ -1,6 +1,7 @@
 package org.bashpile.core
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 import java.nio.file.Path
@@ -39,16 +40,15 @@ class SystemTest {
     @Test
     fun system_shebang_works() {
         val shebangPath = Path.of("build/resources/test/bpsScripts/shebang.bps")
-        // TODO diagnose better on Ubuntu / GitHub builds
-        if (shebangPath.exists()) {
-            val path = shebangPath.makeExecutable()
-            val output = path.toString().runCommand()
-            assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
-            assertEquals("printf \"Hello Shebang!\\n\"\n", output.first.stripFirstLine())
-        }
+        assumeTrue(shebangPath.exists(), "Shebang test file not found")
+        val path = shebangPath.makeExecutable()
+        assumeTrue(path.isExecutable(), "Shebang test file not executable")
+        val output = path.toString().runCommand()
+        assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
+        assertEquals("printf \"Hello Shebang!\\n\"\n", output.first.stripFirstLine())
     }
 
-    // TODO write an immediately execute script
+    // TODO write an immediately executing script
 
     private fun Path.makeExecutable(): Path {
         if (!this.isExecutable()) {
