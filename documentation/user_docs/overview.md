@@ -22,7 +22,6 @@ Bashpile has over 20 StackOverflow answers built in and you get to work with a l
 Bash runs just about anywhere on the most minimal of servers, including production machines and docker containers.
 Also, for all of its faults mentioned above it's fast, especially if you are making a lot of command line calls.
 
-
 ## Quickstart
 
 1. `brew tap michael-amiethyst/core`

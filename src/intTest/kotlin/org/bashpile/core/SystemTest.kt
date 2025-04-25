@@ -9,9 +9,11 @@ import java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE
 import kotlin.io.path.exists
 import kotlin.io.path.isExecutable
 
+
 /**
  * Overall System integration test for [Main].
  */
+// TODO change to test the nativeCompile
 class SystemTest {
     private val bashpileFilename = "build/native/nativeCompile/bashpile"
 
