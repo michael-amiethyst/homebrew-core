@@ -15,6 +15,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
     id("org.graalvm.buildtools.native") version "0.10.6"
     id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 group = "org.bashpile.core"
