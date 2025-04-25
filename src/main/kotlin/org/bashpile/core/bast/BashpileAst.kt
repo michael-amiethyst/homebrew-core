@@ -10,6 +10,10 @@ open class BashpileAst(protected val children: List<BashpileAst>) {
         return children.joinToString("") { it.render() }
     }
 
+    /**
+     * Are all leaves of this AST string literals?
+     * Used to ensure that string concatenation is possible.
+     */
     fun areAllStringLiterals(): Boolean {
         return if (children.isEmpty()) {
             this is StringLiteralBastNode

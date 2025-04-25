@@ -2,4 +2,4 @@
 * 0.2.0 - ANTLR4 Integration
 * 0.3.0 - print statements
 * 0.4.0 - Brew integration, --verbose option, Graal Native integration
-* 0.5.0 - String concatenation
+* 0.5.0 - String concatenation, .runCommand() optimization, initial boolean, int and float implementations
