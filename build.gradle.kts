@@ -13,13 +13,13 @@ plugins {
     antlr
     // kotlin version in plugins must be literal
     kotlin("jvm") version "2.1.10"
-    application
     id("org.graalvm.buildtools.native") version "0.10.6"
     id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 group = "org.bashpile.core"
-version = "0.4.0"
+version = "0.5.0"
 
 repositories {
     mavenCentral()
@@ -62,18 +62,10 @@ kotlin {
     jvmToolchain(21)
 }
 
-application {
-    mainClass = "org.bashpile.core.MainKt"
-}
-
-graalvmNative {
-    binaries {
-        named("main") {
-            // more options at https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#configure-native-image
-            imageName.set("bashpile")
-            mainClass.set("org.bashpile.core.MainKt")
-            sharedLibrary.set(false)
-        }
+// for use in bin/tokenize script
+tasks.register("saveClasspath") {
+    doFirst {
+        File("build/classpath.txt").writeText(sourceSets["main"].runtimeClasspath.asPath)
     }
 }
 
@@ -105,33 +97,25 @@ sourceSets {
     }
 }
 
-////////////////////////////////
-// Untar - for integration tests
-////////////////////////////////
+/////////////////
+// GraalVM Native
+/////////////////
 
-tasks.register<Exec>("untar") {
-    group = "verification"
-    workingDir = File("build/distributions")
-    commandLine = listOf("tar", "-xf", "bashpile-$version.tar")
-    shouldRunAfter("test", "assemble")
-    dependsOn("test", "assemble")
+graalvmNative {
+    binaries {
+        named("main") {
+            // more options at https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#configure-native-image
+            imageName.set("bashpile")
+            mainClass.set("org.bashpile.core.MainKt")
+            sharedLibrary.set(false)
+            // TODO try https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
+//            buildArgs.add("-H:IncludeResources=\".*/logback.*\"")
+        }
+    }
 }
 
-tasks.register<Exec>("rm-untar-dir") {
-    group = "verification"
-    workingDir = File("build")
-    commandLine = listOf("rm", "-rf", "untar")
-    shouldRunAfter("test", "untar")
-    dependsOn("test", "untar")
-}
-
-// create build/untar directory
-tasks.register<Exec>("mv") {
-    group = "verification"
-    workingDir = File("build")
-    commandLine = listOf("mv", "-f", "distributions/bashpile-$version", "untar")
-    shouldRunAfter("rm-untar-dir")
-    dependsOn("rm-untar-dir")
+tasks.named("nativeCompile") {
+    dependsOn("test")
 }
 
 ////////////////////////////////////////////////////////
@@ -164,8 +148,7 @@ val integrationTest = task<Test>("integrationTest") {
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
-    shouldRunAfter("mv")
-    dependsOn("mv")
+    dependsOn("nativeCompile")
 
     useJUnitPlatform()
 

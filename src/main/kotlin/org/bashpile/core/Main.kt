@@ -8,16 +8,16 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
+import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
 import org.bashpile.core.bast.BashpileAst
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 
-
-// TODO figure out why command is running instead of producing BASH
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -54,7 +54,6 @@ class Main : CliktCommand() {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
-        // TODO log to ~/.bashpile/log.txt
         // configure logging
         if (verboseLogging) {
             val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
@@ -63,13 +62,25 @@ class Main : CliktCommand() {
         }
 
         // get and render BAST tree
-        val bast = runAntlrProcessing(scriptPath)
+        val script = Files.readString(scriptPath).stripShebang()
+        val bast = getBast(script.byteInputStream())
         echo(bast.render(), false)
     }
 
-    private fun runAntlrProcessing(scriptPath: Path): BashpileAst {
+    /** The initial shabang line isn't part of the Bashpile script. */
+    private fun String.stripShebang(): String {
+        val shebang = "#!"
+        return if (this.startsWith(shebang)) {
+            this.stripFirstLine()
+        } else {
+            this
+        }
+    }
+
+    /** Invokes ANTLR to parse the script and convert it to a Bashpile AST (BAST) */
+    @VisibleForTesting
+    internal fun getBast(stream: InputStream): BashpileAst {
         // setup lexer
-        val stream = Files.newInputStream(scriptPath)
         val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = org.bashpile.core.BashpileLexer(charStream)
         lexer.removeErrorListeners()
