@@ -67,9 +67,10 @@ class Main : CliktCommand() {
         echo(bast.render(), false)
     }
 
-    /** Antlr chokes on Shebang lines.  Removes it if present as a work-around. */
+    /** The initial shabang line isn't part of the Bashpile script. */
     private fun String.stripShebang(): String {
-        return if (this.startsWith("#!")) {
+        val shebang = "#!"
+        return if (this.startsWith(shebang)) {
             this.stripFirstLine()
         } else {
             this
