@@ -33,6 +33,7 @@ class MainTest {
         val output = fixture.test(arrayOf(HELLO_FILENAME))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
+        assertTrue(output.stderr.isEmpty())
     }
 
     @Test
