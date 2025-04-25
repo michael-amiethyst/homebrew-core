@@ -37,7 +37,7 @@ class SystemTest {
 
     @Test
     fun system_shabang_works() {
-        val path = Path.of("src/test/resources/bpsScripts/shebang.bps").makeExecutable()
+        val path = Path.of("build/resources/test/bpsScripts/shebang.bps").makeExecutable()
         val output = path.toString().runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
         assertEquals("printf \"Hello Shebang!\\n\"\n", output.first.stripFirstLine())
