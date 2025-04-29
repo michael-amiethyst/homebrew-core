@@ -29,7 +29,7 @@ dependencies {
 
     // clikt
     implementation("com.github.ajalt.clikt:clikt:$cliktVersion")
-    // optional support for rendering markdown in help messages
+    // optional support for rendering Markdown in help messages
     implementation("com.github.ajalt.clikt:clikt-markdown:$cliktVersion")
 
     // antlr
@@ -43,7 +43,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.18")
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
 
-    // other depdencies
+    // other dependencies
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.14.0")
     implementation("com.google.guava:guava:32.0.1-jre")
@@ -62,7 +62,7 @@ kotlin {
     jvmToolchain(21)
 }
 
-// for use in bin/tokenize script
+// for use in the bin/tokenize script
 tasks.register("saveClasspath") {
     doFirst {
         File("build/classpath.txt").writeText(sourceSets["main"].runtimeClasspath.asPath)
@@ -76,15 +76,15 @@ tasks.register("saveClasspath") {
 val generatedOutputFilename = "${layout.buildDirectory.get()}/generated/sources/main/java/antlr/org/bashpile/core"
 
 tasks.generateGrammarSource {
-    // set output directory to some arbitrary location in `/build` directory.
+    // set the output directory to some arbitrary location in the `/build` directory.
     // by convention `/build/generated/sources/main/java/<generator name>` is often used
     outputDirectory = file(generatedOutputFilename)
 
-    // pass -package to make generator put code in not default space
+    // pass '-package' to make the generator put code in not default space
     arguments = listOf("-package", "org.bashpile.core", "-no-listener", "-visitor")
 }
 
-// workaround for antlr bug, should be fixed after 4.13.2
+// workaround for an antlr bug, it should be fixed after 4.13.2
 tasks.withType<KotlinCompile>().configureEach {
     dependsOn(tasks.withType<AntlrTask>())
 }
