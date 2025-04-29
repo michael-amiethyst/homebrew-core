@@ -32,9 +32,19 @@ class SystemTest {
 
     @Test
     fun system_withVerbose_works() {
-        val output = "$bashpileFilename --verbose true '${MainTest.HELLO_FILENAME}'".runCommand()
+        val output = "$bashpileFilename --verbose '${MainTest.HELLO_FILENAME}'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertTrue(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE))
+        assertTrue(output.first.contains(Main.STARTUP_MESSAGE), "Output: ${output.first}")
+        assertFalse(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE), "Output: ${output.first}")
+        assertTrue(output.first.endsWith("printf \"Hello Bashpile!\\n\"\n"))
+    }
+
+    @Test
+    fun system_withDoubleVerbose_works() {
+        val output = "$bashpileFilename -vv '${MainTest.HELLO_FILENAME}'".runCommand()
+        assertEquals(SCRIPT_SUCCESS, output.second)
+        assertTrue(output.first.contains(Main.STARTUP_MESSAGE), "Output: ${output.first}")
+        assertTrue(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE), "Output: ${output.first}")
         assertTrue(output.first.endsWith("printf \"Hello Bashpile!\\n\"\n"))
     }
 

@@ -1,13 +1,14 @@
 package org.bashpile.core
 
+import ch.qos.logback.classic.Level.DEBUG
+import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.LoggerContext
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.boolean
 import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -30,14 +31,15 @@ fun main(args: Array<String>) = Main().main(args)
 class Main : CliktCommand() {
 
     companion object {
-        @JvmStatic
-        val VERBOSE_ENABLED_MESSAGE = "Verbose logging enabled"
+        const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
+
+        /** As in source/sink -> generates a startup message given a script filename */
+        const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
     }
 
     private val script by argument(help = "The script to compile")
 
-    private val verboseLogging: Boolean by
-    option("-v", "--verbose", help = "Enabable verbose (debug) logging").boolean().default(false)
+    private val verbosity by option("-v", "--verbose").counted(limit=2, clamp=true)
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
@@ -48,18 +50,16 @@ class Main : CliktCommand() {
      */
     override fun run() {
         // guard, etc
-        logger.info("Running Bashpile compiler with script: $script")
         val scriptPath = Path.of(script)
         if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
         // configure logging
-        if (verboseLogging) {
-            val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
-            context.getLogger("org.bashpile").level = ch.qos.logback.classic.Level.TRACE
-            logger.trace(VERBOSE_ENABLED_MESSAGE)
+        if (verbosity > 0) {
+            configureLogging(verbosity)
         }
+        logger.info(STARTUP_MESSAGE + script) // first logging call after configureLogging() call
 
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
@@ -82,13 +82,13 @@ class Main : CliktCommand() {
     internal fun getBast(stream: InputStream): BashpileAst {
         // setup lexer
         val charStream = stream.use { CharStreams.fromStream(it) }
-        val lexer = org.bashpile.core.BashpileLexer(charStream)
+        val lexer = BashpileLexer(charStream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(ThrowingErrorListener())
 
         // setup parser
         val tokens = CommonTokenStream(lexer)
-        val parser = org.bashpile.core.BashpileParser(tokens)
+        val parser = BashpileParser(tokens)
         parser.removeErrorListeners()
         parser.addErrorListener(ThrowingErrorListener())
 
@@ -96,5 +96,21 @@ class Main : CliktCommand() {
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
         return bast
+    }
+
+    /**
+     * Defaults in src/main/resources/logback.xml
+     *
+     * We went with Logback because Log4j wasn't compatible with Graal nativeCompile.
+     */
+    private fun configureLogging(verbosity: Int) {
+        val logbackLevel = when (verbosity) {
+            1 -> INFO
+            2 -> DEBUG
+            else -> throw IllegalStateException("Unexpected verbosity level: $verbosity")
+        }
+        val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+        context.getLogger("org.bashpile").level = logbackLevel
+        logger.debug(VERBOSE_ENABLED_MESSAGE)
     }
 }

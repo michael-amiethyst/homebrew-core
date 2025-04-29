@@ -111,8 +111,8 @@ graalvmNative {
             imageName.set("bashpile")
             mainClass.set("org.bashpile.core.MainKt")
             sharedLibrary.set(false)
-            // TODO try https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
-//            buildArgs.add("-H:IncludeResources=\".*/logback.*\"")
+            // From https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
+            // Added to src/main/resources/reflection-config.json
             buildArgs.add("--verbose")
             buildArgs.add("--add-opens=java.base/java.nio=ALL-UNNAMED")
             buildArgs.add("--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED")
@@ -120,9 +120,9 @@ graalvmNative {
             buildArgs.add("--trace-class-initialization=ch.qos.logback.classic.Logger")
             buildArgs.add("--trace-object-instantiation=ch.qos.logback.core.AsyncAppenderBase\$Worker")
             buildArgs.add("--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback")
-            buildArgs.add("--initialize-at-run-time=io.netty")
+//            buildArgs.add("--initialize-at-run-time=io.netty")
             buildArgs.add("-H:ReflectionConfigurationFiles=../../../src/main/resources/reflection-config.json")
-//            buildArgs.add("-H:IncludeResources=logback.xml")
+            // didn't need buildArgs.add("-H:IncludeResources=logback.xml")
         }
     }
 }
@@ -161,6 +161,8 @@ val integrationTest = task<Test>("integrationTest") {
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
+    // TODO try the below to enable IDE to detect MainTest from SystemTest
+//    classpath = files(sourceSets["intTest"].runtimeClasspath, sourceSets["test"].runtimeClasspath)
     dependsOn("nativeCompile")
 
     useJUnitPlatform()
