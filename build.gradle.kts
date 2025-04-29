@@ -111,18 +111,11 @@ graalvmNative {
             imageName.set("bashpile")
             mainClass.set("org.bashpile.core.MainKt")
             sharedLibrary.set(false)
+
+            // additional buildArgs at https://www.graalvm.org/21.3/reference-manual/native-image/Options/
+
             // From https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
-            // Added to src/main/resources/reflection-config.json
-            buildArgs.add("--verbose")
-            buildArgs.add("--add-opens=java.base/java.nio=ALL-UNNAMED")
-            buildArgs.add("--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED")
-            buildArgs.add("--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED")
-            buildArgs.add("--trace-class-initialization=ch.qos.logback.classic.Logger")
-            buildArgs.add("--trace-object-instantiation=ch.qos.logback.core.AsyncAppenderBase\$Worker")
-            buildArgs.add("--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback")
-//            buildArgs.add("--initialize-at-run-time=io.netty")
             buildArgs.add("-H:ReflectionConfigurationFiles=../../../src/main/resources/reflection-config.json")
-            // didn't need buildArgs.add("-H:IncludeResources=logback.xml")
         }
     }
 }
