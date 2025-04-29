@@ -1,3 +1,5 @@
+<!-- Any new classes referenced here may need to be added to src/main/resources/reflection-config.json for Graal -->
+
 <configuration>
     <shutdownHook/>
 
