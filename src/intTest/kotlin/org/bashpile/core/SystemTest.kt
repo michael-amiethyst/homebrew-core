@@ -14,6 +14,7 @@ import kotlin.io.path.isExecutable
  */
 class SystemTest {
     private val bashpileFilename = "build/native/nativeCompile/bashpile"
+    private val shebangFilename = "build/resources/test/bpsScripts/shebang.bps"
 
     @Test
     fun system_withBadFilename_printsHelp() {
@@ -39,7 +40,7 @@ class SystemTest {
 
     @Test
     fun system_shebang_works() {
-        val shebangPath = Path.of("build/resources/test/bpsScripts/shebang.bps")
+        val shebangPath = Path.of(shebangFilename)
         assumeTrue(shebangPath.exists(), "Shebang test file not found")
         val path = shebangPath.makeExecutable()
         assumeTrue(path.isExecutable(), "Shebang test file not executable")
@@ -48,7 +49,12 @@ class SystemTest {
         assertEquals("printf \"Hello Shebang!\\n\"\n", output.first)
     }
 
-    // TODO write an immediately executing script
+    @Test
+    fun system_withEval_works() {
+        val output = "eval \"$($shebangFilename)\"".runCommand()
+        assertEquals(SCRIPT_SUCCESS, output.second)
+        assertEquals("Hello Shebang!\n", output.first)
+    }
 
     private fun Path.makeExecutable(): Path {
         if (!this.isExecutable()) {
