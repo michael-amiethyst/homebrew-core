@@ -6,7 +6,7 @@ class Bashpile < Formula
   head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
-  depends_on "openjdk"
+  depends_on "graalvm-jdk"
   depends_on "bash"
   depends_on "gradle" => :build
 

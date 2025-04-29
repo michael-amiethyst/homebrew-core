@@ -19,14 +19,14 @@ class SystemTest {
     fun system_withBadFilename_printsHelp() {
         val output = "$bashpileFilename BAD_FILENAME".runCommand()
         assertNotEquals(SCRIPT_SUCCESS, output.second)
-        assertTrue(output.first.stripFirstLine().startsWith("Usage:"))
+        assertTrue(output.first.startsWith("Usage:"))
     }
 
     @Test
     fun systemWorks() {
         val output = "$bashpileFilename '${MainTest.HELLO_FILENAME}'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals("printf \"Hello Bashpile!\\n\"\n", output.first.stripFirstLine())
+        assertEquals("printf \"Hello Bashpile!\\n\"\n", output.first)
     }
 
     @Test
@@ -45,7 +45,7 @@ class SystemTest {
         assumeTrue(path.isExecutable(), "Shebang test file not executable")
         val output = path.toString().runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
-        assertEquals("printf \"Hello Shebang!\\n\"\n", output.first.stripFirstLine())
+        assertEquals("printf \"Hello Shebang!\\n\"\n", output.first)
     }
 
     // TODO write an immediately executing script

@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "org.bashpile.core"
-version = "0.5.0"
+version = "0.6.0"
 
 repositories {
     mavenCentral()
@@ -103,6 +103,9 @@ sourceSets {
 
 graalvmNative {
     binaries {
+        all {
+            resources.autodetect()
+        }
         named("main") {
             // more options at https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#configure-native-image
             imageName.set("bashpile")
@@ -110,6 +113,16 @@ graalvmNative {
             sharedLibrary.set(false)
             // TODO try https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
 //            buildArgs.add("-H:IncludeResources=\".*/logback.*\"")
+            buildArgs.add("--verbose")
+            buildArgs.add("--add-opens=java.base/java.nio=ALL-UNNAMED")
+            buildArgs.add("--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED")
+            buildArgs.add("--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED")
+            buildArgs.add("--trace-class-initialization=ch.qos.logback.classic.Logger")
+            buildArgs.add("--trace-object-instantiation=ch.qos.logback.core.AsyncAppenderBase\$Worker")
+            buildArgs.add("--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback")
+            buildArgs.add("--initialize-at-run-time=io.netty")
+            buildArgs.add("-H:ReflectionConfigurationFiles=../../../src/main/resources/reflection-config.json")
+//            buildArgs.add("-H:IncludeResources=logback.xml")
         }
     }
 }
