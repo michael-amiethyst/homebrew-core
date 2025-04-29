@@ -8,13 +8,9 @@ import java.io.InputStream
 
 /**
  * Tests Clikt and [Main.getBast], does not test logging.
- * @see [SystemTest] for logger framework tests.
+ * See SystemTest for logger framework tests.
  */
 class MainTest {
-    companion object {
-        const val HELLO_FILENAME = "src/test/resources/bpsScripts/hello.bps"
-        const val HELLO_CONCAT_FILENAME = "src/test/resources/bpsScripts/helloWithConcat.bps"
-    }
 
     val fixture = Main()
 
@@ -34,7 +30,7 @@ class MainTest {
 
     @Test
     fun main_withScript_works() {
-        val output = fixture.test(arrayOf(HELLO_FILENAME))
+        val output = fixture.test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
         assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
@@ -42,7 +38,7 @@ class MainTest {
 
     @Test
     fun main_withConcatScript_works() {
-        val output = fixture.test(arrayOf(HELLO_CONCAT_FILENAME))
+        val output = fixture.test(arrayOf("src/test/resources/bpsScripts/helloWithConcat.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
         assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)

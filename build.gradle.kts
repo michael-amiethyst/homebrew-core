@@ -161,8 +161,6 @@ val integrationTest = task<Test>("integrationTest") {
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
-    // TODO try the below to enable IDE to detect MainTest from SystemTest
-//    classpath = files(sourceSets["intTest"].runtimeClasspath, sourceSets["test"].runtimeClasspath)
     dependsOn("nativeCompile")
 
     useJUnitPlatform()
