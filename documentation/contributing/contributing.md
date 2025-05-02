@@ -2,11 +2,15 @@
 
 ## Quick Start
 ### Setup env
-Any script setup (e.g. for SDKMAN) should be reachable from .profile 
-(e.g. have it source .bashrc or .bash_profile if needed).
+Any script setup (e.g., for SDKMAN) should be reachable from .profile 
+(e.g., have it source .bashrc or .bash_profile if needed).
 ### Build
 `./gradlew clean build`
+Native executable is generated to build/native/nativeCompile/bashpile
 
 ## Design
 
-Parse arguments with [CLIKT](https://ajalt.github.io/clikt/).  Compile script with Antlr.  Render Bash script.
+1. Parse arguments with [CLIKT](https://ajalt.github.io/clikt/).  
+2. Parse Bashpile script with Antlr to Antlr AST.
+3. Transform into Bashpile AST.  
+4. Render Bashpile AST as Bash script.

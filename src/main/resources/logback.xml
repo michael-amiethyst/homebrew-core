@@ -1,3 +1,5 @@
+<!-- Any new classes referenced here may need to be added to src/main/resources/reflection-config.json for Graal -->
+
 <configuration>
     <shutdownHook/>
 
@@ -24,10 +26,10 @@
 
 
 
-    <root level="warn">
+    <root level="error">
         <appender-ref ref="Console" />
         <appender-ref ref="AsyncLogFile" />
     </root>
 
-    <logger name="org.bashpile" level="info" />
+    <logger name="org.bashpile" level="warn" />
 </configuration>
