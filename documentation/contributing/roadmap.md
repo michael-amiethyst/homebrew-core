@@ -1,4 +1,3 @@
-1. IDE integration (IntelliJ)
-2. Shell Strings
-3. Parenthesis handling
-4. Arithmetic
+1. Shell Strings
+2. Floating point calculations
+3. IDE integration (IntelliJ)

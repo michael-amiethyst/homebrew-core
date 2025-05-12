@@ -3,7 +3,7 @@ cask "Bashpile" do
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
   url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.6.0"
-  head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "feature/nativeLogging"
+  head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
   depends_on "bash"
