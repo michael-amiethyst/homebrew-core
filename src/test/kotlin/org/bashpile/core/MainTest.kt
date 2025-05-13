@@ -60,10 +60,30 @@ class MainTest {
     }
 
     @Test
+    fun getBast_printBool_withParens_works() {
+        val printBool: InputStream = "print(((true)))".byteInputStream()
+        assertEquals("printf \"true\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
     fun getBast_printString_tripleConcat_works() {
         val printBool: InputStream = """
             print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
         assertEquals("printf \"Hello Bashpile!\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
+    fun getBast_printString_tripleConcat_withParen_works() {
+        val printBool: InputStream = """
+            print((("Hello" + " " + "Bashpile!")))""".trimIndent().byteInputStream()
+        assertEquals("printf \"Hello Bashpile!\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
+    fun getBast_printString_tripleConcat_withParenAndLongerContents_works() {
+        val printBool: InputStream = """
+            print((("Hello" + " " + "Bashpile!"  + "  Love " + "you!")))""".trimIndent().byteInputStream()
+        assertEquals("printf \"Hello Bashpile!  Love you!\\n\"", fixture.getBast(printBool).render())
     }
 
     @Test

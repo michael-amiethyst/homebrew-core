@@ -14,6 +14,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         return PrintBastNode(nodes)
     }
 
+    override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BashpileAst? {
+        // strip parenthesis until calc implemented
+        require(ctx.childCount == 3)
+        return visit(ctx.children[1])
+    }
+
     /** Encapsulates Antlr context API */
     private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
         return argumentList().expression() // known Law of Demeter violation
