@@ -37,6 +37,7 @@ Also, for all of its faults mentioned above it's fast, especially if you are mak
 
 ## Language Reference
 
+* Quick compiles!  Within a second
 * White space agnostic (except for Python style indentation)
 * `print("Any String here")`, single quotes allowed with no special difference
-* `"string" + "concatination"` (soon)
+* `"string" + "concatination"`
