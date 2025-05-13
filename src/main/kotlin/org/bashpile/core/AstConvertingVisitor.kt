@@ -16,7 +16,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
 
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BashpileAst? {
         // strip parenthesis until calc implemented
-        require(ctx.childCount == 3)
+        check(ctx.childCount == 3)
         return visit(ctx.children[1])
     }
 

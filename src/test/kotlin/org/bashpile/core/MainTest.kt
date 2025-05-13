@@ -80,10 +80,10 @@ class MainTest {
     }
 
     @Test
-    fun getBast_printString_tripleConcat_withParenAndLongerContents_works() {
+    fun getBast_printString_tripleConcat_withMoreParens_works() {
         val printBool: InputStream = """
-            print((("Hello" + " " + "Bashpile!"  + "  Love " + "you!")))""".trimIndent().byteInputStream()
-        assertEquals("printf \"Hello Bashpile!  Love you!\\n\"", fixture.getBast(printBool).render())
+            print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
+        assertEquals("printf \"Hello Bashpile!  It's awesome!\\n\"", fixture.getBast(printBool).render())
     }
 
     @Test
