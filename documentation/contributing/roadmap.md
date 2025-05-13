@@ -1,4 +1,3 @@
-1. Change repo names?, -vv option and immediately executing script
-2. IDE integration (IntelliJ)
-3. Parenthesis handling
-4. Arithmetic
+1. Shell Strings, Cask deploy
+2. Floating point calculations
+3. IDE integration (IntelliJ)

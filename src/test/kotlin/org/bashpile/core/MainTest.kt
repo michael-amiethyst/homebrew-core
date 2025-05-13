@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test
 import java.io.InputStream
 
 
+/**
+ * Tests Clikt and [Main.getBast], does not test logging.
+ * See SystemTest for logger framework tests.
+ */
 class MainTest {
-    companion object {
-        const val HELLO_FILENAME = "src/test/resources/bpsScripts/hello.bps"
-        const val HELLO_CONCAT_FILENAME = "src/test/resources/bpsScripts/helloWithConcat.bps"
-    }
 
     val fixture = Main()
 
@@ -30,24 +30,18 @@ class MainTest {
 
     @Test
     fun main_withScript_works() {
-        val output = fixture.test(arrayOf(HELLO_FILENAME))
+        val output = fixture.test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
-        assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
         assertTrue(output.stderr.isEmpty())
+        assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
     }
 
     @Test
     fun main_withConcatScript_works() {
-        val output = fixture.test(arrayOf(HELLO_CONCAT_FILENAME))
+        val output = fixture.test(arrayOf("src/test/resources/bpsScripts/helloWithConcat.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
+        assertTrue(output.stderr.isEmpty())
         assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
-    }
-
-    @Test
-    fun main_withScript_verbose_works() {
-        val output = fixture.test(arrayOf("--verbose=true", HELLO_FILENAME))
-        assertEquals(SCRIPT_SUCCESS, output.statusCode)
-        assertTrue(output.stdout.endsWith("printf \"Hello Bashpile!\\n\""), "Output: ${output.stdout}")
     }
 
     @Test
@@ -66,10 +60,30 @@ class MainTest {
     }
 
     @Test
+    fun getBast_printBool_withParens_works() {
+        val printBool: InputStream = "print(((true)))".byteInputStream()
+        assertEquals("printf \"true\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
     fun getBast_printString_tripleConcat_works() {
         val printBool: InputStream = """
             print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
         assertEquals("printf \"Hello Bashpile!\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
+    fun getBast_printString_tripleConcat_withParen_works() {
+        val printBool: InputStream = """
+            print((("Hello" + " " + "Bashpile!")))""".trimIndent().byteInputStream()
+        assertEquals("printf \"Hello Bashpile!\\n\"", fixture.getBast(printBool).render())
+    }
+
+    @Test
+    fun getBast_printString_tripleConcat_withMoreParens_works() {
+        val printBool: InputStream = """
+            print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
+        assertEquals("printf \"Hello Bashpile!  It's awesome!\\n\"", fixture.getBast(printBool).render())
     }
 
     @Test
