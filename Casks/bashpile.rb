@@ -20,8 +20,7 @@ cask "Bashpile" do
 
   # TODO change to binary Stanza: https://docs.brew.sh/Cask-Cookbook#stanza-binary
   def install
-    system "gradle", "clean", "nativeCompile", "-x", "test"
-    bin.install "build/native/nativeCompile/bashpile"
+    binary "bin/bashpile"
     # bin.install "target/bpc"
     # FileUtils.cp "#{bin}/bpc", "#{bin}/bashpilec"
     # bin.install "target/bpr"

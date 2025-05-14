@@ -164,3 +164,12 @@ val integrationTest = task<Test>("integrationTest") {
 }
 
 tasks.check { dependsOn(integrationTest) }
+
+// deploy binaries for Homebrew Cask
+
+task<Copy>("deploy") {
+    dependsOn("check")
+    from("build/native/nativeCompile")
+    include("bashpile")
+    into("bin")
+}
