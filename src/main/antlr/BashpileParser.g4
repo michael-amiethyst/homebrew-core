@@ -76,6 +76,7 @@ expression
 literal : StringValues | NumberValues | BoolValues | Empty;
 types    : Unknown | Empty | Bool | Number | Int | Float | Str | List | Map | Ref;
 
+// shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;
 shellStringContents: shellString
                    | DollarOParen shellStringContents* CParen

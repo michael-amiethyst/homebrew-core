@@ -1,3 +1,4 @@
-1. Shell Strings, Cask deploy
-2. Floating point calculations
-3. IDE integration (IntelliJ)
+1. Floating point calculations
+2. IDE integration (IntelliJ)
+3. if-elseif-else
+4. primary expressions

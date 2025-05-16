@@ -2,12 +2,11 @@ cask "Bashpile" do
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.6.0"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.7.0"
   head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
   depends_on "bash"
-  depends_on "gradle" => :build
 
   # tooling dependencies for compilation
   # depends_on "shfmt"
@@ -16,12 +15,10 @@ cask "Bashpile" do
   # tooling dependencies for generated scripts
   # depends_on "gnu-sed"
   # depends_on "bc"
-  depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
+  # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as a generic dependency for consistency
 
-  # TODO change to binary Stanza: https://docs.brew.sh/Cask-Cookbook#stanza-binary
   def install
-    system "gradle", "clean", "nativeCompile", "-x", "test"
-    bin.install "build/native/nativeCompile/bashpile"
+    binary "bin/bashpile"
     # bin.install "target/bpc"
     # FileUtils.cp "#{bin}/bpc", "#{bin}/bashpilec"
     # bin.install "target/bpr"
