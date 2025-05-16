@@ -68,6 +68,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
     // Leaf nodes (parts of expressions)
 
     override fun visitTerminal(node: TerminalNode): BashpileAst? {
-        return LeafBastNode(node.text.replace("newline", "\n"))
+        // antlr may pass us a literal "newline" as the entire node text
+        return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
     }
 }

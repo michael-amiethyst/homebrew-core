@@ -13,12 +13,22 @@ class MainShellStringTest {
     val fixture = Main()
 
     @Test
-    fun getBast_printBool_works() {
+    fun getBast_shellString_printf_works() {
         val script: InputStream = "printf \"true\"".byteInputStream()
         assertEquals("printf \"true\"\n", fixture.getBast(script).render())
     }
 
-    // TODO write tests for built-ins, functions, script executions (with initial variables too)
+    @Test
+    fun getBast_shellString_initialVar_works() {
+        val script: InputStream = "test_var=5 printf \"\$test_var\"".byteInputStream()
+        assertEquals("test_var=5 printf \"\$test_var\"\n", fixture.getBast(script).render())
+    }
+
+    @Test
+    fun getBast_shellString_literalNewline_works() {
+        val script: InputStream = "printf \"newline\"".byteInputStream()
+        assertEquals("printf \"newline\"\n", fixture.getBast(script).render())
+    }
 
     // TODO write tests for shell strings with literal "newline" in them
 }
