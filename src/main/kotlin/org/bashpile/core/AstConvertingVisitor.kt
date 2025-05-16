@@ -16,7 +16,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BashpileAst? {
+        // TODO get rid of .render, have ShellLineBastNode track children instead of a string
         return ShellLineBastNode(ctx.children.map { visit(it).render() }.joinToString(""))
+    }
+
+    override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BashpileAst? {
+        return BashpileAst(ctx.children.map { visit(it) })
     }
 
     /** Encapsulates Antlr API to preserve Law of Demeter */
@@ -66,6 +71,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
     }
 
     // Leaf nodes (parts of expressions)
+
+    override fun visitShellString(ctx: BashpileParser.ShellStringContext): BashpileAst? {
+        check(ctx.children.size == 3) { "ShellStringContext must have exactly 3 children" }
+        return ShellStringBastNode(ctx.shellStringContents().map { visit(it )})
+    }
 
     override fun visitTerminal(node: TerminalNode): BashpileAst? {
         // antlr may pass us a literal "newline" as the entire node text

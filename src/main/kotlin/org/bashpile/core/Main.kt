@@ -63,8 +63,8 @@ class Main : CliktCommand() {
 
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
-        val bast = getBast(script.byteInputStream())
-        echo(bast.render(), false)
+        val bastRoot: BashpileAst = getBast(script.byteInputStream())
+        echo(bastRoot.render(), false)
     }
 
     /** The initial shabang line isn't part of the Bashpile script. */
