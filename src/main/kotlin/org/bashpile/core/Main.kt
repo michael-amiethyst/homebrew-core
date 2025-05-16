@@ -13,7 +13,7 @@ import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
-import org.bashpile.core.bast.BashpileAst
+import org.bashpile.core.bast.BastNode
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
@@ -24,7 +24,7 @@ fun main(args: Array<String>) = Main().main(args)
 
 /**
  * Main entry point for the Bashpile compiler.
- * This is a simple command line interface (CLI) that takes a Bashpile script as input and outputs a Bash script.
+ * This is a simple command line interface (CLI) that takes a Bashpile script as the input and outputs a Bash script.
  * This class is primarily responsible for parsing command line arguments.
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
@@ -46,7 +46,6 @@ class Main : CliktCommand() {
     /**
      * The main entry point for the Bashpile compiler.
      * This method is called by the `main` function by Clikt.
-     * If we want to have an exitCode other than 0 on bad input we can override "parse" instead for manual control.
      */
     override fun run() {
         // guard, etc
@@ -63,11 +62,11 @@ class Main : CliktCommand() {
 
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
-        val bastRoot: BashpileAst = getBast(script.byteInputStream())
+        val bastRoot: BastNode = getBast(script.byteInputStream())
         echo(bastRoot.render(), false)
     }
 
-    /** The initial shabang line isn't part of the Bashpile script. */
+    /** The initial shebang line isn't part of the Bashpile script. */
     private fun String.stripShebang(): String {
         val shebang = "#!"
         return if (this.startsWith(shebang)) {
@@ -79,7 +78,7 @@ class Main : CliktCommand() {
 
     /** Invokes ANTLR to parse the script and convert it to a Bashpile AST (BAST) */
     @VisibleForTesting
-    internal fun getBast(stream: InputStream): BashpileAst {
+    internal fun getBast(stream: InputStream): BastNode {
         // setup lexer
         val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = BashpileLexer(charStream)

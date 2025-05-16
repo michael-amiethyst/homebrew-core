@@ -16,10 +16,10 @@ class BashpileAstTest {
         assertFalse(intLiteral.areAllStringLiterals())
         assertFalse(booleanLiteral.areAllStringLiterals())
 
-        val listOfStringLiterals = BashpileAst(listOf(stringLiteral, stringLiteral))
+        val listOfStringLiterals = BastNode(listOf(stringLiteral, stringLiteral))
         assertTrue(listOfStringLiterals.areAllStringLiterals())
 
-        val listWithIntAndString = BashpileAst(listOf(stringLiteral, intLiteral))
+        val listWithIntAndString = BastNode(listOf(stringLiteral, intLiteral))
         assertFalse(listWithIntAndString.areAllStringLiterals())
     }
 }
