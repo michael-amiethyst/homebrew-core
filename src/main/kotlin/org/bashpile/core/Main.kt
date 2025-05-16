@@ -20,11 +20,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 
-// project TODOs
-// TODO check compiled binaries into GitHub
-// TODO then make a Homebrew cask
-
-
 fun main(args: Array<String>) = Main().main(args)
 
 /**

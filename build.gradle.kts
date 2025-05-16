@@ -115,6 +115,7 @@ graalvmNative {
             // additional buildArgs at https://www.graalvm.org/21.3/reference-manual/native-image/Options/
 
             // From https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
+            buildArgs.add("-H:+UnlockExperimentalVMOptions")
             buildArgs.add("-H:ReflectionConfigurationFiles=../../../src/main/resources/reflection-config.json")
         }
     }

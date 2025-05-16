@@ -29,6 +29,4 @@ class MainShellStringTest {
         val script: InputStream = "printf \"newline\"".byteInputStream()
         assertEquals("printf \"newline\"\n", fixture.getBast(script).render())
     }
-
-    // TODO write tests for shell strings with literal "newline" in them
 }

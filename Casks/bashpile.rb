@@ -7,7 +7,6 @@ cask "Bashpile" do
 
   # foundational dependencies
   depends_on "bash"
-  depends_on "gradle" => :build
 
   # tooling dependencies for compilation
   # depends_on "shfmt"
@@ -16,9 +15,8 @@ cask "Bashpile" do
   # tooling dependencies for generated scripts
   # depends_on "gnu-sed"
   # depends_on "bc"
-  depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
+  # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as a generic dependency for consistency
 
-  # TODO change to binary Stanza: https://docs.brew.sh/Cask-Cookbook#stanza-binary
   def install
     binary "bin/bashpile"
     # bin.install "target/bpc"
