@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.BashpileParser.ExpressionContext
 import org.bashpile.core.bast.*
 
@@ -14,15 +15,23 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         return PrintBastNode(nodes)
     }
 
+    override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BashpileAst? {
+        return ShellLineBastNode(ctx.children.map { visit(it).render() }.joinToString(""))
+    }
+
+    /** Encapsulates Antlr API to preserve Law of Demeter */
+    private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
+        return argumentList().expression()
+    }
+
+    ///////////////////////////////////
+    // expressions
+    ///////////////////////////////////
+
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BashpileAst? {
         // strip parenthesis until calc implemented
         check(ctx.childCount == 3)
         return visit(ctx.children[1])
-    }
-
-    /** Encapsulates Antlr context API */
-    private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
-        return argumentList().expression() // known Law of Demeter violation
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BashpileAst {
@@ -54,5 +63,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BashpileAst>() {
         require(visit(ctx.children[0]).areAllStringLiterals()) { "Left operand must be all strings" }
         require(visit(ctx.children[2]).areAllStringLiterals()) { "Right operand must be all strings" }
         return BashpileAst(listOf(visit(ctx.children[0]), visit(ctx.children[2])))
+    }
+
+    // Leaf nodes (parts of expressions)
+
+    override fun visitTerminal(node: TerminalNode): BashpileAst? {
+        return LeafBastNode(node.text.replace("newline", "\n"))
     }
 }
