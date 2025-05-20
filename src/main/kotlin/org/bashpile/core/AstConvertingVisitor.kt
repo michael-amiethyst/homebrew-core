@@ -76,10 +76,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // Leaf nodes (parts of expressions)
 
-    // we shouldn't need visitShellStringContents, maybe for nested shellstrings?
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode? {
-        check(ctx.children.size == 3) { "ShellStringContext must have exactly 3 children" }
         return ShellStringBastNode(ctx.shellStringContents().map { visit(it )})
+    }
+
+    override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode? {
+        return BastNode(ctx.children.map { visit(it) })
     }
 
     override fun visitTerminal(node: TerminalNode): BastNode? {
