@@ -54,5 +54,14 @@ class MainShellStringTest {
             """.trimIndent() + "\n", fixture.getBast(script).render())
     }
 
-    // TODO write test for shellstring, with shellstring + shellstring contents
+    // TODO write test for nestedSubshells with inner error
+
+    @Test
+    fun getBast_shellstring_withShellStringConcat_works() {
+        val script: InputStream = """
+            print(#(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().byteInputStream()
+        assertEquals("""
+            printf "$(printf "$(printf 'Hello ') $(printf 'shellstring!')")"
+            """.trimIndent() + "\n", fixture.getBast(script).render())
+    }
 }
