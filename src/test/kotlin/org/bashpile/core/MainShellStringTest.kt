@@ -49,12 +49,28 @@ class MainShellStringTest {
     fun getBast_shellstring_nestedSubshells_works() {
         val script: InputStream = """
             print(#(printf $(printf 'shellstring!')))""".trim().byteInputStream()
+        val renderedBash = fixture.getBast(script).render()
         assertEquals("""
             printf "$(printf $(printf 'shellstring!'))"
-            """.trimIndent() + "\n", fixture.getBast(script).render())
+            """.trimIndent() + "\n", renderedBash
+        )
+        assertEquals("shellstring!\n", renderedBash.runCommand().first)
     }
 
-    // TODO write test for nestedSubshells with inner error
+    // TODO after assignments are implemented, uncomment and implement unwind logic
+//    @Test
+//    fun getBast_shellstring_nestedSubshells_withInnerError_fails() {
+//        // TODO reference nestedSubshells.bps instead of literal string here
+//        val script: InputStream = """
+//            print(#(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR)))""".trim().byteInputStream()
+//        val renderedBash = fixture.getBast(script).render()
+//        assertEquals("""
+//            printf "$(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR))"
+//            """.trimIndent() + "\n", renderedBash
+//        )
+//        val results = renderedBash.runCommand()
+//        assertEquals(SCRIPT_GENERIC_ERROR, results.second)
+//    }
 
     @Test
     fun getBast_shellstring_withShellStringConcat_works() {

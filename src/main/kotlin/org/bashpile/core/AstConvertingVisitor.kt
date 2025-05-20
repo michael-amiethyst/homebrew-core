@@ -81,6 +81,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode? {
+        // TODO after assignments implemented:
+        //  when children are '$(', stuff, and ')'
+        //  then "unwind" by moving "stuff" to a preamble node with an assignment
         return BastNode(ctx.children.map { visit(it) })
     }
 
