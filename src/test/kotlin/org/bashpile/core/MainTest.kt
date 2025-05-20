@@ -33,7 +33,7 @@ class MainTest {
         val output = fixture.test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
-        assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
+        assertEquals("printf \"Hello Bashpile!\"\n", output.stdout)
     }
 
     @Test
@@ -41,7 +41,7 @@ class MainTest {
         val output = fixture.test(arrayOf("src/test/resources/bpsScripts/helloWithConcat.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
-        assertEquals("printf \"Hello Bashpile!\\n\"", output.stdout)
+        assertEquals("printf \"Hello Bashpile!\"\n", output.stdout)
     }
 
     @Test
@@ -56,40 +56,40 @@ class MainTest {
     @Test
     fun getBast_printBool_works() {
         val script: InputStream = "print(true)".byteInputStream()
-        assertEquals("printf \"true\\n\"", fixture.getBast(script).render())
+        assertEquals("printf \"true\"\n", fixture.getBast(script).render())
     }
 
     @Test
     fun getBast_printBool_withParens_works() {
         val bpScript: InputStream = "print(((true)))".byteInputStream()
-        assertEquals("printf \"true\\n\"", fixture.getBast(bpScript).render())
+        assertEquals("printf \"true\"\n", fixture.getBast(bpScript).render())
     }
 
     @Test
     fun getBast_printString_tripleConcat_works() {
         val bpScript: InputStream = """
             print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
-        assertEquals("printf \"Hello Bashpile!\\n\"", fixture.getBast(bpScript).render())
+        assertEquals("printf \"Hello Bashpile!\"\n", fixture.getBast(bpScript).render())
     }
 
     @Test
     fun getBast_printString_tripleConcat_withParen_works() {
         val bpScript: InputStream = """
             print((("Hello" + " " + "Bashpile!")))""".trimIndent().byteInputStream()
-        assertEquals("printf \"Hello Bashpile!\\n\"", fixture.getBast(bpScript).render())
+        assertEquals("printf \"Hello Bashpile!\"\n", fixture.getBast(bpScript).render())
     }
 
     @Test
     fun getBast_printString_tripleConcat_withMoreParens_works() {
         val bpScript: InputStream = """
             print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
-        assertEquals("printf \"Hello Bashpile!  It's awesome!\\n\"", fixture.getBast(bpScript).render())
+        assertEquals("printf \"Hello Bashpile!  It's awesome!\"\n", fixture.getBast(bpScript).render())
     }
 
     @Test
     fun getBast_printFloat_works() {
         val bpScript: InputStream = "print(1.0)".byteInputStream()
-        assertEquals("printf \"1.0\\n\"", fixture.getBast(bpScript).render())
+        assertEquals("printf \"1.0\"\n", fixture.getBast(bpScript).render())
     }
 
     @Test

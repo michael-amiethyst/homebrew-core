@@ -15,6 +15,6 @@ class ThrowingErrorListener: BaseErrorListener() {
         recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int, charPositionInLine: Int,
         msg: String, e: RecognitionException?
     ) {
-        throw ParseCancellationException("line $line:$charPositionInLine $msg")
+        throw ParseCancellationException("line $line:$charPositionInLine $msg ${e?.stackTrace ?: ""}")
     }
 }

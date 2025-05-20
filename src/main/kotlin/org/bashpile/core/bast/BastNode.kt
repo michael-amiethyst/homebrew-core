@@ -16,11 +16,11 @@ open class BastNode(protected val children: List<BastNode>) {
      * Are all of the leaves of the AST string literals?
      * Used to ensure that string concatenation is possible.
      */
-    fun areAllStringLiterals(): Boolean {
+    fun areAllStrings(): Boolean {
         return if (children.isEmpty()) {
-            this is StringLiteralBastNode
+            this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
         } else {
-            children.all { it.areAllStringLiterals() }
+            children.all { it.areAllStrings() }
         }
     }
 }

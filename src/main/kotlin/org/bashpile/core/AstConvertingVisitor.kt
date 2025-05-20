@@ -5,7 +5,7 @@ import org.bashpile.core.BashpileParser.ExpressionContext
 import org.bashpile.core.bast.*
 
 /**
- * Converts Antlr AST (aast) to Bashpile AST (bast).
+ * Converts Antlr AST (AAST) to Bashpile AST (BAST).
  * Created by [Main].
  */
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
@@ -16,8 +16,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode? {
-        // TODO get rid of .render, have ShellLineBastNode track children instead of a string
-        return ShellLineBastNode(ctx.children.map { visit(it).render() }.joinToString(""))
+        return ShellLineBastNode(ctx.children.map { visit(it) })
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode? {
@@ -65,13 +64,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         require(ctx.children[1].text == "+") { "Only addition is supported" }
-        require(visit(ctx.children[0]).areAllStringLiterals()) { "Left operand must be all strings" }
-        require(visit(ctx.children[2]).areAllStringLiterals()) { "Right operand must be all strings" }
-        return BastNode(listOf(visit(ctx.children[0]), visit(ctx.children[2])))
+        val leftBast = visit(ctx.children[0])
+        require(leftBast.areAllStrings()) { "Left operand must be all strings" }
+        val right = ctx.children[2]
+        val rightBast = visit(right)
+        require(rightBast.areAllStrings()) {
+            "Right operand must be all strings, class was ${rightBast.javaClass}"
+        }
+        return BastNode(listOf(leftBast, rightBast))
     }
 
     // Leaf nodes (parts of expressions)
 
+    // we shouldn't need visitShellStringContents, maybe for nested shellstrings?
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode? {
         check(ctx.children.size == 3) { "ShellStringContext must have exactly 3 children" }
         return ShellStringBastNode(ctx.shellStringContents().map { visit(it )})

@@ -7,19 +7,19 @@ import org.junit.jupiter.api.Assertions.*
 
 class BashpileAstTest {
     @Test
-    fun areAllStringLiterals() {
+    fun areAllStrings() {
         val stringLiteral = StringLiteralBastNode("\"hello\"")
         val intLiteral = IntLiteralBastNode(1.toBigInteger())
         val booleanLiteral = BooleanLiteralBastNode(true)
 
-        assertTrue(stringLiteral.areAllStringLiterals())
-        assertFalse(intLiteral.areAllStringLiterals())
-        assertFalse(booleanLiteral.areAllStringLiterals())
+        assertTrue(stringLiteral.areAllStrings())
+        assertFalse(intLiteral.areAllStrings())
+        assertFalse(booleanLiteral.areAllStrings())
 
         val listOfStringLiterals = BastNode(listOf(stringLiteral, stringLiteral))
-        assertTrue(listOfStringLiterals.areAllStringLiterals())
+        assertTrue(listOfStringLiterals.areAllStrings())
 
         val listWithIntAndString = BastNode(listOf(stringLiteral, intLiteral))
-        assertFalse(listWithIntAndString.areAllStringLiterals())
+        assertFalse(listWithIntAndString.areAllStrings())
     }
 }

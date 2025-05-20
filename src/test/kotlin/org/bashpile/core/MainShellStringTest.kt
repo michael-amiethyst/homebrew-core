@@ -36,7 +36,15 @@ class MainShellStringTest {
         assertEquals("$(printf \"newline\")\n", fixture.getBast(script).render())
     }
 
-    // TODO write test for concated with a string
+    @Test
+    fun getBast_shellstring_withConcat_works() {
+        val script: InputStream = """
+            print("Hello " + #(printf 'shellstring!'))""".trim().byteInputStream()
+        assertEquals("""
+            printf "Hello $(printf 'shellstring!')"
+            """.trimIndent() + "\n", fixture.getBast(script).render())
+    }
+
     // TODO write test for nested subshells in a shellstring
     // TODO write test for nested shellstrings
     // TODO write test for shellstring, with shellstring + shellstring contents
