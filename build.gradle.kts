@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "org.bashpile.core"
-version = "0.6.0"
+version = "0.7.0"
 
 repositories {
     mavenCentral()
@@ -115,6 +115,7 @@ graalvmNative {
             // additional buildArgs at https://www.graalvm.org/21.3/reference-manual/native-image/Options/
 
             // From https://stackoverflow.com/questions/72770461/graalvm-native-image-can-not-compile-logback-dependencies
+            buildArgs.add("-H:+UnlockExperimentalVMOptions")
             buildArgs.add("-H:ReflectionConfigurationFiles=../../../src/main/resources/reflection-config.json")
         }
     }
@@ -164,3 +165,16 @@ val integrationTest = task<Test>("integrationTest") {
 }
 
 tasks.check { dependsOn(integrationTest) }
+
+////////////////////////////////////
+// Deploy binaries for Homebrew Cask
+////////////////////////////////////
+
+task<Copy>("deploy") {
+    dependsOn("check")
+
+    // copy build/native/nativeCompile/bashpile to bin/bashpile
+    from("build/native/nativeCompile")
+    include("bashpile")
+    into("bin")
+}

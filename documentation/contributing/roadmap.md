@@ -1,3 +1,5 @@
-1. Shell Strings, Cask deploy
+1. Assignment statements
 2. Floating point calculations
-3. IDE integration (IntelliJ)
+2. IDE integration (IntelliJ)
+3. if-elseif-else
+4. primary expressions
