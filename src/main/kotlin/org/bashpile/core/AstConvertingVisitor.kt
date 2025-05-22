@@ -7,6 +7,7 @@ import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.VariableDeclarationBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
@@ -22,11 +23,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     // TODO assignments - rename to variable declaration statements
     override fun visitAssignmentStatement(ctx: BashpileParser.AssignmentStatementContext): BastNode {
-        // TODO assignments - uncomment
-        return BastNode(listOf())
-//        val node = visit(ctx.expression())
-//        return VariableDeclarationBastNode(
-//            ctx.typedId().Id().text, ctx.typedId().complexType().types(0).text, "", node)
+        val node = visit(ctx.expression())
+        // TODO assignments - handle modifiers like export and readonly
+        ctx.typedId().modifier()
+        return VariableDeclarationBastNode(
+            ctx.typedId().Id().text, ctx.typedId().complexType().types(0).text, "", node
+        )
     }
 
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
