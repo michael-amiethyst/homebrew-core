@@ -172,6 +172,8 @@ tasks.check { dependsOn(integrationTest) }
 
 task<Copy>("deploy") {
     dependsOn("check")
+
+    // copy build/native/nativeCompile/bashpile to bin/bashpile
     from("build/native/nativeCompile")
     include("bashpile")
     into("bin")

@@ -64,14 +64,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         require(ctx.children[1].text == "+") { "Only addition is supported" }
-        val leftBast = visit(ctx.children[0])
-        require(leftBast.areAllStrings()) { "Left operand must be all strings" }
-        val right = ctx.children[2]
-        val rightBast = visit(right)
-        require(rightBast.areAllStrings()) {
-            "Right operand must be all strings, class was ${rightBast.javaClass}"
-        }
-        return BastNode(listOf(leftBast, rightBast))
+        val left = visit(ctx.children[0])
+        require(left.areAllStrings()) { "Left operand must be all strings, class was ${left.javaClass}" }
+        val right = visit(ctx.children[2])
+        require(right.areAllStrings()) { "Right operand must be all strings, class was ${right.javaClass}" }
+        return BastNode(listOf(left, right))
     }
 
     // Leaf nodes (parts of expressions)
