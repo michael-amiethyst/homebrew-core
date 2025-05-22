@@ -18,7 +18,6 @@ cask "bashpile" do
   # depends_on "bc"
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as a generic dependency for consistency
 
-  # TODO look into 'artifact, target' stanza for per-os binaries
   binary "bin/bashpile"
 
   def caveats
