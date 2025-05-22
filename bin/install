@@ -4,4 +4,4 @@
 brew uninstall michael-amiethyst/core/bashpile || true
 
 # install
-brew install --HEAD --cask Casks/bashpile.rb
+brew install --verbose --cask Casks/bashpile.rb
