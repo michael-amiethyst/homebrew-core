@@ -5,3 +5,4 @@
 * 0.5.0 - String concatenation, .runCommand() optimization, initial boolean, int and float implementations
 * 0.6.0 - Graal compatible logging, -vv logging option, parenthesis handling
 * 0.7.0 - Shell Strings, Shell Lines and Brew Cask deployment
+* 0.8.0 - Declarations, assignments and strong typing
