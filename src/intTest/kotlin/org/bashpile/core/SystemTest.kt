@@ -29,7 +29,7 @@ class SystemTest {
     fun systemWorks() {
         val output = "$bashpileFilename '$HELLO_FILENAME'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals("printf \"Hello Bashpile!\\n\"\n", output.first)
+        assertEquals("printf \"Hello Bashpile!\"\n", output.first)
     }
 
     @Test
@@ -38,7 +38,7 @@ class SystemTest {
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.contains(Main.STARTUP_MESSAGE), "Output: ${output.first}")
         assertFalse(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE), "Output: ${output.first}")
-        assertTrue(output.first.endsWith("printf \"Hello Bashpile!\\n\"\n"))
+        assertTrue(output.first.endsWith("printf \"Hello Bashpile!\"\n"))
     }
 
     @Test
@@ -47,7 +47,7 @@ class SystemTest {
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.contains(Main.STARTUP_MESSAGE), "Output: ${output.first}")
         assertTrue(output.first.contains(Main.VERBOSE_ENABLED_MESSAGE), "Output: ${output.first}")
-        assertTrue(output.first.endsWith("printf \"Hello Bashpile!\\n\"\n"))
+        assertTrue(output.first.endsWith("printf \"Hello Bashpile!\"\n"))
     }
 
     @Test
@@ -58,7 +58,7 @@ class SystemTest {
         assumeTrue(path.isExecutable(), "Shebang test file not executable")
         val output = path.toString().runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
-        assertEquals("printf \"Hello Shebang!\\n\"\n", output.first)
+        assertEquals("printf \"Hello Shebang!\"\n", output.first)
     }
 
     @Test

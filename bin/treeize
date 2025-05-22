@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Example Usage: bin/tokenize src/test/resources/bpsScripts/hello.bps
+
+
+# set exported classpath
+export CLASSPATH
+./gradlew saveClasspath
+CLASSPATH=$(cat build/classpath.txt)
+
+java org.antlr.v4.gui.TestRig org.bashpile.core.Bashpile program -gui "$@"
