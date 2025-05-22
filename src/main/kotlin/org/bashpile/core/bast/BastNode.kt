@@ -1,6 +1,7 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.AstConvertingVisitor
+import org.bashpile.core.bast.types.LeafBastNode
 
 /**
  * The base class of the BAST class hierarchy, and it may be used as a root node as is.

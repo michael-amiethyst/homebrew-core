@@ -1,5 +1,6 @@
-package org.bashpile.core.bast
+package org.bashpile.core.bast.types
 
+import org.bashpile.core.bast.BastNode
 import java.math.BigInteger
 
 /** Represents an integer of any size */
