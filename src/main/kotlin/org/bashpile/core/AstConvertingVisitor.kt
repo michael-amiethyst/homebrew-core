@@ -7,6 +7,7 @@ import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.types.VariableDeclarationBastNode
 
@@ -31,7 +32,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val readonly = ctx.typedId().modifier().any { it.text == "readonly" }
         val export = ctx.typedId().modifier().any { it.text == "exported" }
         val id = ctx.typedId().Id().text
-        val type = ctx.typedId().complexType().types(0).text
+        val typeText = ctx.typedId().complexType().types(0).text
+        val type = TypeEnum.valueOf(typeText.uppercase())
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
 

@@ -14,7 +14,7 @@ class MainDeclarationsTest {
 
     @Test
     fun getBast_declare_bool_works() {
-        val bashpileText: InputStream = "b: bool = true".byteInputStream()
+        val bashpileText: InputStream = "b: boolean = true".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
         assertEquals("""
             declare b
