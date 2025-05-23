@@ -21,14 +21,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ShellLineBastNode(ctx.children.map { visit(it) })
     }
 
-    // TODO assignments - rename to variable declaration statements
-    override fun visitAssignmentStatement(ctx: BashpileParser.AssignmentStatementContext): BastNode {
+    override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
         val node = visit(ctx.expression())
-        // TODO assignments - handle modifiers like export and readonly
-        ctx.typedId().modifier()
-        return VariableDeclarationBastNode(
-            ctx.typedId().Id().text, ctx.typedId().complexType().types(0).text, "", node
-        )
+        val readonly = ctx.typedId().modifier().any { it.text == "readonly" }
+        val export = ctx.typedId().modifier().any { it.text == "exported" }
+        val id = ctx.typedId().Id().text
+        val type = ctx.typedId().complexType().types(0).text
+        return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
 
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
