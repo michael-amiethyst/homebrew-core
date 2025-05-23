@@ -25,7 +25,6 @@ tokens { INDENT, DEDENT }
 }
 
 // keywords
-// TODO remove empty?
 Empty    : 'empty';
 Unknown  : 'unknown';
 Boolean  : 'boolean';

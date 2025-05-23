@@ -20,7 +20,7 @@ import org.bashpile.core.bast.types.VariableDeclarationBastNode
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
-        return BastNode(ctx.children.map { visit(it) })
+        return InternalBastNode(ctx.children.map { visit(it) })
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode {
@@ -37,13 +37,15 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
 
+    // TODO assignment - impl reassignment
+
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
         val nodes = ctx.expressions().map { visit(it) }
         return PrintBastNode(nodes)
     }
 
     override fun visitExpressionStatement(ctx: BashpileParser.ExpressionStatementContext): BastNode {
-        return BastNode(ctx.children.map { visit(it) })
+        return InternalBastNode(ctx.children.map { visit(it) })
     }
 
     /** Encapsulates Antlr API to preserve Law of Demeter */
@@ -96,7 +98,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         require(left.areAllStrings()) { "Left operand must be all strings, class was ${left.javaClass}" }
         val right = visit(ctx.children[2])
         require(right.areAllStrings()) { "Right operand must be all strings, class was ${right.javaClass}" }
-        return BastNode(listOf(left, right))
+        return InternalBastNode(listOf(left, right))
     }
 
     // Leaf nodes (parts of expressions)
@@ -109,7 +111,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         // TODO after assignments implemented:
         //  when children are '$(', stuff, and ')'
         //  then "unwind" by moving "stuff" to a preamble node with an assignment
-        return BastNode(ctx.children.map { visit(it) })
+        return InternalBastNode(ctx.children.map { visit(it) })
     }
 
     override fun visitTerminal(node: TerminalNode): BastNode {

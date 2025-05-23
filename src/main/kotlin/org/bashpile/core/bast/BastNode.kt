@@ -5,13 +5,12 @@ import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.VariableTypeInfo
 
 /**
- * The base class of the BAST class hierarchy, and it may be used as a root node as is.
+ * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
- * The root is created by the [AstConvertingVisitor].  Subclasses also create manually as an internal node.
+ * The root is created by the [AstConvertingVisitor].
  */
-open class BastNode(protected val children: List<BastNode>) {
+abstract class BastNode(protected val children: List<BastNode>) {
 
-    // TODO assignments - make RootBastNode class that has this variable in it
     protected val stackframe: MutableList<VariableTypeInfo> = mutableListOf()
 
     open fun render(): String {
