@@ -3,7 +3,7 @@ package org.bashpile.core.bast.types
 import org.apache.commons.lang3.StringUtils
 import org.bashpile.core.bast.BastNode
 
-// TODO assignments - make Enum/class for types, make stackframe for type info (e.g. readonly)
+// TODO assignments - make Enum/class for types
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(
     val id: String,
@@ -15,7 +15,7 @@ class VariableDeclarationBastNode(
 ) : BastNode(listOf(child)) {
     override fun render(): String {
         var exportFlags = ""
-        // TODO assignments - put readonly to the stackframe
+        stackframe.add(VariableTypeInfo(id, type, subtype, readonly))
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
         val unQuotedRender = StringUtils.strip(children[0].render(), "\"'")
