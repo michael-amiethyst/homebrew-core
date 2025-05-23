@@ -25,9 +25,10 @@ tokens { INDENT, DEDENT }
 }
 
 // keywords
+// TODO remove empty?
 Empty    : 'empty';
 Unknown  : 'unknown';
-Bool     : 'bool';
+Boolean  : 'boolean';
 Number   : 'number';
 Int      : 'int';
 Float    : 'float';
