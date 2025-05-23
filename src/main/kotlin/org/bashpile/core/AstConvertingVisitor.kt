@@ -7,6 +7,7 @@ import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.types.VariableDeclarationBastNode
 
 /**
@@ -16,6 +17,10 @@ import org.bashpile.core.bast.types.VariableDeclarationBastNode
  * Code is arranged from complex at the top to simple at the bottom.
  */
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
+
+    override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
+        return BastNode(ctx.children.map { visit(it) })
+    }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode {
         return ShellLineBastNode(ctx.children.map { visit(it) })
@@ -47,6 +52,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     ///////////////////////////////////
     // expressions
     ///////////////////////////////////
+
+    override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
+        require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
+        return VariableBastNode(ctx.Id().text)
+    }
 
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {
         // strip parenthesis until calc implemented

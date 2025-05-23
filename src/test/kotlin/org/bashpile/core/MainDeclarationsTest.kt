@@ -42,5 +42,23 @@ class MainDeclarationsTest {
         assertEquals(SCRIPT_SUCCESS, results.second)
     }
 
-    // TODO write declare and print test
+    @Test
+    fun getBast_declare_readonlyExported_string_withPrintWorks() {
+        val bashpileText: InputStream = """
+            b: readonly exported string = 'A_STRING'
+            print(b)
+        """.trimIndent().byteInputStream()
+        val bashScript = fixture.getBast(bashpileText).render()
+        assertEquals("""
+            declare -x b
+            b="A_STRING"
+            printf "${'$'}b"
+        
+        """.trimIndent(), bashScript
+        )
+
+        val results = bashScript.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("A_STRING\n", results.first)
+    }
 }
