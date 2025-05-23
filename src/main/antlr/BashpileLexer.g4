@@ -31,7 +31,7 @@ Bool     : 'bool';
 Number   : 'number';
 Int      : 'int';
 Float    : 'float';
-Str      : 'str';
+String   : 'string';
 List     : 'list';
 Map      : 'map';
 Ref      : 'ref';
