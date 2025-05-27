@@ -1,7 +1,7 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.AstConvertingVisitor
-import org.bashpile.core.Main
+import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableTypeInfo
@@ -16,12 +16,11 @@ abstract class BastNode(
     protected val children: List<BastNode>, val id: String? = null, val type: TypeEnum = TypeEnum.UNKNOWN) {
 
     fun resolvedType(): TypeEnum {
-        // TODO assignment - factor Main.instance into a BashpileState object
-        return Main.instance.stackframe.find { it.id == id }?.type ?: type
+        return bashpileState.variableInfo(id)?.type ?: type
     }
 
     fun variableInfo(): VariableTypeInfo? {
-        return Main.instance.stackframe.find { it.id == id }
+        return bashpileState.variableInfo(id)
     }
 
     open fun render(): String {
