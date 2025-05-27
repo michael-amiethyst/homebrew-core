@@ -2,17 +2,18 @@ package org.bashpile.core.bast
 
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.bast.types.LeafBastNode
-import org.bashpile.core.bast.types.VariableTypeInfo
+import org.bashpile.core.bast.types.TypeEnum
+
 
 /**
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
  * The root is created by the [AstConvertingVisitor].
  */
-abstract class BastNode(protected val children: List<BastNode>) {
+abstract class BastNode(protected val children: List<BastNode>, val type: TypeEnum = TypeEnum.UNKNOWN) {
 
-    protected val stackframe: MutableList<VariableTypeInfo> = mutableListOf()
-
+    // TODO assignments - add init to put id and type on the stack if both set
+    // TODO assignments - add type getter to check the stack, override if type is unknown and check for a match otherwise
     open fun render(): String {
         return children.joinToString("") { it.render() }
     }
