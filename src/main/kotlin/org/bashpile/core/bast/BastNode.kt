@@ -1,8 +1,10 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.AstConvertingVisitor
+import org.bashpile.core.Main
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.TypeEnum
+import org.bashpile.core.bast.types.VariableTypeInfo
 
 
 /**
@@ -10,16 +12,24 @@ import org.bashpile.core.bast.types.TypeEnum
  * Converts this AST and children to the Bashpile text output via [render].
  * The root is created by the [AstConvertingVisitor].
  */
-abstract class BastNode(protected val children: List<BastNode>, val type: TypeEnum = TypeEnum.UNKNOWN) {
+abstract class BastNode(
+    protected val children: List<BastNode>, val id: String? = null, val type: TypeEnum = TypeEnum.UNKNOWN) {
 
-    // TODO assignments - add init to put id and type on the stack if both set
-    // TODO assignments - add type getter to check the stack, override if type is unknown and check for a match otherwise
+    fun resolvedType(): TypeEnum {
+        // TODO assignment - factor Main.instance into a BashpileState object
+        return Main.instance.stackframe.find { it.id == id }?.type ?: type
+    }
+
+    fun variableInfo(): VariableTypeInfo? {
+        return Main.instance.stackframe.find { it.id == id }
+    }
+
     open fun render(): String {
         return children.joinToString("") { it.render() }
     }
 
     /**
-     * Are all of the leaves of the AST string literals?
+     * Are all the leaves of the AST string literals?
      * Used to ensure that string concatenation is possible.
      */
     fun areAllStrings(): Boolean {
