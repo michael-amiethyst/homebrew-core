@@ -1,7 +1,7 @@
 package org.bashpile.core.bast.types
 
 import org.apache.commons.lang3.StringUtils
-import org.bashpile.core.Main
+import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.BastNode
 
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
@@ -16,7 +16,7 @@ class VariableDeclarationBastNode(
     // TODO assignments - move type checking to "init" from render
     override fun render(): String {
         var exportFlags = ""
-        Main.instance.stackframe.add(VariableTypeInfo(id!!, type, subtype, readonly))
+        bashpileState.addVariableInfo(id!!, type, subtype, readonly)
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
         val unQuotedRender = StringUtils.strip(children[0].render(), "\"'")

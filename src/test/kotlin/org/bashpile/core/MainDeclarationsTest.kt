@@ -114,6 +114,4 @@ class MainDeclarationsTest {
             fixture.getBast(bashpileText).render()
         }
     }
-
-    // TODO assignments - more tests
 }
