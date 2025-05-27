@@ -7,6 +7,7 @@ import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.ReassignmentBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.types.VariableDeclarationBastNode
@@ -37,7 +38,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
 
-    // TODO assignment - impl reassignment
+    override fun visitReassignmentStatement(ctx: BashpileParser.ReassignmentStatementContext): BastNode {
+        return ReassignmentBastNode(ctx.Id().text, visit(ctx.expression()))
+    }
 
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
         val nodes = ctx.expressions().map { visit(it) }
@@ -59,7 +62,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
         require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
-        return VariableBastNode(ctx.Id().text)
+        return VariableBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
+    }
+
+    override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
+        require(ctx.children.size == 1) { "TypedId must have exactly one child" }
+        val primaryTypeString = ctx.complexType().types(0).text
+        val typeEnum = TypeEnum.valueOf(primaryTypeString.uppercase())
+        return VariableBastNode(ctx.Id().text, typeEnum)
     }
 
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {
