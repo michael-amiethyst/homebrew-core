@@ -23,6 +23,7 @@ abstract class BastNode(
         return bashpileState.variableInfo(id)
     }
 
+    /** Should be just string manipulation to make final Bashpile text, no logic */
     open fun render(): String {
         return children.joinToString("") { it.render() }
     }

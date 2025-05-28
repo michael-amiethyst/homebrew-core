@@ -85,7 +85,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return if (boolContext != null) {
             BooleanLiteralBastNode(boolContext.text.toBoolean())
         } else if (stringContext != null) {
-            StringLiteralBastNode(stringContext.text)
+            val text = stringContext.text
+            // remove enclosing double or single quotes
+            val trimEnds = stringContext.text.substring(1, text.length - 1)
+            StringLiteralBastNode(trimEnds)
         } else {
             val message = "Unknown literal type.  Numeric values should be handled in visitNumberExpression"
             throw IllegalArgumentException(message)

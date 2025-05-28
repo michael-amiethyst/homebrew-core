@@ -91,6 +91,28 @@ class MainDeclarationsTest {
     }
 
     @Test
+    fun getBast_reassign_withLiteralQuotes_works() {
+        val bashpileText: InputStream = """
+            b: exported string = 'A_STRING'
+            b="'B_STRING'"
+            print(b)
+        """.trimIndent().byteInputStream()
+        val bashScript = fixture.getBast(bashpileText).render()
+        assertEquals("""
+            declare -x b
+            b="A_STRING"
+            b="'B_STRING'"
+            printf "${'$'}b"
+        
+        """.trimIndent(), bashScript
+        )
+
+        val results = bashScript.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("'B_STRING'\n", results.first)
+    }
+
+    @Test
     fun getBast_reassign_readonly_fails() {
         val bashpileText: InputStream = """
             b: readonly exported string = 'A_STRING'
