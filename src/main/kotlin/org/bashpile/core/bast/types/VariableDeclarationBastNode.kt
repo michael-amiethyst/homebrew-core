@@ -1,6 +1,5 @@
 package org.bashpile.core.bast.types
 
-import org.apache.commons.lang3.StringUtils
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.BastNode
 
@@ -8,21 +7,23 @@ import org.bashpile.core.bast.BastNode
 class VariableDeclarationBastNode(
     id: String,
     type: TypeEnum,
-    val subtype: TypeEnum = TypeEnum.UNKNOWN,
+    subtype: TypeEnum = TypeEnum.UNKNOWN,
     val readonly: Boolean = false,
     val export: Boolean = false,
     child: BastNode
 ) : BastNode(listOf(child), id, type) {
-    // TODO assignments - move type checking to "init" from render
+    init {
+        bashpileState.addVariableInfo(id, type, subtype, readonly)
+    }
+
     override fun render(): String {
         var exportFlags = ""
-        bashpileState.addVariableInfo(id!!, type, subtype, readonly)
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
-        val unQuotedRender = StringUtils.strip(children[0].render(), "\"'")
+        val childRender = children[0].render()
         return """
             declare $flags$id
-            $id="$unQuotedRender"
+            $id="$childRender"
         
         """.trimIndent()
     }
