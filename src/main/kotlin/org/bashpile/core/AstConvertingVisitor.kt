@@ -8,6 +8,7 @@ import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.ReassignmentBastNode
+import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.types.VariableDeclarationBastNode

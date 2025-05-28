@@ -3,6 +3,7 @@ package org.bashpile.core.bast
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableTypeInfo
 
