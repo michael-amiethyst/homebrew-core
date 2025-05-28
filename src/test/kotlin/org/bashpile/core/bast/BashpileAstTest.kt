@@ -2,6 +2,7 @@ package org.bashpile.core.bast
 
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.IntLiteralBastNode
+import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
