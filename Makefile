@@ -1,0 +1,2 @@
+default:
+	./gradlew clean deploy
