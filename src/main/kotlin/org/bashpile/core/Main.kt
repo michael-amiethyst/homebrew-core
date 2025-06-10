@@ -20,6 +20,8 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 
+// TODO add Makefile for nativeBuild, jar to Gradle for Formula (Bottles?)
+// TODO change 'int' and 'ref' lexer tokens.  Remove 'unknown'
 
 fun main(args: Array<String>) = Main().main(args)
 
