@@ -1,12 +1,13 @@
-cask "Bashpile" do
+cask "bashpile" do
+  version "0.7.0"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.7.0"
+  name "Bashpile"
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
-  license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.7.0"
-  head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
+  # license "MIT"
 
   # foundational dependencies
-  depends_on "bash"
+  # depends_on "bash"
 
   # tooling dependencies for compilation
   # depends_on "shfmt"
@@ -17,19 +18,7 @@ cask "Bashpile" do
   # depends_on "bc"
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as a generic dependency for consistency
 
-  def install
-    binary "bin/bashpile"
-    # bin.install "target/bpc"
-    # FileUtils.cp "#{bin}/bpc", "#{bin}/bashpilec"
-    # bin.install "target/bpr"
-    # FileUtils.cp "#{bin}/bpr", "#{bin}/bashpile"
-    # bin.install "target/bashpile-stdlib"
-  end
-
-  test do
-    assert_match "Hello Bash", shell_output("printf \"print('Hello World')\" > /tmp/hello && bashpile /tmp/hello")
-    # assert_match "6.28", shell_output("echo \"print(3.14 + 3.14)\" | bpr -c")
-  end
+  binary "bin/bashpile"
 
   def caveats
     <<~EOS

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# uninstall
+brew uninstall michael-amiethyst/core/bashpile || true
+
+# install
+brew install --verbose --cask Casks/bashpile.rb

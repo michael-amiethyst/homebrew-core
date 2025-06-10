@@ -4,10 +4,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // Main Config
 //////////////
 
-// gradle version specified at gradle/wrapper/gradle-wrapper.properties
-val antlrVersion = "4.13.2"
-val cliktVersion = "5.0.1"
-val junitVersion = "5.12.0-M1"
+val antlrVersion = properties["version.antlr"] as String
+val cliktVersion = properties["version.clikt"] as String
+val junitVersion = properties["version.junit"] as String
+
+group = "org.bashpile.core"
+version = properties["version.bashpile"] as String
 
 plugins {
     antlr
@@ -17,9 +19,6 @@ plugins {
     id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
     id("com.adarshr.test-logger") version "4.0.0"
 }
-
-group = "org.bashpile.core"
-version = "0.7.0"
 
 repositories {
     mavenCentral()

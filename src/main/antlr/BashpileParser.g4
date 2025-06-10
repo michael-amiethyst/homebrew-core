@@ -18,7 +18,7 @@ statement
     | Switch expression Colon INDENT (Case expression Colon indentedStatements)+ DEDENT
                                                 # switchStatement
     | <assoc=right> typedId (Equals expression)? Newline
-                                                # assignmentStatement
+                                                # variableDeclarationStatement
     | <assoc=right> (Id | listAccess) assignmentOperator expression Newline
                                                 # reassignmentStatement
     | Print OParen argumentList? CParen Newline # printStatement
@@ -74,7 +74,7 @@ expression
     ;
 
 literal : StringValues | NumberValues | BoolValues | Empty;
-types    : Unknown | Empty | Bool | Number | Int | Float | Str | List | Map | Ref;
+types    : Unknown | Empty | Boolean | Number | Int | Float | String | List | Map | Ref;
 
 // shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;

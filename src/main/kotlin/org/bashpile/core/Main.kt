@@ -13,12 +13,15 @@ import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
+import org.bashpile.core.bast.BashpileState
 import org.bashpile.core.bast.BastNode
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 
+// TODO add Makefile for nativeBuild, jar to Gradle for Formula (Bottles?)
+// TODO change 'int' and 'ref' lexer tokens.  Remove 'unknown'
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -31,6 +34,8 @@ fun main(args: Array<String>) = Main().main(args)
 class Main : CliktCommand() {
 
     companion object {
+        /** Singleton per Main() instance */
+        lateinit var bashpileState: BashpileState
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
 
         /** As in source/sink -> generates a startup message given a script filename */
@@ -42,6 +47,10 @@ class Main : CliktCommand() {
     private val verbosity by option("-v", "--verbose").counted(limit=2, clamp=true)
 
     private val logger = LogManager.getLogger(Main::javaClass)
+
+    init {
+        bashpileState = BashpileState()
+    }
 
     /**
      * The main entry point for the Bashpile compiler.

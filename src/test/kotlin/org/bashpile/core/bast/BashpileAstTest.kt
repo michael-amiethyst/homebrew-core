@@ -1,5 +1,8 @@
 package org.bashpile.core.bast
 
+import org.bashpile.core.bast.types.BooleanLiteralBastNode
+import org.bashpile.core.bast.types.IntLiteralBastNode
+import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -16,10 +19,10 @@ class BashpileAstTest {
         assertFalse(intLiteral.areAllStrings())
         assertFalse(booleanLiteral.areAllStrings())
 
-        val listOfStringLiterals = BastNode(listOf(stringLiteral, stringLiteral))
+        val listOfStringLiterals = InternalBastNode(listOf(stringLiteral, stringLiteral))
         assertTrue(listOfStringLiterals.areAllStrings())
 
-        val listWithIntAndString = BastNode(listOf(stringLiteral, intLiteral))
+        val listWithIntAndString = InternalBastNode(listOf(stringLiteral, intLiteral))
         assertFalse(listWithIntAndString.areAllStrings())
     }
 }
