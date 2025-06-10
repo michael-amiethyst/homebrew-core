@@ -1,7 +1,6 @@
 package org.bashpile.core
 
 import org.antlr.v4.runtime.tree.TerminalNode
-import org.bashpile.core.BashpileParser.ExpressionContext
 import org.bashpile.core.bast.*
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
@@ -31,10 +30,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
         val node = visit(ctx.expression())
-        val readonly = ctx.typedId().modifier().any { it.text == "readonly" }
-        val export = ctx.typedId().modifier().any { it.text == "exported" }
-        val id = ctx.typedId().Id().text
-        val typeText = ctx.typedId().complexType().types(0).text
+        val readonly = ctx.modifiers().any { it.text == "readonly" }
+        val export = ctx.modifiers().any { it.text == "exported" }
+        val id = ctx.id().text
+        val typeText = ctx.majorType().text
         val type = TypeEnum.valueOf(typeText.uppercase())
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
@@ -52,11 +51,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return InternalBastNode(ctx.children.map { visit(it) })
     }
 
-    /** Encapsulates Antlr API to preserve Law of Demeter */
-    private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
-        return argumentList().expression()
-    }
-
     ///////////////////////////////////
     // expressions
     ///////////////////////////////////
@@ -68,7 +62,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
         require(ctx.children.size == 1) { "TypedId must have exactly one child" }
-        val primaryTypeString = ctx.complexType().types(0).text
+        val primaryTypeString = ctx.majorType().text
         val typeEnum = TypeEnum.valueOf(primaryTypeString.uppercase())
         return VariableBastNode(ctx.Id().text, typeEnum)
     }
