@@ -13,9 +13,9 @@ class ReassignmentBastNode(
         if (varInfo != null) {
             check(!varInfo.readonly) { "Tried to reassign readonly variable: $id" }
 
-            val assignType = children[0].resolvedType()
-            check(varInfo.type.coercesTo(assignType)) {
-                "Tried to reassign variable of type ${varInfo.type} to $assignType: $id"
+            val assignType = children[0].resolvedMajorType()
+            check(varInfo.majorType.coercesTo(assignType)) {
+                "Tried to reassign variable of type ${varInfo.majorType} to $assignType: $id"
             }
         }
     }
