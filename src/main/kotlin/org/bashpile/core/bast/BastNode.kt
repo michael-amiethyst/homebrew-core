@@ -12,12 +12,17 @@ import org.bashpile.core.bast.types.VariableTypeInfo
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
  * The root is created by the [AstConvertingVisitor].
+ * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [BashpileState].
  */
 abstract class BastNode(
-    protected val children: List<BastNode>, val id: String? = null, val type: TypeEnum = TypeEnum.UNKNOWN) {
+    protected val children: List<BastNode>,
+    val id: String? = null,
+    /** The type at creation time see class KDoc for more info */
+    val majorType: TypeEnum = TypeEnum.UNKNOWN) {
 
-    fun resolvedType(): TypeEnum {
-        return bashpileState.variableInfo(id)?.type ?: type
+    fun resolvedMajorType(): TypeEnum {
+        // check call stack, fall back on node's type
+        return bashpileState.variableInfo(id)?.majorType ?: majorType
     }
 
     fun variableInfo(): VariableTypeInfo? {
