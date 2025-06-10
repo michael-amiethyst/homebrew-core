@@ -4,9 +4,12 @@
 ### Setup env
 Any script setup (e.g., for SDKMAN) should be reachable from .profile 
 (e.g., have it source .bashrc or .bash_profile if needed).
+
+Ensure your IDE can display Mermaid syntax.
+
 ### Build
-`./gradlew clean build`
-Native executable is generated to build/native/nativeCompile/bashpile
+`./gradlew clean check`
+Native executable is generated to bin/bashpile
 
 ## Design
 
