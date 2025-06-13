@@ -62,11 +62,12 @@ kotlin {
 }
 
 // for use in the bin/tokenize script
-tasks.register("saveClasspath") {
+val saveClasspath = tasks.register("saveClasspath") {
     doFirst {
         File("build/classpath.txt").writeText(sourceSets["main"].runtimeClasspath.asPath)
     }
 }
+tasks.build { dependsOn(saveClasspath) }
 
 ////////////////////
 // antlr integration
@@ -120,10 +121,6 @@ graalvmNative {
     }
 }
 
-tasks.named("nativeCompile") {
-    dependsOn("test")
-}
-
 ////////////////////////////////////////////////////////
 // system tests - integration tests for the whole system
 ////////////////////////////////////////////////////////
@@ -164,16 +161,3 @@ val integrationTest = task<Test>("integrationTest") {
 }
 
 tasks.check { dependsOn(integrationTest) }
-
-////////////////////////////////////
-// Deploy binaries for Homebrew Cask
-////////////////////////////////////
-
-task<Copy>("deploy") {
-    dependsOn("check")
-
-    // copy build/native/nativeCompile/bashpile to bin/bashpile
-    from("build/native/nativeCompile")
-    include("bashpile")
-    into("bin")
-}
