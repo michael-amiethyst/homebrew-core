@@ -128,7 +128,7 @@ class MainDeclarationsTest {
     fun getBast_reassign_wrongType_fails() {
         val bashpileText: InputStream = """
             b: exported string = 'A_STRING'
-            i: int = 0
+            i: integer = 0
             b = i
             print(b)
         """.trimIndent().byteInputStream()
