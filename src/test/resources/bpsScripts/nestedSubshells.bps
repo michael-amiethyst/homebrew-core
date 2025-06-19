@@ -1,1 +1,1 @@
-print(#(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR)))
+print(#(printf $(printf 'shellstring!'; exit 1)))

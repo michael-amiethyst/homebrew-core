@@ -2,6 +2,7 @@ package org.bashpile.core
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.io.File
 import java.io.InputStream
 
 
@@ -57,20 +58,18 @@ class MainShellStringTest {
         assertEquals("shellstring!\n", renderedBash.runCommand().first)
     }
 
-    // TODO after assignments are implemented, uncomment and implement unwind logic
-//    @Test
-//    fun getBast_shellstring_nestedSubshells_withInnerError_fails() {
-//        // TODO reference nestedSubshells.bps instead of literal string here
-//        val script: InputStream = """
-//            print(#(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR)))""".trim().byteInputStream()
-//        val renderedBash = fixture.getBast(script).render()
-//        assertEquals("""
-//            printf "$(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR))"
-//            """.trimIndent() + "\n", renderedBash
-//        )
-//        val results = renderedBash.runCommand()
-//        assertEquals(SCRIPT_GENERIC_ERROR, results.second)
-//    }
+    @Test
+    fun getBast_shellstring_nestedSubshells_withInnerError_fails() {
+        val pathname = "src/test/resources/bpsScripts/nestedSubshells.bps"
+        val script: InputStream =  File(pathname).readText().trim().byteInputStream()
+        val renderedBash = fixture.getBast(script).render()
+        assertEquals("""
+            printf "$(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR))"
+            """.trimIndent() + "\n", renderedBash
+        )
+        val results = renderedBash.runCommand()
+        assertEquals(SCRIPT_GENERIC_ERROR, results.second)
+    }
 
     @Test
     fun getBast_shellstring_withShellStringConcat_works() {
