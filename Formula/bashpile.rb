@@ -1,5 +1,4 @@
 class Bashpile < Formula
-  name "Bashpile"
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
   version "0.9.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
@@ -10,6 +9,7 @@ class Bashpile < Formula
   # foundational dependencies
   depends_on "openjdk"
   depends_on "bash"
+  depends_on "make" => :build
   depends_on "gradle" => :build
 
   # tooling dependencies for compilation
@@ -19,12 +19,12 @@ class Bashpile < Formula
   # tooling dependencies for generated scripts
   # depends_on "gnu-sed"
   # depends_on "bc"
-  depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
+  # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
 
   def install
     # build jar only
-    system "gradle", "clean", "build", "-x", "test", "-x", "nativeCompile"
-    bin.install "build/native/nativeCompile/bashpile"
+    system "make", "jar"
+    bin.install "build/bashpile"
     # bin.install "target/bpc"
     # FileUtils.cp "#{bin}/bpc", "#{bin}/bashpilec"
     # bin.install "target/bpr"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-echo '#!/usr/bin/env -S java -jar' > target/bpc
-/bin/cat target/bashpile.jar >> target/bpc
-/bin/chmod +x target/bpc
+echo '#!/usr/bin/env -S java -jar' > build/bashpile
+/bin/cat build/libs/bashpile-all.jar >> build/bashpile
+/bin/chmod +x build/bashpile
