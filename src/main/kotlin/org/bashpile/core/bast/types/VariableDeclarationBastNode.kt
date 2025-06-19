@@ -7,7 +7,7 @@ import org.bashpile.core.bast.BastNode
 class VariableDeclarationBastNode(
     id: String,
     type: TypeEnum,
-    subtype: TypeEnum = TypeEnum.UNKNOWN,
+    val subtype: TypeEnum = TypeEnum.UNKNOWN,
     val readonly: Boolean = false,
     val export: Boolean = false,
     child: BastNode
@@ -26,5 +26,8 @@ class VariableDeclarationBastNode(
             $id="$childRender"
         
         """.trimIndent()
+    }
+    override fun deepCopy(): VariableDeclarationBastNode {
+        return VariableDeclarationBastNode(id!!, majorType, subtype, readonly, export, children[0].deepCopy())
     }
 }

@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.bast.*
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
-import org.bashpile.core.bast.types.IntLiteralBastNode
+import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.ReassignmentBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
@@ -95,7 +95,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return if (nodeText.contains('.')) {
             FloatLiteralBastNode(nodeText.toBigDecimal())
         } else {
-            IntLiteralBastNode(nodeText.toBigInteger())
+            IntegerLiteralBastNode(nodeText.toBigInteger())
         }
     }
 

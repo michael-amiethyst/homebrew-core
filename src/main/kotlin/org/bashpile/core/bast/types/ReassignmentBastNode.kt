@@ -2,6 +2,8 @@ package org.bashpile.core.bast.types
 
 import org.bashpile.core.bast.BastNode
 
+
+// TODO move out of types subpackage
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class ReassignmentBastNode(
     id: String,
@@ -26,5 +28,9 @@ class ReassignmentBastNode(
             $id="$childRender"
         
         """.trimIndent()
+    }
+
+    override fun deepCopy(): ReassignmentBastNode {
+        return ReassignmentBastNode(id!!, children[0].deepCopy())
     }
 }

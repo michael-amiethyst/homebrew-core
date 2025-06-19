@@ -1,7 +1,7 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
-import org.bashpile.core.bast.types.IntLiteralBastNode
+import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.junit.jupiter.api.Test
 
@@ -12,7 +12,7 @@ class BashpileAstTest {
     @Test
     fun areAllStrings() {
         val stringLiteral = StringLiteralBastNode("\"hello\"")
-        val intLiteral = IntLiteralBastNode(1.toBigInteger())
+        val intLiteral = IntegerLiteralBastNode(1.toBigInteger())
         val booleanLiteral = BooleanLiteralBastNode(true)
 
         assertTrue(stringLiteral.areAllStrings())
@@ -24,5 +24,13 @@ class BashpileAstTest {
 
         val listWithIntAndString = InternalBastNode(listOf(stringLiteral, intLiteral))
         assertFalse(listWithIntAndString.areAllStrings())
+    }
+
+    @Test
+    fun deepCopyWorks() {
+        val orig = StringLiteralBastNode("")
+        val copy = orig.deepCopy()
+        assertEquals(orig.text, copy.text)
+        assertNotEquals(orig.toString(), copy.toString())
     }
 }

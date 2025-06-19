@@ -15,7 +15,7 @@ import org.bashpile.core.bast.types.VariableTypeInfo
  * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [BashpileState].
  */
 abstract class BastNode(
-    protected val children: List<BastNode>,
+    val children: List<BastNode>,
     val id: String? = null,
     /** The type at creation time see class KDoc for more info */
     val majorType: TypeEnum = TypeEnum.UNKNOWN) {
@@ -45,4 +45,6 @@ abstract class BastNode(
             children.all { it.areAllStrings() }
         }
     }
+
+    abstract fun deepCopy(): BastNode
 }

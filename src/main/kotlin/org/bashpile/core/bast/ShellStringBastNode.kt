@@ -7,4 +7,8 @@ class ShellStringBastNode(children: List<BastNode>) : BastNode(children) {
         val childRenders = children.map { it.render() }.joinToString("")
         return "$($childRenders)"
     }
+
+    override fun deepCopy(): ShellStringBastNode {
+        return ShellStringBastNode(children.map { it.deepCopy() })
+    }
 }
