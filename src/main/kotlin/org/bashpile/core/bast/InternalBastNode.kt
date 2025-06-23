@@ -18,7 +18,7 @@ class InternalBastNode(children: List<BastNode> = listOf()) : BastNode(children)
         return InternalBastNode(children.map { it.deepCopy() })
     }
 
-    // TODO NOW update unnest.md
+    // TODO move to BastNode
     /** @return Self unchanged or InternalNode holding an assignment and variable reference */
     fun unnestSubshells(): BastNode {
         if (nestedSubshell()) {
@@ -34,7 +34,10 @@ class InternalBastNode(children: List<BastNode> = listOf()) : BastNode(children)
             // create VarDec node
             val variableReference = VariableBastNode(id, UNKNOWN)
 
-            return InternalBastNode(listOf(assignment, variableReference))
+            // TODO unnest -- implement parentSubshell
+            val preamble =  InternalBastNode(listOf(assignment, variableReference))
+            val parentSubshell = InternalBastNode(listOf(LeafBastNode("before nested"), variableReference, LeafBastNode("after nested")))
+            return InternalBastNode(listOf(preamble, parentSubshell))
         }
         // TODO unnest - make recursive call
         return this.deepCopy()

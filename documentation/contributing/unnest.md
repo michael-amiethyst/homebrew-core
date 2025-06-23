@@ -14,14 +14,28 @@ We do this by transforming the BAST tree before we `render`
 
 ```mermaid
 graph TD;
-    shellString1 --> shellString2;
+    shellStringStart["#("]
+    subshellStart["$("]
+    closeParen2[")"]
+
+    shellString --> shellStringStart
+    shellString --> shellStringContents
+    closeParen[")"]
+    shellString --> closeParen
+
+    shellStringContents --> subshellStart
+    shellStringContents --> subshellContents
+    shellStringContents --> closeParen2
+
 ```
 becomes
 ```mermaid
 graph TD;
-    root --> variableDeclaration
-    variableDeclaration --> shellString2
-    variableDeclaration -- referenced by --ovariableReference
-    root --> shellString1
-    shellString1 --> variableReference
+    shellString --> internalNode
+    internalNode --> variableDeclaration
+    variableDeclaration --> id["i="]
+    variableDeclaration --> nestedSubshellContents
+    internalNode --> parentSubshellContents
+    parentSubshellContents --> variableReference
+    variableReference --> i["$i"]
 ```
