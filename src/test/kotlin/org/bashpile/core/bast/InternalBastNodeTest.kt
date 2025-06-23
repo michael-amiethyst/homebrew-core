@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 class InternalBastNodeTest {
     @Test
-    fun deepCopyWorks() {
+    fun simple_deepCopyWorks() {
         val child = StringLiteralBastNode("Hello")
         val fixture = InternalBastNode(listOf(child))
 
@@ -16,5 +16,9 @@ class InternalBastNodeTest {
 
         assertEquals(origChild.text, copyChild.text)
     }
+
+    // TODO unnest - make more deepCopy tests (e.g. with children, grandchildren)
+
+    // TODO unnest - make unnestSubshells tests, make double nested test
 
 }
