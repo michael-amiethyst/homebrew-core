@@ -1,6 +1,8 @@
 package org.bashpile.core
 
+import org.bashpile.core.bast.BastNode
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.InputStream
@@ -12,6 +14,11 @@ import java.io.InputStream
 class MainShellStringTest {
 
     val fixture = Main()
+
+    @BeforeEach
+    fun setUp() {
+        BastNode.unnestedCount = 0
+    }
 
     @Test
     fun getBast_shellLine_printf_works() {
@@ -52,7 +59,9 @@ class MainShellStringTest {
             print(#(printf $(printf 'shellstring!')))""".trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
         assertEquals("""
-            printf "$(printf $(printf 'shellstring!'))"
+            declare __bp_var0
+            __bp_var0=$(printf 'shellstring!')
+            printf "$(printf ${'$'}__bp_var0)"
             """.trimIndent() + "\n", renderedBash
         )
         assertEquals("shellstring!\n", renderedBash.runCommand().first)
@@ -64,7 +73,9 @@ class MainShellStringTest {
         val script: InputStream =  File(pathname).readText().trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
         assertEquals("""
-            printf "$(printf $(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR))"
+            declare __bp_var0
+            __bp_var0=$(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR)
+            printf "$(printf ${'$'}__bp_var0)"
             """.trimIndent() + "\n", renderedBash
         )
         val results = renderedBash.runCommand()
@@ -76,7 +87,10 @@ class MainShellStringTest {
         val script: InputStream = """
             print(#(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().byteInputStream()
         assertEquals("""
-            printf "$(printf "$(printf 'Hello ') $(printf 'shellstring!')")"
+            declare __bp_var0
+            __bp_var0="$(printf 'Hello ')"
+            declare __bp_var1="$(printf 'shellstring!')"
+            printf "$(printf ${'$'}__bp_var0 ${'$'}__bp_var1)"
             """.trimIndent() + "\n", fixture.getBast(script).render())
     }
 }

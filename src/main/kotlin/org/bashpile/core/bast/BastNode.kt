@@ -1,5 +1,6 @@
 package org.bashpile.core.bast
 
+import com.google.common.annotations.VisibleForTesting
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.types.LeafBastNode
@@ -21,7 +22,12 @@ abstract class BastNode(
     val children: List<BastNode>,
     val id: String? = null,
     /** The type at creation time see class KDoc for more info */
-    val majorType: TypeEnum = UNKNOWN) {
+    val majorType: TypeEnum = UNKNOWN
+) {
+    companion object {
+        @VisibleForTesting
+        var unnestedCount: Int = 0
+    }
 
     fun resolvedMajorType(): TypeEnum {
         // check call stack, fall back on node's type
@@ -68,7 +74,7 @@ abstract class BastNode(
     private fun unnestSubshells(inSubshell: Boolean): BastNode {
         if (inSubshell && this is ShellStringBastNode) {
             // create an assignment statement
-            val id = "__bp_var0" // TODO unnest - generate var names
+            val id = "__bp_var${unnestedCount++}"
             val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = deepCopy())
 
             // create VarDec node
