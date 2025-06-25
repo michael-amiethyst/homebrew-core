@@ -8,7 +8,7 @@ class ShellStringBastNode(children: List<BastNode>) : BastNode(children) {
         return "$($childRenders)"
     }
 
-    override fun deepCopy(): ShellStringBastNode {
-        return ShellStringBastNode(children.map { it.deepCopy() })
+    override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
+        return ShellStringBastNode(nextChildren.map { it.deepCopy() })
     }
 }

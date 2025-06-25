@@ -7,7 +7,7 @@ class StringLiteralBastNode(val text: String) : BastNode(listOf(), majorType = T
         return text
     }
 
-    override fun deepCopy(): StringLiteralBastNode {
-        return StringLiteralBastNode(this.text)
+    override fun replaceChildren(nextChildren: List<BastNode>): StringLiteralBastNode {
+        return StringLiteralBastNode(text)
     }
 }

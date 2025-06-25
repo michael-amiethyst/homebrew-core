@@ -9,7 +9,7 @@ class IntegerLiteralBastNode(private val bigInt: BigInteger) : BastNode(listOf()
         return bigInt.toString()
     }
 
-    override fun deepCopy(): IntegerLiteralBastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): IntegerLiteralBastNode {
         return IntegerLiteralBastNode(bigInt)
     }
 }

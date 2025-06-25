@@ -8,7 +8,7 @@ class VariableBastNode(id: String, majorType: TypeEnum) : BastNode(listOf(), id,
         return "$$id"
     }
 
-    override fun deepCopy(): VariableBastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): VariableBastNode {
         return VariableBastNode(id!!, majorType)
     }
 }

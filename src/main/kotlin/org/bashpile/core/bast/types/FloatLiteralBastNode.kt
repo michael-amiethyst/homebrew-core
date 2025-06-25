@@ -9,7 +9,7 @@ class FloatLiteralBastNode(private val float: BigDecimal) : BastNode(listOf(), m
         return float.toString()
     }
 
-    override fun deepCopy(): FloatLiteralBastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): FloatLiteralBastNode {
         return FloatLiteralBastNode(float)
     }
 }

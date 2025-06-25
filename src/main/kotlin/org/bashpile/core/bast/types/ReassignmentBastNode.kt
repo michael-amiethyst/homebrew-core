@@ -30,7 +30,7 @@ class ReassignmentBastNode(
         """.trimIndent()
     }
 
-    override fun deepCopy(): ReassignmentBastNode {
-        return ReassignmentBastNode(id!!, children[0].deepCopy())
+    override fun replaceChildren(nextChildren: List<BastNode>): ReassignmentBastNode {
+        return ReassignmentBastNode(id!!, nextChildren[0].deepCopy())
     }
 }

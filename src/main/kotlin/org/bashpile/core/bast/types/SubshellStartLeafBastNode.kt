@@ -1,3 +1,9 @@
 package org.bashpile.core.bast.types
 
-class SubshellStartLeafBastNode : LeafBastNode("$(")
+import org.bashpile.core.bast.BastNode
+
+class SubshellStartLeafBastNode : LeafBastNode("$(") {
+    override fun replaceChildren(nextChildren: List<BastNode>): LeafBastNode {
+        return SubshellStartLeafBastNode()
+    }
+}

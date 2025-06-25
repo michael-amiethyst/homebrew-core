@@ -101,7 +101,8 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        return bast
+        val modifiedBast = bast.unnestSubshells()
+        return modifiedBast
     }
 
     /**

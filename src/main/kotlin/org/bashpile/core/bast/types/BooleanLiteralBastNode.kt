@@ -8,7 +8,7 @@ class BooleanLiteralBastNode(private val bool: Boolean) : BastNode(listOf(), maj
         return bool.toString()
     }
 
-    override fun deepCopy(): BooleanLiteralBastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): BooleanLiteralBastNode {
         return BooleanLiteralBastNode(bool)
     }
 }

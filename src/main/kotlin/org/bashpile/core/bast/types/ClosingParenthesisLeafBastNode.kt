@@ -1,3 +1,9 @@
 package org.bashpile.core.bast.types
 
-class ClosingParenthesisLeafBastNode : LeafBastNode(")")
+import org.bashpile.core.bast.BastNode
+
+class ClosingParenthesisLeafBastNode : LeafBastNode(")") {
+    override fun replaceChildren(nextChildren: List<BastNode>): LeafBastNode {
+        return ClosingParenthesisLeafBastNode()
+    }
+}

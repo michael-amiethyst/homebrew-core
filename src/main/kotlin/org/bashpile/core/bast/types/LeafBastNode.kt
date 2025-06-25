@@ -7,7 +7,7 @@ open class LeafBastNode(private val text: String) : BastNode(listOf()) {
         return text
     }
 
-    override fun deepCopy(): LeafBastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): LeafBastNode {
         return LeafBastNode(text)
     }
 }

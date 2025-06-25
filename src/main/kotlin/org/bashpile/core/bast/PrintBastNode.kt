@@ -9,7 +9,7 @@ class PrintBastNode(children: List<BastNode>) : BastNode(children) {
         return "printf \"$childRenders\"\n"
     }
 
-    override fun deepCopy(): PrintBastNode {
-        return PrintBastNode(children.map { it.deepCopy() })
+    override fun replaceChildren(nextChildren: List<BastNode>): PrintBastNode {
+        return PrintBastNode(nextChildren.map { it.deepCopy() })
     }
 }
