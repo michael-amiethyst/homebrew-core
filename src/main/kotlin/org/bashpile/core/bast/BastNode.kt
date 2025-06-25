@@ -2,10 +2,8 @@ package org.bashpile.core.bast
 
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
-import org.bashpile.core.bast.types.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.SubshellStartLeafBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.types.VariableBastNode
@@ -66,31 +64,19 @@ abstract class BastNode(
         return unnestSubshells(false)
     }
 
+    // TODO create statement parent class, render preambles there?
     private fun unnestSubshells(inSubshell: Boolean): BastNode {
-        if (inSubshell && isASubshell()) {
-            // TODO unnest - finish, account for double nesting
-            // get subshell text
-            val nestedSubshellText = ""
-            val subshellNode = ShellStringBastNode(listOf(LeafBastNode(nestedSubshellText)))
-
-            // create assignment statement
+        if (inSubshell && this is ShellStringBastNode) {
+            // create an assignment statement
             val id = "__bp_var0" // TODO unnest - generate var names
-            val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = subshellNode)
+            val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = deepCopy())
 
             // create VarDec node
             val variableReference = VariableBastNode(id, UNKNOWN)
-
-            // TODO unnest -- implement parentSubshell
-            val preamble =  InternalBastNode(listOf(assignment, variableReference))
-            val parentSubshell = InternalBastNode(listOf(LeafBastNode("before nested"), variableReference, LeafBastNode("after nested")))
-            return InternalBastNode(listOf(preamble, parentSubshell))
+            // TODO unnest - change render() to return a preambles/string pair
+            // statement nodes render the preambles, and return empty list of preambles to parent
+            return UnnestedShellStringBastNode(listOf(assignment, variableReference))
         }
-        return replaceChildren(children.map { it.unnestSubshells(isASubshell()) })
-    }
-
-    private fun isASubshell(): Boolean {
-        return children.size == 3
-                && children.first() is SubshellStartLeafBastNode
-                && children.last() is ClosingParenthesisLeafBastNode
+        return replaceChildren(children.map { it.unnestSubshells(this is ShellStringBastNode) })
     }
 }

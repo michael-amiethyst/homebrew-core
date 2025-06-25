@@ -14,19 +14,13 @@ We do this by transforming the BAST tree before we `render`
 
 ```mermaid
 graph TD;
-    shellStringStart["#("]
-    subshellStart["$("]
-    closeParen2[")"]
+    shellStringNode --> internalNode
 
-    shellString --> shellStringStart
-    shellString --> shellStringContents
-    closeParen[")"]
-    shellString --> closeParen
-
-    shellStringContents --> subshellStart
-    shellStringContents --> subshellContents
-    shellStringContents --> closeParen2
-
+    internalNode --> subshellStart
+    internalNode --> internalNode2
+    internalNode --> closingParenthesis
+    
+    internalNode2 --> leafNode
 ```
 becomes
 ```mermaid
