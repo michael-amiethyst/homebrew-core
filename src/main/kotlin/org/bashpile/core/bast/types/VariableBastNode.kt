@@ -4,8 +4,8 @@ import org.bashpile.core.bast.BastNode
 
 class VariableBastNode(id: String, majorType: TypeEnum) : BastNode(listOf(), id, majorType) {
 
-    override fun render(): String {
-        return "$$id"
+    override fun render(): Pair<List<BastNode>, String> {
+        return Pair(listOf(), "$$id")
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): VariableBastNode {

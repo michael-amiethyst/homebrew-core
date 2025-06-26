@@ -7,7 +7,7 @@ class SubshellStartLeafBastNode : LeafBastNode("$(") {
         return SubshellStartLeafBastNode()
     }
 
-    override fun render(): String {
+    override fun render(): Pair<List<BastNode>, String> {
         throw UnsupportedOperationException("Intermediate node")
     }
 }

@@ -7,7 +7,7 @@ class ClosingParenthesisLeafBastNode : LeafBastNode(")") {
         return ClosingParenthesisLeafBastNode()
     }
 
-    override fun render(): String {
+    override fun render(): Pair<List<BastNode>, String> {
         throw UnsupportedOperationException("Intermediate node")
     }
 }

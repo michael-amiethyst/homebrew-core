@@ -39,8 +39,9 @@ abstract class BastNode(
     }
 
     /** Should be just string manipulation to make final Bashpile text, no logic */
-    open fun render(): String {
-        return children.joinToString("") { it.render() }
+    open fun render(): Pair<List<BastNode>, String> {
+        val renders = children.map { it.render()}
+        return Pair(renders.flatMap { it.first }, renders.map { it.second }.joinToString("") )
     }
 
     /**
@@ -71,6 +72,7 @@ abstract class BastNode(
     }
 
     // TODO create statement parent class, render preambles there?
+    // TODO ensure all statement nodes render preambles
     private fun unnestSubshells(inSubshell: Boolean): BastNode {
         if (inSubshell && this is ShellStringBastNode) {
             // create an assignment statement
@@ -79,7 +81,6 @@ abstract class BastNode(
 
             // create VarDec node
             val variableReference = VariableBastNode(id, UNKNOWN)
-            // TODO unnest - change render() to return a preambles/string pair
             // statement nodes render the preambles, and return empty list of preambles to parent
             return UnnestedShellStringBastNode(listOf(assignment, variableReference))
         }
