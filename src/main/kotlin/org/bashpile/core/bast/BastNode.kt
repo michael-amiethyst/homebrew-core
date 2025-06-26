@@ -18,6 +18,7 @@ import org.bashpile.core.bast.types.VariableTypeInfo
  * The root is created by the [AstConvertingVisitor].
  * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [BashpileState].
  */
+// create a generateMermaidGraph method
 abstract class BastNode(
     val children: List<BastNode>,
     val id: String? = null,

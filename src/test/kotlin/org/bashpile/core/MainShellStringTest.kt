@@ -87,14 +87,23 @@ class MainShellStringTest {
     fun getBast_shellstring_withShellStringConcat_works() {
         val script: InputStream = """
             print(#(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().byteInputStream()
+        val render = fixture.getBast(script).render()
+        assertTrue(render.first.isEmpty())
+        var renderedBash = render.second
         assertEquals("""
             declare __bp_var0
             __bp_var0="$(printf 'Hello ')"
             declare __bp_var1
             __bp_var1="$(printf 'shellstring!')"
             printf "$(printf "${'$'}__bp_var0 ${'$'}__bp_var1")"
-            """.trimIndent() + "\n", fixture.getBast(script).render().second)
+            """.trimIndent() + "\n", renderedBash
+        )
+        var results = renderedBash.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
 
-        // TODO exec and confirm SCRIPT_SUCCESS
+        // confirm succeeds with strict mode
+        renderedBash = "set -euo pipefail\n" + renderedBash
+        results = renderedBash.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
     }
 }
