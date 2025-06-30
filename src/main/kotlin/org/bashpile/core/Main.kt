@@ -20,8 +20,6 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 
-// TODO add Makefile for nativeBuild, jar to Gradle for Formula (Bottles?)
-// TODO change 'int' and 'ref' lexer tokens.  Remove 'unknown'
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -72,7 +70,7 @@ class Main : CliktCommand() {
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
         val bastRoot: BastNode = getBast(script.byteInputStream())
-        echo(bastRoot.render(), false)
+        echo(bastRoot.render().second, false)
     }
 
     /** The initial shebang line isn't part of the Bashpile script. */
@@ -103,7 +101,8 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        return bast
+        val modifiedBast = bast.unnestSubshells()
+        return modifiedBast
     }
 
     /**

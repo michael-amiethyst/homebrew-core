@@ -2,10 +2,15 @@ package org.bashpile.core.bast
 
 import org.apache.commons.lang3.StringUtils
 
+
 class ShellLineBastNode(children: List<BastNode>) : BastNode(children) {
-    override fun render(): String {
-        val childRenders = children.map { it.render() }.joinToString("")
-        return childRenders.appendIfMissing("\n")
+    override fun render(): Pair<List<BastNode>, String> {
+        val childRenders = children.map { it.render().second }.joinToString("")
+        return Pair(listOf(), childRenders.appendIfMissing("\n"))
+    }
+
+    override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
+        return ShellLineBastNode(nextChildren.map { it.deepCopy() })
     }
 
     private fun String.appendIfMissing(suffix: String): String {

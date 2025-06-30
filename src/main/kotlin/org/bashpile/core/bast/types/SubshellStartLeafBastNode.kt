@@ -1,0 +1,13 @@
+package org.bashpile.core.bast.types
+
+import org.bashpile.core.bast.BastNode
+
+class SubshellStartLeafBastNode : LeafBastNode("$(") {
+    override fun replaceChildren(nextChildren: List<BastNode>): LeafBastNode {
+        return SubshellStartLeafBastNode()
+    }
+
+    override fun render(): Pair<List<BastNode>, String> {
+        throw UnsupportedOperationException("Intermediate node")
+    }
+}

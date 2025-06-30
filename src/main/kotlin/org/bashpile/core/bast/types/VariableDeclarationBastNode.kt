@@ -7,7 +7,7 @@ import org.bashpile.core.bast.BastNode
 class VariableDeclarationBastNode(
     id: String,
     type: TypeEnum,
-    subtype: TypeEnum = TypeEnum.UNKNOWN,
+    val subtype: TypeEnum = TypeEnum.UNKNOWN,
     val readonly: Boolean = false,
     val export: Boolean = false,
     child: BastNode
@@ -16,15 +16,19 @@ class VariableDeclarationBastNode(
         bashpileState.addVariableInfo(id, type, subtype, readonly)
     }
 
-    override fun render(): String {
+    // TODO unnest - impl, test with triple nested
+    override fun render(): Pair<List<BastNode>, String> {
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
-        val childRender = children[0].render()
-        return """
+        val childRender = children[0].render().second
+        return Pair(listOf(), """
             declare $flags$id
             $id="$childRender"
         
-        """.trimIndent()
+        """.trimIndent())
+    }
+    override fun replaceChildren(nextChildren: List<BastNode>): VariableDeclarationBastNode {
+        return VariableDeclarationBastNode(id!!, majorType, subtype, readonly, export, nextChildren[0].deepCopy())
     }
 }

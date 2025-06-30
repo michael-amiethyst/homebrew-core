@@ -3,11 +3,13 @@ package org.bashpile.core
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.bast.*
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
+import org.bashpile.core.bast.types.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
-import org.bashpile.core.bast.types.IntLiteralBastNode
+import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.types.ReassignmentBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
+import org.bashpile.core.bast.types.SubshellStartLeafBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.types.VariableDeclarationBastNode
@@ -95,7 +97,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return if (nodeText.contains('.')) {
             FloatLiteralBastNode(nodeText.toBigDecimal())
         } else {
-            IntLiteralBastNode(nodeText.toBigInteger())
+            IntegerLiteralBastNode(nodeText.toBigInteger())
         }
     }
 
@@ -116,14 +118,26 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
-        // TODO after assignments implemented:
-        //  when children are '$(', stuff, and ')'
-        //  then "unwind" by moving "stuff" to a preamble node with an assignment
-        return InternalBastNode(ctx.children.map { visit(it) })
+        val bastChildren = ctx.children.map { visit(it) }
+        val isNestedSubshell = bastChildren.size == 3
+                && bastChildren[0] is SubshellStartLeafBastNode
+                && bastChildren[2] is ClosingParenthesisLeafBastNode
+        return if (bastChildren.size == 1) {
+            bastChildren[0]
+        } else if (isNestedSubshell) {
+            // middle child only
+            ShellStringBastNode(bastChildren.subList(1, 2))
+        } else {
+            InternalBastNode(bastChildren)
+        }
     }
 
     override fun visitTerminal(node: TerminalNode): BastNode {
-        // antlr may pass us a literal "newline" as the entire node text
-        return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
+        return when (node.text) {
+            "$(" -> SubshellStartLeafBastNode()
+            ")" -> ClosingParenthesisLeafBastNode()
+            // antlr may pass us a literal "newline" as the entire node text
+            else -> LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
+        }
     }
 }

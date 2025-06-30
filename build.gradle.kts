@@ -15,6 +15,7 @@ plugins {
     antlr
     // kotlin version in plugins must be literal
     kotlin("jvm") version "2.1.10"
+    id("com.gradleup.shadow") version "9.0.0-beta15"
     id("org.graalvm.buildtools.native") version "0.10.6"
     id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -61,12 +62,21 @@ kotlin {
     jvmToolchain(21)
 }
 
+tasks.shadowJar {
+    archiveVersion = ""
+    manifest {
+        // Optionally, set the main class for the shadowed JAR.
+        attributes["Main-Class"] = "org.bashpile.core.MainKt"
+    }
+}
+
 // for use in the bin/tokenize script
-tasks.register("saveClasspath") {
+val saveClasspath = tasks.register("saveClasspath") {
     doFirst {
         File("build/classpath.txt").writeText(sourceSets["main"].runtimeClasspath.asPath)
     }
 }
+tasks.build { dependsOn(saveClasspath) }
 
 ////////////////////
 // antlr integration
@@ -120,10 +130,6 @@ graalvmNative {
     }
 }
 
-tasks.named("nativeCompile") {
-    dependsOn("test")
-}
-
 ////////////////////////////////////////////////////////
 // system tests - integration tests for the whole system
 ////////////////////////////////////////////////////////
@@ -148,7 +154,7 @@ dependencies {
     intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-val integrationTest = task<Test>("integrationTest") {
+val integrationTest = tasks.register<Test>("integrationTest") {
     description = "Runs integration tests."
     group = "verification"
 
@@ -165,15 +171,14 @@ val integrationTest = task<Test>("integrationTest") {
 
 tasks.check { dependsOn(integrationTest) }
 
-////////////////////////////////////
-// Deploy binaries for Homebrew Cask
-////////////////////////////////////
+//////////////////////////////////////
+// Create the executable from the .jar
+//////////////////////////////////////
 
-task<Copy>("deploy") {
-    dependsOn("check")
-
-    // copy build/native/nativeCompile/bashpile to bin/bashpile
-    from("build/native/nativeCompile")
-    include("bashpile")
-    into("bin")
+val createBashpileExe = tasks.register<Exec>("create-bashpile-exe") {
+    dependsOn("shadowJar")
+    // CWD is project root
+    commandLine("bin/create-bashpile-exe")
 }
+
+tasks.build { finalizedBy(createBashpileExe)}
