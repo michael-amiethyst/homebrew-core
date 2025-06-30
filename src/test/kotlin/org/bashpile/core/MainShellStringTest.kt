@@ -73,13 +73,13 @@ class MainShellStringTest {
         val script: InputStream =  File(pathname).readText().trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render().second
         assertEquals("""
+            set -euo pipefail
             declare __bp_var0
             __bp_var0="$(printf 'shellstring!'; exit $SCRIPT_GENERIC_ERROR)"
             printf "$(printf ${'$'}__bp_var0)"
             """.trimIndent() + "\n", renderedBash
         )
         val results = renderedBash.runCommand()
-        // TODO write strict mode feature
         assertEquals(SCRIPT_GENERIC_ERROR, results.second)
     }
 
