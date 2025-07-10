@@ -1,5 +1,7 @@
 package org.bashpile.core.bast
 
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.Assertions.*
 
 
 class BastNodeTest {
+    val log: Logger = LogManager.getLogger()
     @Test
     fun areAllStrings() {
         val stringLiteral = StringLiteralBastNode("\"hello\"")
@@ -27,7 +30,7 @@ class BastNodeTest {
     }
 
     @Test
-    fun simple_deepCopyWorks() {
+    fun deepCopyWorks() {
         val child = StringLiteralBastNode("Hello")
         val fixture = InternalBastNode(listOf(child))
 
@@ -37,6 +40,23 @@ class BastNodeTest {
 
         assertEquals(origChild.text, copyChild.text)
         assertNotEquals(origChild.toString(), copyChild.toString())
+    }
+
+    @Test
+    fun mermaidGraphWorks() {
+        val child = ShellLineBastNode()
+        val root = PrintBastNode(listOf(child))
+        // TODO test logger somewhere else
+        val graph = root.mermaidGraph()
+        assertFalse(graph.contains("reflection", true))
+        assertFalse(graph.contains("BastNode"))
+        log.info("Mermaid Graph: {}", graph)
+    }
+
+    @Test
+    fun unnest_withPrint_works() {
+        // TODO unnest -- impl
+        var root = PrintBastNode()
     }
 
     // TODO unnest - make unnestSubshells tests, make double nested test

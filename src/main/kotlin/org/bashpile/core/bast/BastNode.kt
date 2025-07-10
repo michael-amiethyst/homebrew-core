@@ -18,7 +18,6 @@ import org.bashpile.core.bast.types.VariableTypeInfo
  * The root is created by the [AstConvertingVisitor].
  * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [BashpileState].
  */
-// create a generateMermaidGraph method
 abstract class BastNode(
     val children: List<BastNode>,
     val id: String? = null,
@@ -28,6 +27,7 @@ abstract class BastNode(
     companion object {
         @VisibleForTesting
         var unnestedCount: Int = 0
+        private var mermaidNodeId = 0
     }
 
     fun resolvedMajorType(): TypeEnum {
@@ -43,6 +43,15 @@ abstract class BastNode(
     open fun render(): Pair<List<BastNode>, String> {
         val renders = children.map { it.render()}
         return Pair(renders.flatMap { it.first }, renders.map { it.second }.joinToString("") )
+    }
+
+    open fun mermaidGraph(): String {
+        mermaidNodeId = 0
+        var mermaid = "graph TD;"
+        children.map { child -> child::class.simpleName!!.removeSuffix("BastNode")}
+            .map { "$it$mermaidNodeId" }
+            .forEach { mermaid += "root --> $it;" }
+        return mermaid
     }
 
     /**
@@ -72,8 +81,8 @@ abstract class BastNode(
         return unnestSubshells(false)
     }
 
-    // TODO create statement parent class, render preambles there?
-    // TODO ensure all statement nodes render preambles
+    // TODO unnest - create statement parent class, render preambles there?
+    // TODO unnest - ensure all statement nodes render preambles
     private fun unnestSubshells(inSubshell: Boolean): BastNode {
         if (inSubshell && this is ShellStringBastNode) {
             // create an assignment statement

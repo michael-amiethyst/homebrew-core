@@ -26,10 +26,11 @@ repositories {
 }
 
 dependencies {
+    // kotlin
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // clikt
     implementation("com.github.ajalt.clikt:clikt:$cliktVersion")
-    // optional support for rendering Markdown in help messages
     implementation("com.github.ajalt.clikt:clikt-markdown:$cliktVersion")
 
     // antlr

@@ -3,7 +3,7 @@ package org.bashpile.core.bast
 import org.apache.commons.lang3.StringUtils
 
 
-class ShellLineBastNode(children: List<BastNode>) : BastNode(children) {
+class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
     override fun render(): Pair<List<BastNode>, String> {
         val childRenders = children.map { it.render().second }.joinToString("")
         return Pair(listOf(), childRenders.appendIfMissing("\n"))

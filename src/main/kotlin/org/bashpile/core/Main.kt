@@ -101,7 +101,9 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
+        logger.info("Mermaid graph before modifications: {}", bast.mermaidGraph())
         val modifiedBast = bast.unnestSubshells()
+        logger.info("Mermaid graph after modifications: {}", modifiedBast.mermaidGraph())
         return modifiedBast
     }
 
@@ -110,6 +112,7 @@ class Main : CliktCommand() {
      *
      * We went with Logback because Log4j wasn't compatible with Graal nativeCompile.
      */
+    // TODO unnest - verify logging to console and file in tests
     private fun configureLogging(verbosity: Int) {
         val logbackLevel = when (verbosity) {
             1 -> INFO

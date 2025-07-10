@@ -2,7 +2,7 @@ package org.bashpile.core.bast
 
 
 /** This is a Print Statement node */
-class PrintBastNode(children: List<BastNode>) : BastNode(children) {
+class PrintBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
     /** Combines all children into a single string as a pre-computation for Bash */
     override fun render(): Pair<List<BastNode>, String> {
         val renders = children.map { it.render() }
