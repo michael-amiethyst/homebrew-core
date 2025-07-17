@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils
 
 
 class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
-    override fun render(): Pair<List<BastNode>, String> {
+    override fun render(): RenderTuple {
         val childRenders = children.map { it.render().second }.joinToString("")
         return Pair(listOf(), childRenders.appendIfMissing("\n"))
     }

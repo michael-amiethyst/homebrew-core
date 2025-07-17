@@ -112,7 +112,6 @@ class Main : CliktCommand() {
      *
      * We went with Logback because Log4j wasn't compatible with Graal nativeCompile.
      */
-    // TODO unnest - verify logging to console and file in tests
     private fun configureLogging(verbosity: Int) {
         val logbackLevel = when (verbosity) {
             1 -> INFO

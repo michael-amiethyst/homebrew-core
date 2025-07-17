@@ -1,9 +1,10 @@
 package org.bashpile.core.bast.types
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.RenderTuple
 
 open class LeafBastNode(private val text: String) : BastNode(listOf()) {
-    override fun render(): Pair<List<BastNode>, String> {
+    override fun render(): RenderTuple {
         return Pair(listOf(), text)
     }
 

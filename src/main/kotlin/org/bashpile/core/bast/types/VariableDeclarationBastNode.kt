@@ -2,6 +2,7 @@ package org.bashpile.core.bast.types
 
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.RenderTuple
 
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(
@@ -17,7 +18,7 @@ class VariableDeclarationBastNode(
     }
 
     // TODO unnest - impl, test with triple nested
-    override fun render(): Pair<List<BastNode>, String> {
+    override fun render(): RenderTuple {
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""

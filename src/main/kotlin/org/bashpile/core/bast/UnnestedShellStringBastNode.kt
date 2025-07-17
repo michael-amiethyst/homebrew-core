@@ -5,7 +5,7 @@ class UnnestedShellStringBastNode(children: List<BastNode>) : ShellStringBastNod
         require(children.size == 2) { "There should be two children, preamble and body" }
     }
 
-    override fun render(): Pair<List<BastNode>, String> {
+    override fun render(): RenderTuple {
         return Pair(listOf(children[0]), children[1].render().second)
     }
 

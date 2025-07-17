@@ -108,4 +108,6 @@ class MainTest {
             fixture.getBast(bpScript).render().second
         }
     }
+
+    // TODO write test to ensure logger writes to file -- may need to go into system integration test
 }

@@ -46,7 +46,6 @@ class BastNodeTest {
     fun mermaidGraphWorks() {
         val child = ShellLineBastNode()
         val root = PrintBastNode(listOf(child))
-        // TODO test logger somewhere else
         val graph = root.mermaidGraph()
         assertFalse(graph.contains("reflection", true))
         assertFalse(graph.contains("BastNode"))

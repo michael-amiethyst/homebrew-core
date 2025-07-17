@@ -1,10 +1,11 @@
 package org.bashpile.core.bast.types
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.RenderTuple
 
 class VariableBastNode(id: String, majorType: TypeEnum) : BastNode(listOf(), id, majorType) {
 
-    override fun render(): Pair<List<BastNode>, String> {
+    override fun render(): RenderTuple {
         return Pair(listOf(), "$$id")
     }
 

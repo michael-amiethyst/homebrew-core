@@ -12,6 +12,9 @@ import org.bashpile.core.bast.types.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.VariableTypeInfo
 
 
+
+typealias RenderTuple = Pair<List<BastNode>, String>
+
 /**
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
@@ -39,12 +42,18 @@ abstract class BastNode(
         return bashpileState.variableInfo(id)
     }
 
-    /** Should be just string manipulation to make final Bashpile text, no logic */
-    open fun render(): Pair<List<BastNode>, String> {
+    /**
+     * Should be just string manipulation to make final Bashpile text, very little logic.
+     * Returns a list of preambles to support unnesting.
+     * @return A list of nodes that must be rendered prior to the Bash render, and the Bash render.
+     * @see /documentation/contributing/unnest.md
+     */
+    open fun render(): RenderTuple {
         val renders = children.map { it.render()}
         return Pair(renders.flatMap { it.first }, renders.map { it.second }.joinToString("") )
     }
 
+    // TODO unnest - make more tests
     open fun mermaidGraph(): String {
         mermaidNodeId = 0
         var mermaid = "graph TD;"
