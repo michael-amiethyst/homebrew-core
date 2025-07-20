@@ -56,12 +56,12 @@ class MainShellStringTest {
     @Test
     fun getBast_shellstring_nestedSubshells_works() {
         val script: InputStream = """
-            print(#(printf $(printf 'shellstring!')))""".trim().byteInputStream()
+            print(#(ls $(echo 'shellstring!')))""".trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
         assertEquals("""
             declare __bp_var0
-            __bp_var0="$(printf 'shellstring!')"
-            printf "$(printf ${'$'}__bp_var0)"
+            __bp_var0="$(echo 'shellstring!')"
+            printf "$(ls ${'$'}__bp_var0)"
             """.trimIndent() + "\n", renderedBash
         )
         assertEquals("shellstring!\n", renderedBash.runCommand().first)

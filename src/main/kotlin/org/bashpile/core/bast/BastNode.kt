@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.ReassignmentBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
@@ -39,6 +40,15 @@ abstract class BastNode(
 
     fun variableInfo(): VariableTypeInfo? {
         return bashpileState.variableInfo(id)
+    }
+
+    fun isStatementNode(): Boolean {
+        return this is PrintBastNode || this is ShellLineBastNode || this is ShellStringBastNode
+                || this is VariableDeclarationBastNode || this is ReassignmentBastNode
+    }
+
+    fun isSubshellNode(): Boolean {
+        return this is ShellLineBastNode || this is ShellStringBastNode
     }
 
     /**
@@ -87,7 +97,7 @@ abstract class BastNode(
 
     /** @return An unnested version of the input tree */
     fun unnestSubshells(): BastNode {
-        val unnestedRoot = unnestSubshells(this is ShellLineBastNode)
+        val unnestedRoot = unnestSubshells(isSubshellNode())
         return if (unnestedRoot.first.isEmpty()) {
             // no unnesting performed
             unnestedRoot.second
@@ -102,14 +112,14 @@ abstract class BastNode(
      * @see /documentation/contributing/unnest.md
      */
     private fun unnestSubshells(inSubshell: Boolean): UnnestTuple {
-        val unnestedChildPairs = children.map { it.unnestSubshells(this is ShellStringBastNode) }
+        val unnestedChildPairs = children.map { it.unnestSubshells(inSubshell || isSubshellNode()) }
         val unnestedPreambles = unnestedChildPairs.flatMap { it.first }
         val unnestedChildren = unnestedChildPairs.map { it.second }
 
-        val currentNodeIsNested = inSubshell && this is ShellStringBastNode
+        val currentNodeIsNested = inSubshell && isSubshellNode()
         val noNestedChildren = unnestedPreambles.isEmpty()
         return if (!currentNodeIsNested && noNestedChildren) {
-            Pair(listOf(), deepCopy())
+            Pair(listOf(), replaceChildren(unnestedChildren))
         } else if (currentNodeIsNested) {
             // create an assignment statement
             val id = "__bp_var${unnestedCount++}"
@@ -117,15 +127,17 @@ abstract class BastNode(
 
             // create VarDec node
             val variableReference = VariableBastNode(id, UNKNOWN)
-            Pair(listOf(assignment), variableReference)
+            Pair(listOf(assignment) + unnestedPreambles, variableReference)
         } else { // current node isn't nested, but children are
-            // TODO NOW join on statement nodes (new BashNode field)
-            Pair(unnestedPreambles, unnestedChildren.toBastNode())
+            if (isStatementNode()) {
+                Pair(listOf(), (unnestedPreambles + unnestedChildren).toBastNode())
+            } else Pair(unnestedPreambles, unnestedChildren.toBastNode())
         }
     }
 
     protected fun List<BastNode>.toBastNode(): BastNode {
         require(isNotEmpty())
-        return if (size == 1) first() else InternalBastNode(this, " ")
+        val separator = if (isStatementNode()) "" else " "
+        return if (size == 1) first() else InternalBastNode(this, separator)
     }
 }
