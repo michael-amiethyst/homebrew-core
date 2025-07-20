@@ -43,8 +43,8 @@ abstract class BastNode(
     }
 
     fun isStatementNode(): Boolean {
-        return this is PrintBastNode || this is ShellLineBastNode || this is ShellStringBastNode
-                || this is VariableDeclarationBastNode || this is ReassignmentBastNode
+        return this is PrintBastNode || this is ShellLineBastNode || this is VariableDeclarationBastNode
+                || this is ReassignmentBastNode
     }
 
     fun isSubshellNode(): Boolean {
@@ -130,8 +130,8 @@ abstract class BastNode(
             Pair(listOf(assignment) + unnestedPreambles, variableReference)
         } else { // current node isn't nested, but children are
             if (isStatementNode()) {
-                Pair(listOf(), (unnestedPreambles + unnestedChildren).toBastNode())
-            } else Pair(unnestedPreambles, unnestedChildren.toBastNode())
+                Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())
+            } else Pair(unnestedPreambles, replaceChildren(listOf(unnestedChildren.toBastNode())))
         }
     }
 

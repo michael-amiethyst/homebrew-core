@@ -5,6 +5,7 @@ import org.bashpile.core.bast.BastNode
 class VariableBastNode(id: String, majorType: TypeEnum) : BastNode(listOf(), id, majorType) {
 
     override fun render(): String {
+        // TODO render in ${id} style
         return "$$id"
     }
 
