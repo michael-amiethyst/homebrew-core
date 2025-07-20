@@ -2,14 +2,13 @@ package org.bashpile.core.bast
 
 
 /** A Shell String is the Bashpile equivalent of a Bash subshell */
-open class ShellStringBastNode(children: List<BastNode>) : BastNode(children) {
-    override fun render(): RenderTuple {
-        val renders = children.map { it.render() }
-        val stringRender = renders.map { it.second }.joinToString("")
-        return Pair(renders.flatMap { it.first }, "$($stringRender)")
+open class ShellStringBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
+    override fun render(): String {
+        val childRenders = children.map { it.render() }.joinToString("")
+        return "$($childRenders)"
     }
 
-    override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
         return ShellStringBastNode(nextChildren.map { it.deepCopy() })
     }
 }

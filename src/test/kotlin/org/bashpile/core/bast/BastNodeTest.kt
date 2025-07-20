@@ -2,6 +2,7 @@ package org.bashpile.core.bast
 
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.bashpile.core.Main
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
@@ -55,8 +56,26 @@ class BastNodeTest {
     @Test
     fun unnest_withPrint_works() {
         // TODO unnest -- impl
+        Main() // create for static state
         var root = PrintBastNode()
+        var shellString = ShellStringBastNode()
+        val ls = StringLiteralBastNode("ls")
+        val subshell = ShellStringBastNode(listOf(StringLiteralBastNode("printf '.'; exit 1")))
+        shellString = shellString.replaceChildren(listOf(ls, subshell))
+        root = root.replaceChildren(listOf(shellString))
+        log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
+        val unnestedRoot = root.unnestSubshells()
+        log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
+        assert(unnestedRoot.children.size == 2)
+        assert(unnestedRoot.children[1].children.size == 2)
+
+        val render = unnestedRoot.render()
+        assertEquals("""
+            declare __bp_var2
+            __bp_var2="$(printf '.'; exit 1)"
+            ls ${'$'}__bp_var2
+        """.trimIndent(), render)
     }
 
-    // TODO unnest - make unnestSubshells tests, make double nested test
+    // TODO unnest - make double nested test
 }

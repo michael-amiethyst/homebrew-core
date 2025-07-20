@@ -1,7 +1,6 @@
 package org.bashpile.core.bast.types
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.RenderTuple
 
 
 // TODO move out of types subpackage
@@ -23,13 +22,12 @@ class ReassignmentBastNode(
         }
     }
 
-    override fun render(): RenderTuple {
-        val render = children[0].render()
-        val stringRender = render.second
-        return Pair(render.first, """
-            $id="$stringRender"
-        
-        """.trimIndent())
+    override fun render(): String {
+        val childRender = children[0].render()
+        return """
+            $id="$childRender"
+
+        """.trimIndent()
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ReassignmentBastNode {

@@ -12,8 +12,7 @@ import org.bashpile.core.bast.types.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.VariableTypeInfo
 
 
-
-typealias RenderTuple = Pair<List<BastNode>, String>
+typealias UnnestTuple = Pair<List<BastNode>, BastNode>
 
 /**
  * The base class of the BAST class hierarchy.
@@ -43,23 +42,24 @@ abstract class BastNode(
     }
 
     /**
-     * Should be just string manipulation to make final Bashpile text, very little logic.
-     * Returns a list of preambles to support unnesting.
-     * @return A list of nodes that must be rendered prior to the Bash render, and the Bash render.
-     * @see /documentation/contributing/unnest.md
+     * Should be just string manipulation to make final Bashpile text, no logic.
      */
-    open fun render(): RenderTuple {
-        val renders = children.map { it.render()}
-        return Pair(renders.flatMap { it.first }, renders.map { it.second }.joinToString("") )
+    open fun render(): String {
+        return children.joinToString("") { it.render() }
     }
 
     // TODO unnest - make more tests
-    open fun mermaidGraph(): String {
+    fun mermaidGraph(): String {
         mermaidNodeId = 0
-        var mermaid = "graph TD;"
-        children.map { child -> child::class.simpleName!!.removeSuffix("BastNode")}
-            .map { "$it$mermaidNodeId" }
-            .forEach { mermaid += "root --> $it;" }
+        return "graph TD;" + mermaidGraph("root")
+    }
+
+    private fun mermaidGraph(parentNodeName: String): String {
+        var mermaid = ""
+        children.forEach { child ->
+            val nodeName = child::class.simpleName!!.removeSuffix("BastNode") + mermaidNodeId++
+            mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
+        }
         return mermaid
     }
 
@@ -85,24 +85,47 @@ abstract class BastNode(
      */
     abstract fun replaceChildren(nextChildren: List<BastNode>): BastNode
 
-    /** @return Self unchanged or InternalNode holding an assignment and variable reference */
+    /** @return An unnested version of the input tree */
     fun unnestSubshells(): BastNode {
-        return unnestSubshells(false)
+        val unnestedRoot = unnestSubshells(this is ShellLineBastNode)
+        return if (unnestedRoot.first.isEmpty()) {
+            // no unnesting performed
+            unnestedRoot.second
+        } else {
+            InternalBastNode(unnestedRoot.first + unnestedRoot.second)
+        }
     }
 
-    // TODO unnest - create statement parent class, render preambles there?
-    // TODO unnest - ensure all statement nodes render preambles
-    private fun unnestSubshells(inSubshell: Boolean): BastNode {
-        if (inSubshell && this is ShellStringBastNode) {
+    /**
+     * Returns a list of preambles to support unnesting.
+     * @return Preambles and unnested subshell.
+     * @see /documentation/contributing/unnest.md
+     */
+    private fun unnestSubshells(inSubshell: Boolean): UnnestTuple {
+        val unnestedChildPairs = children.map { it.unnestSubshells(this is ShellStringBastNode) }
+        val unnestedPreambles = unnestedChildPairs.flatMap { it.first }
+        val unnestedChildren = unnestedChildPairs.map { it.second }
+
+        val currentNodeIsNested = inSubshell && this is ShellStringBastNode
+        val noNestedChildren = unnestedPreambles.isEmpty()
+        return if (!currentNodeIsNested && noNestedChildren) {
+            Pair(listOf(), deepCopy())
+        } else if (currentNodeIsNested) {
             // create an assignment statement
             val id = "__bp_var${unnestedCount++}"
-            val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = deepCopy())
+            val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = ShellStringBastNode(unnestedChildren))
 
             // create VarDec node
             val variableReference = VariableBastNode(id, UNKNOWN)
-            // statement nodes render the preambles, and return empty list of preambles to parent
-            return UnnestedShellStringBastNode(listOf(assignment, variableReference))
+            Pair(listOf(assignment), variableReference)
+        } else { // current node isn't nested, but children are
+            // TODO NOW join on statement nodes (new BashNode field)
+            Pair(unnestedPreambles, unnestedChildren.toBastNode())
         }
-        return replaceChildren(children.map { it.unnestSubshells(this is ShellStringBastNode) })
+    }
+
+    protected fun List<BastNode>.toBastNode(): BastNode {
+        require(isNotEmpty())
+        return if (size == 1) first() else InternalBastNode(this, " ")
     }
 }

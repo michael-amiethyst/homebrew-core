@@ -2,7 +2,6 @@ package org.bashpile.core.bast.types
 
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.RenderTuple
 
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(
@@ -17,17 +16,17 @@ class VariableDeclarationBastNode(
         bashpileState.addVariableInfo(id, type, subtype, readonly)
     }
 
-    // TODO unnest - impl, test with triple nested
-    override fun render(): RenderTuple {
+    // TODO unnest - test with triple nested
+    override fun render(): String {
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
-        val childRender = children[0].render().second
-        return Pair(listOf(), """
+        val childRender = children[0].render()
+        return """
             declare $flags$id
             $id="$childRender"
         
-        """.trimIndent())
+        """.trimIndent()
     }
     override fun replaceChildren(nextChildren: List<BastNode>): VariableDeclarationBastNode {
         return VariableDeclarationBastNode(id!!, majorType, subtype, readonly, export, nextChildren[0].deepCopy())
