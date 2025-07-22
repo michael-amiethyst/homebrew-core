@@ -1,9 +1,7 @@
-package org.bashpile.core.bast.types
+package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
 
-
-// TODO move out of types subpackage
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class ReassignmentBastNode(
     id: String,

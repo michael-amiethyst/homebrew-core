@@ -2,17 +2,19 @@ package org.bashpile.core
 
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.bast.*
+import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
-import org.bashpile.core.bast.types.ClosingParenthesisLeafBastNode
+import org.bashpile.core.bast.types.leaves.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
-import org.bashpile.core.bast.types.LeafBastNode
-import org.bashpile.core.bast.types.ReassignmentBastNode
+import org.bashpile.core.bast.types.leaves.LeafBastNode
+import org.bashpile.core.bast.statements.ReassignmentBastNode
+import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.SubshellStartLeafBastNode
+import org.bashpile.core.bast.types.leaves.SubshellStartLeafBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
-import org.bashpile.core.bast.types.VariableDeclarationBastNode
+import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).

@@ -3,12 +3,14 @@ package org.bashpile.core.bast
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.bashpile.core.Main
+import org.bashpile.core.bast.statements.PrintBastNode
+import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.junit.jupiter.api.Test
-
+import org.bashpile.core.bast.types.leaves.LeafBastNode
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 
 class BastNodeTest {
@@ -53,18 +55,19 @@ class BastNodeTest {
         log.info("Mermaid Graph: {}", graph)
     }
 
+    /** Should test #(ls $(printf '.'; exit 1)) */
     @Test
     fun unnest_withPrint_works() {
-        // TODO unnest -- impl
         Main() // create for static state
-        var root = PrintBastNode()
+        var printBastNode = PrintBastNode()
         var shellString = ShellStringBastNode()
-        val ls = StringLiteralBastNode("ls")
-        val subshell = ShellStringBastNode(listOf(StringLiteralBastNode("printf '.'; exit 1")))
+        val ls = LeafBastNode("ls ")
+        val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1")))
         shellString = shellString.replaceChildren(listOf(ls, subshell))
-        root = root.replaceChildren(listOf(shellString))
-        log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-        val unnestedRoot = root.unnestSubshells()
+        printBastNode = printBastNode.replaceChildren(listOf(shellString))
+
+        log.info("Mermaid Graph before unnest: {}", printBastNode.mermaidGraph())
+        val unnestedRoot = printBastNode.unnestSubshells()
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
         assert(unnestedRoot.children[1].children.size == 1)
@@ -72,8 +75,9 @@ class BastNodeTest {
         val render = unnestedRoot.render()
         assertEquals("""
             declare __bp_var2
-            __bp_var2="$(printf '.'; exit 1)"
-            ls ${'$'}__bp_var2
+            __bp_var2="$(echo '.'; exit 1)"
+            printf "$(ls ${'$'}__bp_var2)"
+            
         """.trimIndent(), render)
     }
 }

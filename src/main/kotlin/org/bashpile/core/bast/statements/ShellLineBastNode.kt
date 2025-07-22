@@ -1,7 +1,7 @@
-package org.bashpile.core.bast
+package org.bashpile.core.bast.statements
 
 import org.apache.commons.lang3.StringUtils
-
+import org.bashpile.core.bast.BastNode
 
 class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
     override fun render(): String {

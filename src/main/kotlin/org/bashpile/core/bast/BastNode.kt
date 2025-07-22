@@ -3,13 +3,15 @@ package org.bashpile.core.bast
 import com.google.common.annotations.VisibleForTesting
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
-import org.bashpile.core.bast.types.LeafBastNode
-import org.bashpile.core.bast.types.ReassignmentBastNode
+import org.bashpile.core.bast.statements.PrintBastNode
+import org.bashpile.core.bast.types.leaves.LeafBastNode
+import org.bashpile.core.bast.statements.ReassignmentBastNode
+import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.types.VariableBastNode
-import org.bashpile.core.bast.types.VariableDeclarationBastNode
+import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.VariableTypeInfo
 
 

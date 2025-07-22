@@ -1,7 +1,8 @@
-package org.bashpile.core.bast.types
+package org.bashpile.core.bast.statements
 
-import org.bashpile.core.Main.Companion.bashpileState
+import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.types.TypeEnum
 
 /** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(
@@ -13,7 +14,7 @@ class VariableDeclarationBastNode(
     child: BastNode
 ) : BastNode(listOf(child), id, type) {
     init {
-        bashpileState.addVariableInfo(id, type, subtype, readonly)
+        Main.Companion.bashpileState.addVariableInfo(id, type, subtype, readonly)
     }
 
     // TODO unnest - test with triple nested

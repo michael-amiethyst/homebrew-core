@@ -1,10 +1,10 @@
-package org.bashpile.core.bast.types
+package org.bashpile.core.bast.types.leaves
 
 import org.bashpile.core.bast.BastNode
 
-class SubshellStartLeafBastNode : LeafBastNode("$(") {
+class ClosingParenthesisLeafBastNode : LeafBastNode(")") {
     override fun replaceChildren(nextChildren: List<BastNode>): LeafBastNode {
-        return SubshellStartLeafBastNode()
+        return ClosingParenthesisLeafBastNode()
     }
 
     override fun render(): String {

@@ -1,4 +1,4 @@
-package org.bashpile.core.bast.types
+package org.bashpile.core.bast.types.leaves
 
 import org.bashpile.core.bast.BastNode
 

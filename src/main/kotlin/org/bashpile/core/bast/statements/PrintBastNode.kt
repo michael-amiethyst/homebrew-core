@@ -1,5 +1,6 @@
-package org.bashpile.core.bast
+package org.bashpile.core.bast.statements
 
+import org.bashpile.core.bast.BastNode
 
 /** This is a Print Statement node */
 class PrintBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
