@@ -29,7 +29,10 @@ class SystemTest {
     fun systemWorks() {
         val output = "$bashpileFilename '$HELLO_FILENAME'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals("printf \"Hello Bashpile!\"\n", output.first)
+        val bashLines = output.first.split("\n").filter { it.isNotBlank() }
+        assertTrue(bashLines.size > 1) { "Didn't have INFO logs, no extra lines for logs" }
+        assertTrue(output.first.contains("INFO")) { "Didn't have INFO logs" }
+        assertEquals("printf \"Hello Bashpile!\"", bashLines.last())
     }
 
     @Test
@@ -58,12 +61,13 @@ class SystemTest {
         assumeTrue(path.isExecutable(), "Shebang test file not executable")
         val output = path.toString().runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second, "Script not successful, output was: ${output.first}")
-        assertEquals("printf \"Hello Shebang!\"\n", output.first)
+        val resultLines = output.first.split("\n").filter { it.isNotBlank() }
+        assertEquals("printf \"Hello Shebang!\"", resultLines.last())
     }
 
     @Test
     fun system_withEval_works() {
-        val output = "eval \"$($shebangFilename)\"".runCommand()
+        val output = "eval \"$($shebangFilename | tail -n 1)\"".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertEquals("Hello Shebang!\n", output.first)
     }

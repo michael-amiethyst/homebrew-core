@@ -58,7 +58,7 @@ class MainDeclarationsTest {
         assertEquals("""
             declare -x b
             b="A_STRING"
-            printf "${'$'}b"
+            printf "${'$'}{b}"
         
         """.trimIndent(), bashScript
         )
@@ -80,7 +80,7 @@ class MainDeclarationsTest {
             declare -x b
             b="A_STRING"
             b="B_STRING"
-            printf "${'$'}b"
+            printf "${'$'}{b}"
         
         """.trimIndent(), bashScript
         )
@@ -102,7 +102,7 @@ class MainDeclarationsTest {
             declare -x b
             b="A_STRING"
             b="'B_STRING'"
-            printf "${'$'}b"
+            printf "${'$'}{b}"
         
         """.trimIndent(), bashScript
         )

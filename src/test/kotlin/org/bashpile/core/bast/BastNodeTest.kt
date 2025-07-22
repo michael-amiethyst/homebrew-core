@@ -78,7 +78,7 @@ class BastNodeTest {
         assertEquals("""
             declare __bp_var0
             __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
-            printf "$(ls ${'$'}__bp_var0)"
+            printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
     }
@@ -111,7 +111,7 @@ class BastNodeTest {
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
-            printf "$(ls ${'$'}__bp_var0)"
+            printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
 

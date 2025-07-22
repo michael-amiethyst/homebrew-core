@@ -55,7 +55,7 @@ class MainShellStringTest {
         assertEquals("""
             declare __bp_var0
             __bp_var0="$(echo '.')"
-            printf "$(ls ${'$'}__bp_var0)"
+            printf "$(ls ${'$'}{__bp_var0})"
             """.trimIndent() + "\n", renderedBash
         )
         assertTrue(renderedBash.runCommand().first.contains("bin"))
@@ -70,7 +70,7 @@ class MainShellStringTest {
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
-            printf "$(ls ${'$'}__bp_var0)"
+            printf "$(ls ${'$'}{__bp_var0})"
             """.trimIndent() + "\n", renderedBash
         )
         val results = renderedBash.runCommand()
@@ -88,7 +88,7 @@ class MainShellStringTest {
             __bp_var0="$(printf 'Hello ')"
             declare __bp_var1
             __bp_var1="$(printf 'shellstring!')"
-            printf "$(printf "${'$'}__bp_var0 ${'$'}__bp_var1")"
+            printf "$(printf "${'$'}{__bp_var0} ${'$'}{__bp_var1}")"
             """.trimIndent() + "\n", renderedBash
         )
         var results = renderedBash.runCommand()
