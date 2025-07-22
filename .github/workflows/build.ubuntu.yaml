@@ -13,11 +13,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        # Latest Ubuntu, MacOS Intel, MacOS ARM
-        os-name: [ubuntu-24.04, macos-15, macos-15-large]
-    runs-on: ${{ matrix.os-name }}
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
