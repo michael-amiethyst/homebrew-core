@@ -1,8 +1,7 @@
 package org.bashpile.core
 
-import org.bashpile.core.bast.BastNode
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.InputStream
@@ -14,11 +13,6 @@ import java.io.InputStream
 class MainShellStringTest {
 
     val fixture = Main()
-
-    @BeforeEach
-    fun setUp() {
-        BastNode.unnestedCount = 0
-    }
 
     @Test
     fun getBast_shellLine_printf_works() {

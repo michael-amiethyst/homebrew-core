@@ -1,6 +1,5 @@
 package org.bashpile.core.bast
 
-import com.google.common.annotations.VisibleForTesting
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.statements.PrintBastNode
@@ -30,9 +29,10 @@ abstract class BastNode(
     val majorType: TypeEnum = UNKNOWN
 ) {
     companion object {
-        @VisibleForTesting
-        var unnestedCount: Int = 0
+        private var unnestedCount = 0
+        private val unnestedCountLock = Any()
         private var mermaidNodeId = 0
+        private val mermaidNodeIdLock = Any()
     }
 
     fun resolvedMajorType(): TypeEnum {
@@ -60,10 +60,12 @@ abstract class BastNode(
         return children.joinToString("") { it.render() }
     }
 
-    // TODO unnest - make more tests
+    @Synchronized
     fun mermaidGraph(): String {
-        mermaidNodeId = 0
-        return "graph TD;" + mermaidGraph("root")
+        synchronized(mermaidNodeIdLock) {
+            mermaidNodeId = 0
+            return "graph TD;" + mermaidGraph("root")
+        }
     }
 
     private fun mermaidGraph(parentNodeName: String): String {
@@ -98,13 +100,17 @@ abstract class BastNode(
     abstract fun replaceChildren(nextChildren: List<BastNode>): BastNode
 
     /** @return An unnested version of the input tree */
+    @Synchronized
     fun unnestSubshells(): BastNode {
-        val unnestedRoot = unnestSubshells(isSubshellNode())
-        return if (unnestedRoot.first.isEmpty()) {
-            // no unnesting performed
-            unnestedRoot.second
-        } else {
-            InternalBastNode(unnestedRoot.first + unnestedRoot.second)
+        synchronized(unnestedCountLock) {
+            unnestedCount = 0
+            val unnestedRoot = unnestSubshells(isSubshellNode())
+            return if (unnestedRoot.first.isEmpty()) {
+                // no unnesting performed
+                unnestedRoot.second
+            } else {
+                InternalBastNode(unnestedRoot.first + unnestedRoot.second)
+            }
         }
     }
 
