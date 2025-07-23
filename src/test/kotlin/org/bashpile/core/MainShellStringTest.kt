@@ -17,25 +17,45 @@ class MainShellStringTest {
     @Test
     fun getBast_shellLine_printf_works() {
         val script: InputStream = "printf \"true\"".byteInputStream()
-        assertEquals("printf \"true\"\n", fixture.getBast(script).render())
+        assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
+            printf "true"
+            
+            """.trimIndent(), fixture.getBast(script).render())
     }
 
     @Test
     fun getBast_shellLine_initialVar_works() {
         val script: InputStream = "test_var=5 printf \"\$test_var\"".byteInputStream()
-        assertEquals("test_var=5 printf \"\$test_var\"\n", fixture.getBast(script).render())
+        assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
+            test_var=5 printf "${'$'}test_var"
+            
+            """.trimIndent(), fixture.getBast(script).render())
     }
 
     @Test
     fun getBast_shellLine_literalNewline_works() {
         val script: InputStream = "printf \"newline\"".byteInputStream()
-        assertEquals("printf \"newline\"\n", fixture.getBast(script).render())
+        assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
+            printf "newline"
+            
+            """.trimIndent(), fixture.getBast(script).render())
     }
 
     @Test
     fun getBast_shellstring_works() {
         val script: InputStream = "#(printf \"newline\")".byteInputStream()
-        assertEquals("$(printf \"newline\")\n", fixture.getBast(script).render())
+        assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
+            $(printf "newline")
+            
+            """.trimIndent(), fixture.getBast(script).render())
     }
 
     @Test
@@ -43,6 +63,8 @@ class MainShellStringTest {
         val script: InputStream = """
             print("Hello " + #(printf 'shellstring!'))""".trim().byteInputStream()
         assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
             printf "Hello $(printf 'shellstring!')"
             """.trimIndent() + "\n", fixture.getBast(script).render())
     }
@@ -53,6 +75,8 @@ class MainShellStringTest {
             print(#(ls $(echo '.')))""".trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
         assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
             declare __bp_var0
             __bp_var0="$(echo '.')"
             printf "$(ls ${'$'}{__bp_var0})"
@@ -67,6 +91,8 @@ class MainShellStringTest {
         val script: InputStream =  File(pathname).readText().trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
         assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
@@ -84,6 +110,8 @@ class MainShellStringTest {
         val render = fixture.getBast(script).render()
         var renderedBash = render
         assertEquals("""
+            __bp_old_options=$(set +o)
+            set -euo pipefail
             declare __bp_var0
             __bp_var0="$(printf 'Hello ')"
             declare __bp_var1

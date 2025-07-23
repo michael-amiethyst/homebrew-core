@@ -23,6 +23,8 @@ class MainDeclarationsTest {
         val bashpileText: InputStream = "b: boolean = true".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
         assertEquals("""
+            __bp_old_options=${'$'}(set +o)
+            set -euo pipefail
             declare b
             b="true"
 
@@ -38,6 +40,8 @@ class MainDeclarationsTest {
         val bashpileText: InputStream = "b: readonly exported string = 'A_STRING'".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
         assertEquals("""
+            __bp_old_options=${'$'}(set +o)
+            set -euo pipefail
             declare -x b
             b="A_STRING"
 
@@ -56,6 +60,8 @@ class MainDeclarationsTest {
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
         assertEquals("""
+            __bp_old_options=${'$'}(set +o)
+            set -euo pipefail
             declare -x b
             b="A_STRING"
             printf "${'$'}{b}"
@@ -77,6 +83,8 @@ class MainDeclarationsTest {
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
         assertEquals("""
+            __bp_old_options=${'$'}(set +o)
+            set -euo pipefail
             declare -x b
             b="A_STRING"
             b="B_STRING"
@@ -99,6 +107,8 @@ class MainDeclarationsTest {
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
         assertEquals("""
+            __bp_old_options=${'$'}(set +o)
+            set -euo pipefail
             declare -x b
             b="A_STRING"
             b="'B_STRING'"
