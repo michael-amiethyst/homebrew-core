@@ -55,3 +55,4 @@ JVM project to run as a fast native program!  I've seen a start of 5 seconds go 
 * `varName: str = "variable"`
 * `SOME_CONSTANT: readonly str = "const"`
 * `varName = "reassign"`
+* Automatic strict mode handling
