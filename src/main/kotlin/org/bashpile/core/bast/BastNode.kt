@@ -97,7 +97,10 @@ abstract class BastNode(
      * @param replaceChildren will not be modified
      * @return A new instance of a BastNode subclass with the same fields, besides the children
      */
-    abstract fun replaceChildren(nextChildren: List<BastNode>): BastNode
+    open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
+        // making this abstract triggers a compilation bug in Ubuntu as of July 2025
+        throw UnsupportedOperationException("Should be overridden in child class")
+    }
 
     /** @return An unnested version of the input tree */
     @Synchronized
