@@ -7,7 +7,7 @@ class LeafBastNode(private val text: String) : BastNode(listOf()) {
         return text
     }
 
-    override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
+    override fun replaceChildren(nextChildren: List<BastNode>): LeafBastNode {
         return LeafBastNode(text)
     }
 
