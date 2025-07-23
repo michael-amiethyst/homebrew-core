@@ -12,7 +12,7 @@ class LeafBastNode(private val text: String) : BastNode(listOf()) {
     }
 
     fun isSubshellStart(): Boolean {
-        return text == "${'$'}("
+        return text == "$("
     }
 
     fun isSubshellEnd(): Boolean {
