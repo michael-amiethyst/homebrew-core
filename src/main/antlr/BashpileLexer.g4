@@ -26,15 +26,14 @@ tokens { INDENT, DEDENT }
 
 // keywords
 Empty    : 'empty';
-Unknown  : 'unknown';
 Boolean  : 'boolean';
 Number   : 'number';
-Int      : 'int';
+Integer  : 'integer';
 Float    : 'float';
 String   : 'string';
 List     : 'list';
 Map      : 'map';
-Ref      : 'ref';
+Reference: 'reference';
 
 Function : 'function';
 Block    : 'block';

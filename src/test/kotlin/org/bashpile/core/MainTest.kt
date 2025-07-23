@@ -83,7 +83,8 @@ class MainTest {
     fun getBast_printString_tripleConcat_withMoreParens_works() {
         val bpScript: InputStream = """
             print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
-        assertEquals("printf \"Hello Bashpile!  It's awesome!\"\n", fixture.getBast(bpScript).render())
+        assertEquals("printf \"Hello Bashpile!  It's awesome!\"\n",
+            fixture.getBast(bpScript).render())
     }
 
     @Test

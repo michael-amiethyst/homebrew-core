@@ -7,4 +7,8 @@ class BooleanLiteralBastNode(private val bool: Boolean) : BastNode(listOf(), maj
     override fun render(): String {
         return bool.toString()
     }
+
+    override fun replaceChildren(nextChildren: List<BastNode>): BooleanLiteralBastNode {
+        return BooleanLiteralBastNode(bool)
+    }
 }

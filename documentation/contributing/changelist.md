@@ -6,3 +6,4 @@
 * 0.6.0 - Graal compatible logging, -vv logging option, parenthesis handling
 * 0.7.0 - Shell Strings, Shell Lines and Brew Cask deployment
 * 0.8.0 - Variable Declarations, reassignments and strong typing.  Readonly variables
+* 0.9.0 - Unnesting subshells, makefile integration and Brew Formula integration
