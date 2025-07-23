@@ -4,14 +4,12 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.bast.*
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
-import org.bashpile.core.bast.types.leaves.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
-import org.bashpile.core.bast.types.leaves.LeafBastNode
+import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.statements.ReassignmentBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.leaves.SubshellStartLeafBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
@@ -122,8 +120,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
         val bastChildren = ctx.children.map { visit(it) }
         val isNestedSubshell = bastChildren.size == 3
-                && bastChildren[0] is SubshellStartLeafBastNode
-                && bastChildren[2] is ClosingParenthesisLeafBastNode
+                && bastChildren[0] is LeafBastNode && (bastChildren[0] as LeafBastNode).isSubshellStart()
+                && bastChildren[2] is LeafBastNode && (bastChildren[2] as LeafBastNode).isSubshellEnd()
         return if (bastChildren.size == 1) {
             bastChildren[0]
         } else if (isNestedSubshell) {
@@ -135,11 +133,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitTerminal(node: TerminalNode): BastNode {
-        return when (node.text) {
-            "$(" -> SubshellStartLeafBastNode()
-            ")" -> ClosingParenthesisLeafBastNode()
-            // antlr may pass us a literal "newline" as the entire node text
-            else -> LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
-        }
+        return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
     }
 }

@@ -3,7 +3,7 @@ package org.bashpile.core.bast
 import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.statements.PrintBastNode
-import org.bashpile.core.bast.types.leaves.LeafBastNode
+import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.statements.ReassignmentBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode

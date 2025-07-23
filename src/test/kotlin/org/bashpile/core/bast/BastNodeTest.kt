@@ -9,7 +9,7 @@ import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.leaves.LeafBastNode
+import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.runCommand
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
