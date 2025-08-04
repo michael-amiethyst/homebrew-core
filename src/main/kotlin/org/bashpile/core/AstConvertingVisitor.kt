@@ -23,13 +23,14 @@ import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     companion object {
-        private const val OLD_OPTIONS = "__bp_old_options"
-        private const val ENABLE_STRICT = "set -euo pipefail"
+        const val OLD_OPTIONS = "__bp_old_options"
+        const val ENABLE_STRICT = "set -euo pipefail"
     }
 
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
         val strictMode = """
-            $OLD_OPTIONS=${'$'}(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             $ENABLE_STRICT
             """.trimIndent()
         val shellLineChildNode = listOf(LeafBastNode(strictMode))
@@ -126,6 +127,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
         return ShellStringBastNode(ctx.shellStringContents().map { visit(it )})
+    }
+
+    override fun visitLooseShellString(ctx: BashpileParser.LooseShellStringContext): BastNode {
+        return ShellStringBastNode(ctx.shellStringContents().map { visit(it )}, true)
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {

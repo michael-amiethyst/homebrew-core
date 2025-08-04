@@ -2,8 +2,10 @@ package org.bashpile.core.bast
 
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main
 import org.bashpile.core.SCRIPT_GENERIC_ERROR
+import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
@@ -85,7 +87,7 @@ class BastNodeTest {
 
     /** Tests set -euo pipefail; print(#(ls $(printf '.'; exit 1))) */
     @Test
-    fun unnest_withPrint_strictMode_exitsWithScriptError() {
+    fun unnest_withPrintError_strictMode_exitsWithScriptError() {
         Main() // create for static state
 
         // create printNode
@@ -117,4 +119,51 @@ class BastNodeTest {
 
         assertEquals(SCRIPT_GENERIC_ERROR, render.runCommand().second)
     }
+
+    /** Tests set -euo pipefail; print(#(ls $(printf '.'; exit 1))) */
+    @Test
+    fun unnest_withPrintError_looseMode_runs() {
+        Main() // create for static state
+
+        // create printNode
+        var printBastNode = PrintBastNode()
+        var shellString = ShellStringBastNode(loose = true)
+        val ls = LeafBastNode("ls ")
+        val subshell = ShellStringBastNode("echo '.'; exit 1")
+        shellString = shellString.replaceChildren(listOf(ls, subshell))
+        printBastNode = printBastNode.replaceChildren(listOf(shellString))
+
+        // create parent of printNode and sibling
+        val strictNode = ShellLineBastNode("""
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
+            set -euo pipefail
+            
+        """.trimIndent())
+        val root = InternalBastNode(strictNode, printBastNode)
+
+        log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
+        val unnestedRoot = root.unnestSubshells()
+        log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
+        assert(unnestedRoot.children.size == 2)
+        assert(unnestedRoot.children[1].children.size == 2)
+
+        val looseNode = unnestedRoot.loosenShellStrings()
+        log.info("Mermaid Graph after loosing: {}", looseNode.mermaidGraph())
+        val render = looseNode.render()
+        assertEquals("""
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
+            set -euo pipefail
+            declare __bp_var0
+            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
+            eval "${'$'}__bp_old_options"
+            printf "$(ls ${'$'}{__bp_var0})"
+            set -euo pipefail
+            
+        """.trimIndent(), render)
+
+        assertEquals(SCRIPT_SUCCESS, render.runCommand().second)
+    }
+
 }

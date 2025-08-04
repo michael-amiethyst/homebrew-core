@@ -2,8 +2,13 @@ package org.bashpile.core.bast.statements
 
 import org.apache.commons.lang3.StringUtils
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.types.LeafBastNode
 
+/** Represents a line of Bash, has no loose mode like [org.bashpile.core.bast.ShellStringBastNode] */
 class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
+
+    constructor(contents: String) : this(listOf(LeafBastNode(contents)))
+
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
         return childRenders.appendIfMissing("\n")

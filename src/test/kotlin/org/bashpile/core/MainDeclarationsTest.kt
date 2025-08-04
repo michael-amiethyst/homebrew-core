@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,8 +23,10 @@ class MainDeclarationsTest {
     fun getBast_declare_bool_works() {
         val bashpileText: InputStream = "b: boolean = true".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             declare b
             b="true"
@@ -39,8 +42,10 @@ class MainDeclarationsTest {
     fun getBast_declare_readonlyExported_string_works() {
         val bashpileText: InputStream = "b: readonly exported string = 'A_STRING'".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             declare -x b
             b="A_STRING"
@@ -59,8 +64,10 @@ class MainDeclarationsTest {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             declare -x b
             b="A_STRING"
@@ -82,8 +89,10 @@ class MainDeclarationsTest {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             declare -x b
             b="A_STRING"
@@ -106,8 +115,10 @@ class MainDeclarationsTest {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             declare -x b
             b="A_STRING"

@@ -1,6 +1,8 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.AstConvertingVisitor
+import org.bashpile.core.AstConvertingVisitor.Companion.ENABLE_STRICT
+import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.types.LeafBastNode
@@ -60,7 +62,6 @@ abstract class BastNode(
         return children.joinToString("") { it.render() }
     }
 
-    @Synchronized
     fun mermaidGraph(): String {
         synchronized(mermaidNodeIdLock) {
             mermaidNodeId = 0
@@ -103,7 +104,6 @@ abstract class BastNode(
     }
 
     /** @return An unnested version of the input tree */
-    @Synchronized
     fun unnestSubshells(): BastNode {
         synchronized(unnestedCountLock) {
             unnestedCount = 0
@@ -143,6 +143,36 @@ abstract class BastNode(
             if (isStatementNode()) {
                 Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())
             } else Pair(unnestedPreambles, replaceChildren(listOf(unnestedChildren.toBastNode())))
+        }
+    }
+
+    /** @return A loosened version of the input tree */
+    fun loosenShellStrings(): BastNode {
+        val looseChildren = children.map { it.loosenShellStrings(false).second }
+        check(looseChildren.isNotEmpty() && looseChildren[0].isStatementNode()) {
+            "Loose child[0] was not a statement, was " + looseChildren[0].javaClass }
+        return replaceChildren(looseChildren)
+    }
+
+    /**
+     * Returns a list of preambles to support unnesting.
+     * @return Preambles and unnested subshell.
+     * @see /documentation/contributing/unnest.md
+     */
+    private fun loosenShellStrings(foundLooseShellString: Boolean): Pair<Boolean, BastNode> {
+        val foundLoose = children.map {
+            it.loosenShellStrings(foundLooseShellString)
+            // TODO strict - make "loose" a BastNode property
+        }.fold(Pair(this is ShellStringBastNode && this.loose, InternalBastNode())) { acc, b ->
+            Pair(acc.first || b.first, acc.second.replaceChildren(acc.second.children + b.second)) }
+        // TODO make an "unnested" node type, make a branch for it here -- make a statement node parent
+        return if (foundLoose.first && isStatementNode()) {
+            Pair(true, InternalBastNode(
+                ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
+                replaceChildren(foundLoose.second.children),
+                ShellLineBastNode(ENABLE_STRICT)))
+        } else {
+            Pair(foundLoose.first, replaceChildren(foundLoose.second.children))
         }
     }
 

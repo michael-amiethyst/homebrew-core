@@ -1,6 +1,7 @@
 package org.bashpile.core
 
 import com.github.ajalt.clikt.testing.test
+import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.InputStream
@@ -35,7 +36,8 @@ class MainTest {
         assertTrue(output.stderr.isEmpty())
         assertEquals(
             """
-            __bp_old_options=$(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "Hello Bashpile!"
             
@@ -49,7 +51,8 @@ class MainTest {
         assertTrue(output.stderr.isEmpty())
         assertEquals(
             """
-            __bp_old_options=$(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "Hello Bashpile!"
             
@@ -68,8 +71,10 @@ class MainTest {
     @Test
     fun getBast_printBool_works() {
         val script: InputStream = "print(true)".byteInputStream()
-        assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "true"
             
@@ -80,7 +85,8 @@ class MainTest {
     fun getBast_printBool_withParens_works() {
         val bpScript: InputStream = "print(((true)))".byteInputStream()
         assertEquals("""
-            __bp_old_options=${'$'}(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "true"
             
@@ -92,7 +98,8 @@ class MainTest {
         val bpScript: InputStream = """
             print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
         assertEquals("""
-            __bp_old_options=$(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "Hello Bashpile!"
             
@@ -104,7 +111,8 @@ class MainTest {
         val bpScript: InputStream = """
             print((("Hello" + " " + "Bashpile!")))""".trimIndent().byteInputStream()
         assertEquals("""
-            __bp_old_options=$(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "Hello Bashpile!"
             
@@ -115,8 +123,10 @@ class MainTest {
     fun getBast_printString_tripleConcat_withMoreParens_works() {
         val bpScript: InputStream = """
             print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
-        assertEquals("""
-            __bp_old_options=$(set +o)
+        assertEquals(
+            """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "Hello Bashpile!  It's awesome!"
             
@@ -127,7 +137,8 @@ class MainTest {
     fun getBast_printFloat_works() {
         val bpScript: InputStream = "print(1.0)".byteInputStream()
         assertEquals("""
-            __bp_old_options=$(set +o)
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
             set -euo pipefail
             printf "1.0"
             
