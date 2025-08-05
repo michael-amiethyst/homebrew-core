@@ -7,15 +7,12 @@ import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
-import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.statements.ReassignmentBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.TypeEnum
-import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.types.VariableBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.bast.types.VariableTypeInfo
+import org.bashpile.core.bast.types.*
+import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
+import java.util.function.Predicate
 
 
 typealias UnnestTuple = Pair<List<BastNode>, BastNode>
@@ -109,6 +106,10 @@ abstract class BastNode(
     fun unnestSubshells(): BastNode {
         synchronized(unnestedCountLock) {
             unnestedCount = 0
+            val hasLooseShellStringChild = findInTree { it is LooseShellStringBastNode }
+            if (hasLooseShellStringChild) {
+                return this
+            }
             val unnestedRoot = unnestSubshells(isSubshellNode())
             return if (unnestedRoot.first.isEmpty()) {
                 // no unnesting performed
@@ -146,6 +147,10 @@ abstract class BastNode(
                 Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())
             } else Pair(unnestedPreambles, replaceChildren(listOf(unnestedChildren.toBastNode())))
         }
+    }
+
+    fun findInTree(condition: Predicate<BastNode>) : Boolean {
+        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
     }
 
     /** @return A loosened version of the input tree */

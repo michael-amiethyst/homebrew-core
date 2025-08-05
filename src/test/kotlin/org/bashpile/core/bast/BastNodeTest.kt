@@ -148,19 +148,18 @@ class BastNodeTest {
         val unnestedRoot = root.unnestSubshells()
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
-        assert(unnestedRoot.children[1].children.size == 2)
+        assert(unnestedRoot.children[1].children.size != 2)
 
         val looseNode = unnestedRoot.loosenShellStrings()
         log.info("Mermaid Graph after loosing: {}", looseNode.mermaidGraph())
         val render = looseNode.render()
-        assertEquals("""
+        assertEquals(
+            """
             declare $OLD_OPTIONS
             $OLD_OPTIONS=$(set +o)
             set -euo pipefail
-            declare __bp_var0
-            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
             eval "${'$'}__bp_old_options"
-            printf "$(ls ${'$'}{__bp_var0})"
+            printf "$(ls $(echo '.'; exit $SCRIPT_GENERIC_ERROR))"
             set -euo pipefail
             
         """.trimIndent(), render)
