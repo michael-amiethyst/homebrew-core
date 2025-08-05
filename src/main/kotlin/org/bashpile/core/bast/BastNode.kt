@@ -4,6 +4,8 @@ import org.bashpile.core.AstConvertingVisitor
 import org.bashpile.core.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main.Companion.bashpileState
+import org.bashpile.core.bast.expressions.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.types.LeafBastNode
 import org.bashpile.core.bast.statements.ReassignmentBastNode
@@ -162,10 +164,9 @@ abstract class BastNode(
     private fun loosenShellStrings(foundLooseShellString: Boolean): Pair<Boolean, BastNode> {
         val foundLoose = children.map {
             it.loosenShellStrings(foundLooseShellString)
-            // TODO strict - make "loose" a BastNode property
-        }.fold(Pair(this is ShellStringBastNode && this.loose, InternalBastNode())) { acc, b ->
+        }.fold(Pair(this is LooseShellStringBastNode, InternalBastNode())) { acc, b ->
             Pair(acc.first || b.first, acc.second.replaceChildren(acc.second.children + b.second)) }
-        // TODO make an "unnested" node type, make a branch for it here -- make a statement node parent
+        // TODO do loose before unnest, don't do unnest for loose shellstrings (check for +o options?)
         return if (foundLoose.first && isStatementNode()) {
             Pair(true, InternalBastNode(
                 ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),

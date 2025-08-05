@@ -2,6 +2,8 @@ package org.bashpile.core
 
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.bast.*
+import org.bashpile.core.bast.expressions.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
@@ -126,11 +128,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     // Leaf nodes (parts of expressions)
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
-        return ShellStringBastNode(ctx.shellStringContents().map { visit(it )})
+        return ShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitLooseShellString(ctx: BashpileParser.LooseShellStringContext): BastNode {
-        return ShellStringBastNode(ctx.shellStringContents().map { visit(it )}, true)
+        return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {

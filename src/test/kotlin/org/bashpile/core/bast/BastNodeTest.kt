@@ -6,6 +6,8 @@ import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main
 import org.bashpile.core.SCRIPT_GENERIC_ERROR
 import org.bashpile.core.SCRIPT_SUCCESS
+import org.bashpile.core.bast.expressions.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
@@ -127,7 +129,7 @@ class BastNodeTest {
 
         // create printNode
         var printBastNode = PrintBastNode()
-        var shellString = ShellStringBastNode(loose = true)
+        var shellString = LooseShellStringBastNode()
         val ls = LeafBastNode("ls ")
         val subshell = ShellStringBastNode("echo '.'; exit 1")
         shellString = shellString.replaceChildren(listOf(ls, subshell))
