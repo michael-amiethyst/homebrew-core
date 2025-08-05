@@ -1,7 +1,7 @@
 package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.leaf.LeafBastNode
 
 /**
  * A Shell String is the Bashpile equivalent of a Bash subshell (i.e., $() syntax).  It represents an expression.

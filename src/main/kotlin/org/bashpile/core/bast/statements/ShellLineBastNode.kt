@@ -2,7 +2,7 @@ package org.bashpile.core.bast.statements
 
 import org.apache.commons.lang3.StringUtils
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.LeafBastNode
+import org.bashpile.core.bast.types.leaf.LeafBastNode
 
 /** Represents a line of Bash, has no loose mode like [org.bashpile.core.bast.expressions.ShellStringBastNode] */
 class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children) {

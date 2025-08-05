@@ -1,6 +1,6 @@
 class Bashpile < Formula
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
-  version "0.9.0"
+  version "0.10.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
   url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.10.0"

@@ -33,6 +33,8 @@ This will install a JVM Jar, and may be a bit slow
    3. E.g. `bashpile /tmp/hello > /tmp/hello.bash && bash /tmp/hello.bash` for "Hello World"
 
 ## Regular start
+If you've used Bashpile a bit and want faster execution times, read this section.  
+
 To make a faster execution time you can pull the code and build on your machine.  The magic of Graal will let this
 JVM project to run as a fast native program!  I've seen a start of 5 seconds go to milliseconds
 1. Pull the code from our repo at https://github.com/michael-amiethyst/homebrew-core
@@ -56,3 +58,4 @@ JVM project to run as a fast native program!  I've seen a start of 5 seconds go 
 * `SOME_CONSTANT: readonly str = "const"`
 * `varName = "reassign"`
 * Automatic strict mode handling
+  * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax

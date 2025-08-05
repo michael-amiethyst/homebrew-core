@@ -12,6 +12,7 @@ import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
+import org.bashpile.core.bast.types.leaf.LeafBastNode
 import java.util.function.Predicate
 
 
