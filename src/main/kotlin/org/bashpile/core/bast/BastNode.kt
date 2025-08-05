@@ -171,7 +171,6 @@ abstract class BastNode(
             it.loosenShellStrings(foundLooseShellString)
         }.fold(Pair(this is LooseShellStringBastNode, InternalBastNode())) { acc, b ->
             Pair(acc.first || b.first, acc.second.replaceChildren(acc.second.children + b.second)) }
-        // TODO do loose before unnest, don't do unnest for loose shellstrings (check for +o options?)
         return if (foundLoose.first && isStatementNode()) {
             Pair(true, InternalBastNode(
                 ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),

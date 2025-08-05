@@ -122,7 +122,7 @@ class BastNodeTest {
         assertEquals(SCRIPT_GENERIC_ERROR, render.runCommand().second)
     }
 
-    /** Tests set -euo pipefail; print(#(ls $(printf '.'; exit 1))) */
+    /** Tests set -euo pipefail; print(##(ls $(printf '.'; exit 1))) */
     @Test
     fun unnest_withPrintError_looseMode_runs() {
         Main() // create for static state

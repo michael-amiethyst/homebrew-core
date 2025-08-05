@@ -17,7 +17,6 @@ class VariableDeclarationBastNode(
         Main.Companion.bashpileState.addVariableInfo(id, type, subtype, readonly)
     }
 
-    // TODO unnest - test with triple nested
     override fun render(): String {
         var exportFlags = ""
         if (export) { exportFlags += "x" }
