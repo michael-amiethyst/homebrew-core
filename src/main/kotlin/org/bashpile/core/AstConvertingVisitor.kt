@@ -39,8 +39,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             $OLD_OPTIONS=$(set +o)
             $ENABLE_STRICT
             """.trimIndent()
-        val shellLineChildNode = listOf(LeafBastNode(strictMode))
-        val childNodes = listOf(ShellLineBastNode(shellLineChildNode)) + ctx.children.map { visit(it) }
+        val childNodes = ShellLineBastNode(strictMode).toList() + ctx.children.map { visit(it) }
         return InternalBastNode(childNodes)
     }
 
@@ -132,11 +131,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     // Leaf nodes (parts of expressions)
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
-        return ShellStringBastNode(ctx.shellStringContents().map { visit(it) })
+        return ShellStringBastNode(ctx.shellStringContents().map { visit(it) } )
     }
 
     override fun visitLooseShellString(ctx: BashpileParser.LooseShellStringContext): BastNode {
-        return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) })
+        return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) } )
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {

@@ -76,7 +76,10 @@ class BastNodeTest {
         val unnestedRoot = printBastNode.unnestSubshells()
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
+        assert(!unnestedRoot.children[0].render().endsWith(" "))
         assert(unnestedRoot.children[1].children.size == 1)
+        assert(!unnestedRoot.children[1].render().startsWith(" "))
+        assert(!unnestedRoot.children[1].render().endsWith(" "))
 
         val render = unnestedRoot.render()
         assertEquals("""

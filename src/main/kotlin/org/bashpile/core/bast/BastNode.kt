@@ -6,9 +6,8 @@ import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
-import org.bashpile.core.bast.statements.PrintBastNode
-import org.bashpile.core.bast.statements.ReassignmentBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
+import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
@@ -46,14 +45,11 @@ abstract class BastNode(
         return bashpileState.variableInfo(id)
     }
 
-    fun isStatementNode(): Boolean {
-        return this is PrintBastNode || this is ShellLineBastNode || this is VariableDeclarationBastNode
-                || this is ReassignmentBastNode
-    }
-
     fun isSubshellNode(): Boolean {
         return this is ShellLineBastNode || this is ShellStringBastNode
     }
+
+    fun toList(): List<BastNode> = listOf(this)
 
     /**
      * Should be just string manipulation to make final Bashpile text, no logic.
@@ -144,7 +140,7 @@ abstract class BastNode(
             val variableReference = VariableBastNode(id, UNKNOWN)
             Pair(listOf(assignment) + unnestedPreambles, variableReference)
         } else { // current node isn't nested, but children are
-            if (isStatementNode()) {
+            if (this is StatementBastNode) {
                 Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())
             } else Pair(unnestedPreambles, replaceChildren(listOf(unnestedChildren.toBastNode())))
         }
@@ -157,7 +153,7 @@ abstract class BastNode(
     /** @return A loosened version of the input tree */
     fun loosenShellStrings(): BastNode {
         val looseChildren = children.map { it.loosenShellStrings(false).second }
-        check(looseChildren.isNotEmpty() && looseChildren[0].isStatementNode()) {
+        check(looseChildren.isNotEmpty() && looseChildren[0] is StatementBastNode) {
             "Loose child[0] was not a statement, was " + looseChildren[0].javaClass }
         return replaceChildren(looseChildren)
     }
@@ -172,7 +168,7 @@ abstract class BastNode(
             it.loosenShellStrings(foundLooseShellString)
         }.fold(Pair(this is LooseShellStringBastNode, InternalBastNode())) { acc, b ->
             Pair(acc.first || b.first, acc.second.replaceChildren(acc.second.children + b.second)) }
-        return if (foundLoose.first && isStatementNode()) {
+        return if (foundLoose.first && this is StatementBastNode) {
             Pair(true, InternalBastNode(
                 ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
                 replaceChildren(foundLoose.second.children),
@@ -184,7 +180,7 @@ abstract class BastNode(
 
     protected fun List<BastNode>.toBastNode(): BastNode {
         require(isNotEmpty())
-        val separator = if (isStatementNode()) "" else " "
+        val separator = if (this@BastNode is StatementBastNode) "" else " "
         return if (size == 1) first() else InternalBastNode(this, separator)
     }
 }

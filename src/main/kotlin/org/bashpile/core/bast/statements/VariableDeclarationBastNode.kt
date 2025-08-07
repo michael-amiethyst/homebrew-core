@@ -12,7 +12,7 @@ class VariableDeclarationBastNode(
     val readonly: Boolean = false,
     val export: Boolean = false,
     child: BastNode
-) : BastNode(listOf(child), id, type) {
+) : StatementBastNode(child, id, type) {
     init {
         Main.Companion.bashpileState.addVariableInfo(id, type, subtype, readonly)
     }
@@ -25,7 +25,7 @@ class VariableDeclarationBastNode(
         return """
             declare $flags$id
             $id="$childRender"
-        
+            
         """.trimIndent()
     }
     override fun replaceChildren(nextChildren: List<BastNode>): VariableDeclarationBastNode {
