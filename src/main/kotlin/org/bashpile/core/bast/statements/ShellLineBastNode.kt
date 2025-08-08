@@ -1,9 +1,14 @@
 package org.bashpile.core.bast.statements
 
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.Strings
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.types.leaf.LeafBastNode
 
-class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
+/** Represents a line of Bash, has no loose mode like [org.bashpile.core.bast.expressions.ShellStringBastNode] */
+class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
+
+    constructor(contents: String) : this(LeafBastNode(contents).toList())
+
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
         return childRenders.appendIfMissing("\n")
@@ -14,6 +19,6 @@ class ShellLineBastNode(children: List<BastNode> = listOf()) : BastNode(children
     }
 
     private fun String.appendIfMissing(suffix: String): String {
-        return StringUtils.appendIfMissing(this, suffix)
+        return Strings.CS.appendIfMissing(this, suffix)
     }
 }

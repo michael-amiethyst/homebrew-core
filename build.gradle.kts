@@ -45,7 +45,7 @@ dependencies {
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
 
     // other dependencies
-    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.apache.commons:commons-lang3:3.18.0")
     implementation("commons-io:commons-io:2.14.0")
     implementation("com.google.guava:guava:32.0.1-jre")
 
@@ -66,7 +66,6 @@ kotlin {
 tasks.shadowJar {
     archiveVersion = ""
     manifest {
-        // Optionally, set the main class for the shadowed JAR.
         attributes["Main-Class"] = "org.bashpile.core.MainKt"
     }
 }

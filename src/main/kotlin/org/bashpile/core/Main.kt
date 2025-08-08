@@ -101,10 +101,14 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        logger.info("Mermaid graph before modifications: {}", bast.mermaidGraph())
-        val modifiedBast = bast.unnestSubshells()
-        logger.info("Mermaid graph after modifications: {}", modifiedBast.mermaidGraph())
-        return modifiedBast
+        logger.info("Mermaid graph before unnesting subshells: {}", bast.mermaidGraph())
+        val unnestedBast = bast.unnestSubshells()
+        logger.info(
+            "Mermaid graph after unnestings subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
+        val looseBast = unnestedBast.loosenShellStrings()
+        logger.info(
+            "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
+        return looseBast
     }
 
     /**
