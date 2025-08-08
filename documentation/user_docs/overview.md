@@ -24,10 +24,23 @@ Also, for all of its faults mentioned above it's fast, especially if you are mak
 
 
 ## Quickstart
-
+This will install a JVM Jar, and may be a bit slow
 1. `brew tap michael-amiethyst/core`
-2. `brew install michael-amiethyst/core`
+2. `brew install michael-amiethyst/core/bashpile`
 3. `echo "print('Hello World')" > /tmp/hello && bashpile /tmp/hello`
+   1. This will print out the Bash translation
+   2. You can redirect this to a file to use the Bash directly or immediatly execute it
+   3. E.g. `bashpile /tmp/hello > /tmp/hello.bash && bash /tmp/hello.bash` for "Hello World"
+
+## Regular start
+If you've used Bashpile a bit and want faster execution times, read this section.  
+
+To make a faster execution time you can pull the code and build on your machine.  The magic of Graal will let this
+JVM project to run as a fast native program!  I've seen a start of 5 seconds go to milliseconds
+1. Pull the code from our repo at https://github.com/michael-amiethyst/homebrew-core
+2. At the project root run 'make install', it will install a bashpile binary to `/usr/local/bin/bashpile`
+3. `echo "print('Hello World')" > /tmp/hello && bashpile /tmp/hello` should run much quicker
+   1. Note to OSX users, you may need to jump through some security hoops to allow the program to run
 
 ## Script Start
 
@@ -41,3 +54,8 @@ Also, for all of its faults mentioned above it's fast, especially if you are mak
 * White space agnostic (except for Python style indentation)
 * `print("Any String here")`, single quotes allowed with no special difference
 * `"string" + "concatination"`
+* `varName: str = "variable"`
+* `SOME_CONSTANT: readonly str = "const"`
+* `varName = "reassign"`
+* Automatic strict mode handling
+  * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax

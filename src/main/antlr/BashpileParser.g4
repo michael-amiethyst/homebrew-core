@@ -56,6 +56,7 @@ expression
                                         # unaryPrimaryExpression
     | expression Colon complexType      # typecastExpression
     | shellString                       # shellStringExpression
+    | looseShellString                  # looseShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     // operator expressions
     | OParen expression CParen          # parenthesisExpression
@@ -74,12 +75,12 @@ expression
     ;
 
 literal : StringValues | NumberValues | BoolValues | Empty;
-types    : Unknown | Empty | Boolean | Number | Int | Float | String | List | Map | Ref;
+types    : Empty | Boolean | Number | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;
-shellStringContents: shellString
-                   | DollarOParen shellStringContents* CParen
+looseShellString   : DoubleHashOParen shellStringContents* CParen;
+shellStringContents: DollarOParen shellStringContents* CParen
                    | OParen shellStringContents* CParen
                    | ShellStringText
                    | ShellStringEscapeSequence;

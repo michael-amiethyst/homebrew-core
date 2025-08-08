@@ -8,4 +8,8 @@ class FloatLiteralBastNode(private val float: BigDecimal) : BastNode(listOf(), m
     override fun render(): String {
         return float.toString()
     }
+
+    override fun replaceChildren(nextChildren: List<BastNode>): FloatLiteralBastNode {
+        return FloatLiteralBastNode(float)
+    }
 }

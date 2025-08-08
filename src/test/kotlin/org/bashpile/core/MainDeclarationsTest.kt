@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.bashpile.core.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,12 +23,11 @@ class MainDeclarationsTest {
     fun getBast_declare_bool_works() {
         val bashpileText: InputStream = "b: boolean = true".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
+        assertEquals(STRICT_HEADER + """
             declare b
             b="true"
 
-        """.trimIndent(), bashScript
-        )
+        """.trimIndent(), bashScript)
 
         val results = bashScript.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
@@ -37,12 +37,11 @@ class MainDeclarationsTest {
     fun getBast_declare_readonlyExported_string_works() {
         val bashpileText: InputStream = "b: readonly exported string = 'A_STRING'".byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
 
-        """.trimIndent(), bashScript
-        )
+        """.trimIndent(), bashScript)
 
         val results = bashScript.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
@@ -55,13 +54,12 @@ class MainDeclarationsTest {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
-            printf "${'$'}b"
+            printf "${'$'}{b}"
         
-        """.trimIndent(), bashScript
-        )
+        """.trimIndent(), bashScript)
 
         val results = bashScript.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
@@ -76,14 +74,13 @@ class MainDeclarationsTest {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
             b="B_STRING"
-            printf "${'$'}b"
+            printf "${'$'}{b}"
         
-        """.trimIndent(), bashScript
-        )
+        """.trimIndent(), bashScript)
 
         val results = bashScript.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
@@ -98,14 +95,13 @@ class MainDeclarationsTest {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture.getBast(bashpileText).render()
-        assertEquals("""
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
             b="'B_STRING'"
-            printf "${'$'}b"
-        
-        """.trimIndent(), bashScript
-        )
+            printf "${'$'}{b}"
+
+        """.trimIndent(), bashScript)
 
         val results = bashScript.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
@@ -128,7 +124,7 @@ class MainDeclarationsTest {
     fun getBast_reassign_wrongType_fails() {
         val bashpileText: InputStream = """
             b: exported string = 'A_STRING'
-            i: int = 0
+            i: integer = 0
             b = i
             print(b)
         """.trimIndent().byteInputStream()

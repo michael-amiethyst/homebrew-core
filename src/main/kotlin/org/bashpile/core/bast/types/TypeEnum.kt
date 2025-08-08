@@ -4,7 +4,7 @@ enum class TypeEnum {
     /** Coerces to anything */
     UNKNOWN,
     BOOLEAN,
-    INT,
+    INTEGER,
     /** Also used for unknown calculation results */
     FLOAT,
     STRING,

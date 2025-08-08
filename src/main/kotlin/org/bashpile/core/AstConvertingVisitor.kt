@@ -2,15 +2,23 @@ package org.bashpile.core
 
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.bast.*
+import org.bashpile.core.bast.expressions.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.ShellStringBastNode
+import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
-import org.bashpile.core.bast.types.IntLiteralBastNode
-import org.bashpile.core.bast.types.LeafBastNode
-import org.bashpile.core.bast.types.ReassignmentBastNode
+import org.bashpile.core.bast.types.IntegerLiteralBastNode
+import org.bashpile.core.bast.types.leaf.LeafBastNode
+import org.bashpile.core.bast.statements.ReassignmentBastNode
+import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
-import org.bashpile.core.bast.types.VariableDeclarationBastNode
+import org.bashpile.core.bast.statements.VariableDeclarationBastNode
+import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode
+import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode.Companion.CLOSING_PARENTHESIS
+import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode
+import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode.Companion.SUBSHELL_START
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
@@ -20,8 +28,21 @@ import org.bashpile.core.bast.types.VariableDeclarationBastNode
  */
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
+    companion object {
+        const val OLD_OPTIONS = "__bp_old_options"
+        const val ENABLE_STRICT = "set -euo pipefail"
+        @JvmStatic
+        val STRICT_HEADER = """
+            declare $OLD_OPTIONS
+            $OLD_OPTIONS=$(set +o)
+            $ENABLE_STRICT
+
+        """.trimIndent()
+    }
+
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
-        return InternalBastNode(ctx.children.map { visit(it) })
+        val childNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
+        return InternalBastNode(childNodes)
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode {
@@ -95,7 +116,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return if (nodeText.contains('.')) {
             FloatLiteralBastNode(nodeText.toBigDecimal())
         } else {
-            IntLiteralBastNode(nodeText.toBigInteger())
+            IntegerLiteralBastNode(nodeText.toBigInteger())
         }
     }
 
@@ -112,18 +133,33 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     // Leaf nodes (parts of expressions)
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
-        return ShellStringBastNode(ctx.shellStringContents().map { visit(it )})
+        return ShellStringBastNode(ctx.shellStringContents().map { visit(it) } )
+    }
+
+    override fun visitLooseShellString(ctx: BashpileParser.LooseShellStringContext): BastNode {
+        return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) } )
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
-        // TODO after assignments implemented:
-        //  when children are '$(', stuff, and ')'
-        //  then "unwind" by moving "stuff" to a preamble node with an assignment
-        return InternalBastNode(ctx.children.map { visit(it) })
+        val bastChildren = ctx.children.map { visit(it) }
+        val isNestedSubshell = bastChildren.size == 3
+                && bastChildren[0] is SubshellStartLeafBastNode
+                && bastChildren[2] is ClosingParenthesisLeafBastNode
+        return if (bastChildren.size == 1) {
+            bastChildren[0]
+        } else if (isNestedSubshell) {
+            // middle child only
+            ShellStringBastNode(bastChildren.subList(1, 2))
+        } else {
+            InternalBastNode(bastChildren)
+        }
     }
 
     override fun visitTerminal(node: TerminalNode): BastNode {
-        // antlr may pass us a literal "newline" as the entire node text
-        return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
+        return when (node.text) {
+            SUBSHELL_START -> SubshellStartLeafBastNode()
+            CLOSING_PARENTHESIS -> ClosingParenthesisLeafBastNode()
+            else -> return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
+        }
     }
 }

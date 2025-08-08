@@ -20,8 +20,6 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 
-// TODO add Makefile for nativeBuild, jar to Gradle for Formula (Bottles?)
-// TODO change 'int' and 'ref' lexer tokens.  Remove 'unknown'
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -103,7 +101,14 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        return bast
+        logger.info("Mermaid graph before unnesting subshells: {}", bast.mermaidGraph())
+        val unnestedBast = bast.unnestSubshells()
+        logger.info(
+            "Mermaid graph after unnestings subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
+        val looseBast = unnestedBast.loosenShellStrings()
+        logger.info(
+            "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
+        return looseBast
     }
 
     /**

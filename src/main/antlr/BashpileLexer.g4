@@ -26,15 +26,14 @@ tokens { INDENT, DEDENT }
 
 // keywords
 Empty    : 'empty';
-Unknown  : 'unknown';
 Boolean  : 'boolean';
 Number   : 'number';
-Int      : 'int';
+Integer  : 'integer';
 Float    : 'float';
 String   : 'string';
 List     : 'list';
 Map      : 'map';
-Ref      : 'ref';
+Reference: 'reference';
 
 Function : 'function';
 Block    : 'block';
@@ -132,13 +131,15 @@ StringEscapeSequence: '\\' . | '\\' Newline;
 
 // tokens for modes
 
-HashOParen  : '#(' -> pushMode(SHELL_STRING);
-DollarOParen: '$(' -> pushMode(SHELL_STRING);
+DoubleHashOParen : '##(' -> pushMode(SHELL_STRING);
+HashOParen       : '#(' -> pushMode(SHELL_STRING);
+DollarOParen     : '$(' -> pushMode(SHELL_STRING);
 
 // modes
 
 /** See https://github.com/sepp2k/antlr4-string-interpolation-examples/blob/master/with-duplication/StringLexer.g4 */
 mode SHELL_STRING;
+ShellStringDoubleHashOParen : '##(' -> type(DoubleHashOParen), pushMode(SHELL_STRING);
 ShellStringHashOParen    : '#(' -> type(HashOParen), pushMode(SHELL_STRING);
 ShellStringDollarOParen  : '$(' -> type(DollarOParen), pushMode(SHELL_STRING);
 ShellStringOParen        : '(' -> type(OParen), pushMode(SHELL_STRING);
