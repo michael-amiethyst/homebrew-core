@@ -31,15 +31,17 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     companion object {
         const val OLD_OPTIONS = "__bp_old_options"
         const val ENABLE_STRICT = "set -euo pipefail"
-    }
-
-    override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
-        val strictMode = """
+        @JvmStatic
+        val STRICT_HEADER = """
             declare $OLD_OPTIONS
             $OLD_OPTIONS=$(set +o)
             $ENABLE_STRICT
-            """.trimIndent()
-        val childNodes = ShellLineBastNode(strictMode).toList() + ctx.children.map { visit(it) }
+
+        """.trimIndent()
+    }
+
+    override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
+        val childNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
         return InternalBastNode(childNodes)
     }
 

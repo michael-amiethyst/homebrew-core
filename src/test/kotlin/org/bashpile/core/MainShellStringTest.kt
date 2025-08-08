@@ -1,6 +1,6 @@
 package org.bashpile.core
 
-import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
+import org.bashpile.core.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -18,11 +18,7 @@ class MainShellStringTest {
     @Test
     fun getBast_shellLine_printf_works() {
         val script: InputStream = "printf \"true\"".byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "true"
             
             """.trimIndent(), fixture.getBast(script).render())
@@ -31,11 +27,7 @@ class MainShellStringTest {
     @Test
     fun getBast_shellLine_initialVar_works() {
         val script: InputStream = "test_var=5 printf \"\$test_var\"".byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             test_var=5 printf "${'$'}test_var"
             
             """.trimIndent(), fixture.getBast(script).render())
@@ -44,11 +36,7 @@ class MainShellStringTest {
     @Test
     fun getBast_shellLine_literalNewline_works() {
         val script: InputStream = "printf \"newline\"".byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "newline"
             
             """.trimIndent(), fixture.getBast(script).render())
@@ -57,11 +45,7 @@ class MainShellStringTest {
     @Test
     fun getBast_shellstring_works() {
         val script: InputStream = "#(printf \"newline\")".byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             $(printf "newline")
             
             """.trimIndent(), fixture.getBast(script).render())
@@ -71,11 +55,7 @@ class MainShellStringTest {
     fun getBast_shellstring_withConcat_works() {
         val script: InputStream = """
             print("Hello " + #(printf 'shellstring!'))""".trim().byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "Hello $(printf 'shellstring!')"
             """.trimIndent() + "\n", fixture.getBast(script).render())
     }
@@ -85,11 +65,7 @@ class MainShellStringTest {
         val script: InputStream = """
             print(#(ls $(echo '.')))""".trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             declare __bp_var0
             __bp_var0="$(echo '.')"
             printf "$(ls ${'$'}{__bp_var0})"
@@ -103,11 +79,7 @@ class MainShellStringTest {
         val pathname = "src/test/resources/bpsScripts/nestedSubshells.bps"
         val script: InputStream =  File(pathname).readText().trim().byteInputStream()
         val renderedBash = fixture.getBast(script).render()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             set -euo pipefail
             declare __bp_var0
             __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
@@ -124,11 +96,7 @@ class MainShellStringTest {
             print(#(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().byteInputStream()
         val render = fixture.getBast(script).render()
         var renderedBash = render
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             declare __bp_var0
             __bp_var0="$(printf 'Hello ')"
             declare __bp_var1

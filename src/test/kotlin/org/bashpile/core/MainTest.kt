@@ -1,7 +1,7 @@
 package org.bashpile.core
 
 import com.github.ajalt.clikt.testing.test
-import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
+import org.bashpile.core.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.InputStream
@@ -34,11 +34,7 @@ class MainTest {
         val output = fixture.test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), output.stdout)
@@ -49,11 +45,7 @@ class MainTest {
         val output = fixture.test(arrayOf("src/test/resources/bpsScripts/helloWithConcat.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), output.stdout)
@@ -71,11 +63,7 @@ class MainTest {
     @Test
     fun getBast_printBool_works() {
         val script: InputStream = "print(true)".byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "true"
             
             """.trimIndent(), fixture.getBast(script).render())
@@ -84,10 +72,7 @@ class MainTest {
     @Test
     fun getBast_printBool_withParens_works() {
         val bpScript: InputStream = "print(((true)))".byteInputStream()
-        assertEquals("""
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "true"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
@@ -97,10 +82,7 @@ class MainTest {
     fun getBast_printString_tripleConcat_works() {
         val bpScript: InputStream = """
             print("Hello" + " " + "Bashpile!")""".trimIndent().byteInputStream()
-        assertEquals("""
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
@@ -110,10 +92,7 @@ class MainTest {
     fun getBast_printString_tripleConcat_withParen_works() {
         val bpScript: InputStream = """
             print((("Hello" + " " + "Bashpile!")))""".trimIndent().byteInputStream()
-        assertEquals("""
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
@@ -123,11 +102,7 @@ class MainTest {
     fun getBast_printString_tripleConcat_withMoreParens_works() {
         val bpScript: InputStream = """
             print(((("Hello" + " " + "Bashpile!" ) + "  It's " + "awesome!")))""".trimIndent().byteInputStream()
-        assertEquals(
-            """
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!  It's awesome!"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
@@ -136,10 +111,7 @@ class MainTest {
     @Test
     fun getBast_printFloat_works() {
         val bpScript: InputStream = "print(1.0)".byteInputStream()
-        assertEquals("""
-            declare $OLD_OPTIONS
-            $OLD_OPTIONS=$(set +o)
-            set -euo pipefail
+        assertEquals(STRICT_HEADER + """
             printf "1.0"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
