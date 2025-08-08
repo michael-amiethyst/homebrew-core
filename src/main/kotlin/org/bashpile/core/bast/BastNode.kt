@@ -32,8 +32,8 @@ abstract class BastNode(
     companion object {
         private var unnestedCount = 0
         private val unnestedCountLock = Any()
-        private var mermaidNodeId = 0
-        private val mermaidNodeIdLock = Any()
+        private var mermaidNodeIds = HashMap<String, Int>()
+        private val mermaidNodeIdsLock = Any()
     }
 
     fun resolvedMajorType(): TypeEnum {
@@ -59,8 +59,8 @@ abstract class BastNode(
     }
 
     fun mermaidGraph(): String {
-        synchronized(mermaidNodeIdLock) {
-            mermaidNodeId = 0
+        synchronized(mermaidNodeIdsLock) {
+            mermaidNodeIds.clear()
             return "graph TD;" + mermaidGraph("root")
         }
     }
@@ -68,7 +68,10 @@ abstract class BastNode(
     private fun mermaidGraph(parentNodeName: String): String {
         var mermaid = ""
         children.forEach { child ->
-            val nodeName = child::class.simpleName!!.removeSuffix("BastNode") + mermaidNodeId++
+            val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
+            val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
+            val nodeName = nodeTypeName + nodeId
+            mermaidNodeIds[nodeTypeName] = nodeId + 1
             mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
         }
         return mermaid
@@ -91,7 +94,7 @@ abstract class BastNode(
     }
 
     /**
-     * @param replaceChildren will not be modified
+     * @param nextChildren Contents will not be modified
      * @return A new instance of a BastNode subclass with the same fields, besides the children
      */
     open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
@@ -138,7 +141,7 @@ abstract class BastNode(
 
             // create VarDec node
             val variableReference = VariableBastNode(id, UNKNOWN)
-            Pair(listOf(assignment) + unnestedPreambles, variableReference)
+            Pair(assignment.toList() + unnestedPreambles, variableReference)
         } else { // current node isn't nested, but children are
             if (this is StatementBastNode) {
                 Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())

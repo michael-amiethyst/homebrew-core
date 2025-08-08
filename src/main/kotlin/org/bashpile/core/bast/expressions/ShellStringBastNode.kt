@@ -9,7 +9,7 @@ import org.bashpile.core.bast.types.leaf.LeafBastNode
  */
 open class ShellStringBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
 
-    constructor(contents: String) : this(listOf(LeafBastNode(contents)))
+    constructor(contents: String) : this(LeafBastNode(contents).toList())
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")

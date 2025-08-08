@@ -7,7 +7,7 @@ import org.bashpile.core.bast.types.leaf.LeafBastNode
 /** Represents a line of Bash, has no loose mode like [org.bashpile.core.bast.expressions.ShellStringBastNode] */
 class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
 
-    constructor(contents: String) : this(listOf(LeafBastNode(contents)))
+    constructor(contents: String) : this(LeafBastNode(contents).toList())
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
@@ -15,7 +15,7 @@ class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return ShellLineBastNode(nextChildren.map { it.deepCopy() })
+        return ShellLineBastNode(nextChildren.map { it.deepCopy() } )
     }
 
     private fun String.appendIfMissing(suffix: String): String {

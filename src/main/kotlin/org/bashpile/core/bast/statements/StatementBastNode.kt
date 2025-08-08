@@ -10,5 +10,5 @@ open class StatementBastNode(
     majorType: TypeEnum = UNKNOWN) : BastNode(children, id, majorType) {
         /** Takes a single node as a child */
         constructor(child: BastNode, id: String? = null, majorType: TypeEnum = UNKNOWN)
-                : this(listOf(child), id, majorType)
+                : this(child.toList(), id, majorType)
     }

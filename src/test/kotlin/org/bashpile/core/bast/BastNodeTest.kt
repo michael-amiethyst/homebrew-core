@@ -52,12 +52,23 @@ class BastNodeTest {
     }
 
     @Test
-    fun mermaidGraphWorks() {
-        val child = ShellLineBastNode()
-        val root = PrintBastNode(listOf(child))
+    fun mermaidGraph_works() {
+        val child = ShellStringBastNode()
+        val root = PrintBastNode(child)
         val graph = root.mermaidGraph()
         assertFalse(graph.contains("reflection", true))
         assertFalse(graph.contains("BastNode"))
+        log.info("Mermaid Graph: {}", graph)
+    }
+
+    @Test
+    fun mermaidGraph_nodeNumbering_works() {
+        val printNode = PrintBastNode(ShellStringBastNode("ls"), ShellStringBastNode("pwd"))
+        val root = InternalBastNode(printNode)
+        val graph = root.mermaidGraph()
+        assertFalse(graph.contains("reflection", true))
+        assertFalse(graph.contains("BastNode"))
+        assertTrue(graph.contains("ShellString1"))
         log.info("Mermaid Graph: {}", graph)
     }
 
