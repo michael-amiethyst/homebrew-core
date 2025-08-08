@@ -1,11 +1,10 @@
 package org.bashpile.core
 
 import com.github.ajalt.clikt.testing.test
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
+import org.bashpile.core.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.InputStream
-import java.lang.UnsupportedOperationException
 
 
 /**
@@ -113,7 +112,7 @@ class MainTest {
     fun getBast_printFloat_works() {
         val bpScript: InputStream = "print(1.0)".byteInputStream()
         assertEquals(STRICT_HEADER + """
-            printf "%s" "1.0"
+            printf "1.0"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
     }
@@ -121,7 +120,7 @@ class MainTest {
     @Test
     fun getBast_printFloat_plusString_fails() {
         val bpScript: InputStream = "print(1.0 + \" apples please\")".byteInputStream()
-        assertThrows(UnsupportedOperationException::class.java) {
+        assertThrows(IllegalArgumentException::class.java) {
             fixture.getBast(bpScript).render()
         }
     }
@@ -129,7 +128,7 @@ class MainTest {
     @Test
     fun getBast_printString_plusBool_fails() {
         val bpScript: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
-        assertThrows(UnsupportedOperationException::class.java) {
+        assertThrows(IllegalArgumentException::class.java) {
             fixture.getBast(bpScript).render()
         }
     }

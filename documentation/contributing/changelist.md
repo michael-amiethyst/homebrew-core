@@ -8,5 +8,3 @@
 * 0.8.0  - Variable Declarations, reassignments and strong typing.  Readonly variables
 * 0.9.0  - Unnesting subshells, makefile integration and Brew Formula integration
 * 0.10.0 - Automatic strict mode
-* 0.11.0 - Integer arithmetic, --verbose option
-* 0.12.0 - Floating point arithmetic

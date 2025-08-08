@@ -1,17 +1,13 @@
 package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.Subshell
-import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 
 /**
  * A Shell String is the Bashpile equivalent of a Bash subshell (i.e., $() syntax).  It represents an expression.
  * A full line of bash is a [org.bashpile.core.bast.statements.ShellLineBastNode].
  */
-open class ShellStringBastNode(
-    children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.UNKNOWN)
-    : BastNode(children, majorType = majorType), Subshell {
+open class ShellStringBastNode(children: List<BastNode> = listOf()) : BastNode(children) {
 
     constructor(contents: String) : this(LeafBastNode(contents).toList())
 
@@ -21,6 +17,6 @@ open class ShellStringBastNode(
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
-        return ShellStringBastNode(nextChildren.map { it.deepCopy() }, majorType)
+        return ShellStringBastNode(nextChildren.map { it.deepCopy() })
     }
 }

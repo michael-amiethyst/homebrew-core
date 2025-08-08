@@ -4,7 +4,7 @@ import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.types.TypeEnum
 
-/** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement] */
+/** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(
     id: String,
     type: TypeEnum,

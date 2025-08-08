@@ -52,12 +52,10 @@ JVM project to run as a fast native program!  I've seen a start of 5 seconds go 
 
 * Quick compiles!  Within a second
 * White space agnostic (except for Python style indentation)
-* `print("Any String here")`, [print statements](statements/print-statements.md)
-* `"string" + "concatination"` [calculation expressions](expressions/calculation-expressions.md)
-  * Integer and Floating Point arithmatic supported
-* [Types!](types.md)
-* `varName: str = "variable"` [variable declaration statements](statements/variable-declaration-statements.md)
-  * `SOME_CONSTANT: readonly str = "const"`
-* `varName = "reassign"` [reassignment statements](statements/reassignment-statements.md)
-* Automatic [strict mode](strict-mode.md) handling
+* `print("Any String here")`, single quotes allowed with no special difference
+* `"string" + "concatination"`
+* `varName: str = "variable"`
+* `SOME_CONSTANT: readonly str = "const"`
+* `varName = "reassign"`
+* Automatic strict mode handling
   * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax

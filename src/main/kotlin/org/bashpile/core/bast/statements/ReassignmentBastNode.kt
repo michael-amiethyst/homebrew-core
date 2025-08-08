@@ -2,7 +2,7 @@ package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
 
-/** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement] */
+/** Created by [org.bashpile.core.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class ReassignmentBastNode(id: String, child: BastNode) : StatementBastNode(child, id) {
     init {
         check(children.size == 1)
