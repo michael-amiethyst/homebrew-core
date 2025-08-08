@@ -25,7 +25,7 @@ class VariableDeclarationBastNode(
         return """
             declare $flags$id
             $id="$childRender"
-            
+
         """.trimIndent()
     }
     override fun replaceChildren(nextChildren: List<BastNode>): VariableDeclarationBastNode {

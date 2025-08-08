@@ -15,7 +15,7 @@ class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return ShellLineBastNode(nextChildren.map { it.deepCopy() } )
+        return ShellLineBastNode(nextChildren.map { it.deepCopy() })
     }
 
     private fun String.appendIfMissing(suffix: String): String {
