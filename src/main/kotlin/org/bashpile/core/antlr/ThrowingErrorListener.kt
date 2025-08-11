@@ -1,4 +1,4 @@
-package org.bashpile.core
+package org.bashpile.core.antlr
 
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException

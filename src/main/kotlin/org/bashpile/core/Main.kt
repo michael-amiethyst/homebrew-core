@@ -13,6 +13,8 @@ import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.antlr.ThrowingErrorListener
 import org.bashpile.core.bast.BashpileState
 import org.bashpile.core.bast.BastNode
 import org.slf4j.LoggerFactory
@@ -101,14 +103,7 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        logger.info("Mermaid graph before unnesting subshells: {}", bast.mermaidGraph())
-        val unnestedBast = bast.unnestSubshells()
-        logger.info(
-            "Mermaid graph after unnestings subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
-        val looseBast = unnestedBast.loosenShellStrings()
-        logger.info(
-            "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
-        return looseBast
+        return FinishedBastFactory().transform(bast)
     }
 
     /**

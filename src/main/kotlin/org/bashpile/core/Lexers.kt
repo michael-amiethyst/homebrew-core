@@ -16,6 +16,8 @@ import java.util.regex.Pattern
 /**
  * Helper class for BashpileLexer.
  */
+// TODO NOW - move to antlr package
+// TODO NOW - take --version option
 class Lexers {
     companion object {
         /**
@@ -148,7 +150,7 @@ class Lexers {
                     COMMAND_TO_VALIDITY_CACHE[command] = false
                     return false
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 return false
             }
         }

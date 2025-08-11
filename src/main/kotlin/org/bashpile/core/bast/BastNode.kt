@@ -1,14 +1,13 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.AstConvertingVisitor
-import org.bashpile.core.AstConvertingVisitor.Companion.ENABLE_STRICT
-import org.bashpile.core.AstConvertingVisitor.Companion.OLD_OPTIONS
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.StatementBastNode
-import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.types.leaf.LeafBastNode
@@ -30,8 +29,6 @@ abstract class BastNode(
     val majorType: TypeEnum = UNKNOWN
 ) {
     companion object {
-        private var unnestedCount = 0
-        private val unnestedCountLock = Any()
         private var mermaidNodeIds = HashMap<String, Int>()
         private val mermaidNodeIdsLock = Any()
     }
@@ -58,23 +55,26 @@ abstract class BastNode(
         return children.joinToString("") { it.render() }
     }
 
-    fun mermaidGraph(): String {
+    fun mermaidGraph(parentNodeName: String = ""): String {
         synchronized(mermaidNodeIdsLock) {
-            mermaidNodeIds.clear()
-            return "graph TD;" + mermaidGraph("root")
-        }
-    }
+            if (parentNodeName.isEmpty()) {
+                // initial case
+                mermaidNodeIds.clear()
+                return "graph TD;" + mermaidGraph("root")
+            } else {
+                // terminating cose: no children
+                var mermaid = ""
+                children.forEach { child ->
+                    val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
+                    val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
+                    val nodeName = nodeTypeName + nodeId
+                    mermaidNodeIds[nodeTypeName] = nodeId + 1
+                    mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
+                }
+                return mermaid
+            }
 
-    private fun mermaidGraph(parentNodeName: String): String {
-        var mermaid = ""
-        children.forEach { child ->
-            val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
-            val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
-            val nodeName = nodeTypeName + nodeId
-            mermaidNodeIds[nodeTypeName] = nodeId + 1
-            mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
         }
-        return mermaid
     }
 
     /**
@@ -102,56 +102,9 @@ abstract class BastNode(
         throw UnsupportedOperationException("Should be overridden in child class")
     }
 
-    /** @return An unnested version of the input tree */
-    fun unnestSubshells(): BastNode {
-        synchronized(unnestedCountLock) {
-            unnestedCount = 0
-            val hasLooseShellStringChild = findInTree { it is LooseShellStringBastNode }
-            if (hasLooseShellStringChild) {
-                return this
-            }
-            val unnestedRoot = unnestSubshells(isSubshellNode())
-            return if (unnestedRoot.first.isEmpty()) {
-                // no unnesting performed
-                unnestedRoot.second
-            } else {
-                InternalBastNode(unnestedRoot.first + unnestedRoot.second)
-            }
-        }
-    }
-
-    /**
-     * Returns a list of preambles to support unnesting.
-     * @return Preambles and unnested subshell.
-     * @see /documentation/contributing/unnest.md
-     */
-    private fun unnestSubshells(inSubshell: Boolean): UnnestTuple {
-        val unnestedChildPairs = children.map { it.unnestSubshells(inSubshell || isSubshellNode()) }
-        val unnestedPreambles = unnestedChildPairs.flatMap { it.first }
-        val unnestedChildren = unnestedChildPairs.map { it.second }
-
-        val currentNodeIsNested = inSubshell && isSubshellNode()
-        val noNestedChildren = unnestedPreambles.isEmpty()
-        return if (!currentNodeIsNested && noNestedChildren) {
-            Pair(listOf(), replaceChildren(unnestedChildren))
-        } else if (currentNodeIsNested) {
-            // create an assignment statement
-            val id = "__bp_var${unnestedCount++}"
-            val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = ShellStringBastNode(unnestedChildren))
-
-            // create VarDec node
-            val variableReference = VariableBastNode(id, UNKNOWN)
-            Pair(assignment.toList() + unnestedPreambles, variableReference)
-        } else { // current node isn't nested, but children are
-            if (this is StatementBastNode) {
-                Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())
-            } else Pair(unnestedPreambles, replaceChildren(listOf(unnestedChildren.toBastNode())))
-        }
-    }
-
-    fun findInTree(condition: Predicate<BastNode>) : Boolean {
-        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
-    }
+    ///////////////////////////
+    // Transformation -- loosen
+    ///////////////////////////
 
     /** @return A loosened version of the input tree */
     fun loosenShellStrings(): BastNode {
@@ -181,9 +134,17 @@ abstract class BastNode(
         }
     }
 
-    protected fun List<BastNode>.toBastNode(): BastNode {
+    //////////
+    // helpers
+    //////////
+
+    fun List<BastNode>.toBastNode(): BastNode {
         require(isNotEmpty())
         val separator = if (this@BastNode is StatementBastNode) "" else " "
         return if (size == 1) first() else InternalBastNode(this, separator)
+    }
+
+    fun findInTree(condition: Predicate<BastNode>) : Boolean {
+        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
     }
 }

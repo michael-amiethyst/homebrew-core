@@ -1,28 +1,30 @@
-package org.bashpile.core
+package org.bashpile.core.antlr
 
 import org.antlr.v4.runtime.tree.TerminalNode
-import org.bashpile.core.bast.*
+import org.bashpile.core.BashpileParser
+import org.bashpile.core.BashpileParserBaseVisitor
+import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.InternalBastNode
+import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
+import org.bashpile.core.bast.statements.ReassignmentBastNode
+import org.bashpile.core.bast.statements.ShellLineBastNode
+import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.BooleanLiteralBastNode
 import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
-import org.bashpile.core.bast.types.leaf.LeafBastNode
-import org.bashpile.core.bast.statements.ReassignmentBastNode
-import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.VariableBastNode
-import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode
-import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode.Companion.CLOSING_PARENTHESIS
+import org.bashpile.core.bast.types.leaf.LeafBastNode
 import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode
-import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode.Companion.SUBSHELL_START
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
- * Created by [Main].
+ * Created by [org.bashpile.core.Main].
  * Is in two major sections - Statements and Expressions.
  * Code is arranged from complex at the top to simple at the bottom.
  */
@@ -122,22 +124,29 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
-        require(ctx.children[1].text == "+") { "Only addition is supported" }
         val left = visit(ctx.children[0])
-        require(left.areAllStrings()) { "Left operand must be all strings, class was ${left.javaClass}" }
         val right = visit(ctx.children[2])
-        require(right.areAllStrings()) { "Right operand must be all strings, class was ${right.javaClass}" }
-        return InternalBastNode(listOf(left, right))
+        // TODO arithmetic - always return an arithmeticBastNode, move this logic into ArithmaticBastNode.render
+        return if (left.areAllStrings() && right.areAllStrings()) {
+            require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
+            InternalBastNode(left, right)
+        } else if (left.majorType == TypeEnum.INTEGER && right.majorType == TypeEnum.INTEGER) {
+            val middle = visit(ctx.children[1])
+            ArithmeticBastNode(left, middle, right)
+        } else {
+            throw UnsupportedOperationException(
+                "Only calculations on Strings or Integers are supported, but found ${left.majorType} and ${right.majorType}")
+        }
     }
 
     // Leaf nodes (parts of expressions)
 
     override fun visitShellString(ctx: BashpileParser.ShellStringContext): BastNode {
-        return ShellStringBastNode(ctx.shellStringContents().map { visit(it) } )
+        return ShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitLooseShellString(ctx: BashpileParser.LooseShellStringContext): BastNode {
-        return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) } )
+        return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
@@ -157,8 +166,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitTerminal(node: TerminalNode): BastNode {
         return when (node.text) {
-            SUBSHELL_START -> SubshellStartLeafBastNode()
-            CLOSING_PARENTHESIS -> ClosingParenthesisLeafBastNode()
+            SubshellStartLeafBastNode.Companion.SUBSHELL_START -> SubshellStartLeafBastNode()
+            ClosingParenthesisLeafBastNode.Companion.CLOSING_PARENTHESIS -> ClosingParenthesisLeafBastNode()
             else -> return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
         }
     }
