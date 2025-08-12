@@ -33,7 +33,7 @@ class FinishedBastFactoryTest {
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
 
         log.info("Mermaid Graph before unnest: {}", printBastNode.mermaidGraph())
-        val unnestedRoot = fixture.unnestSubshells(printBastNode)
+        val unnestedRoot = fixture.unnestSubshells(printBastNode).second
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
         assert(!unnestedRoot.children[0].render().endsWith(" "))
@@ -66,7 +66,7 @@ class FinishedBastFactoryTest {
         val root = InternalBastNode(listOf(strictNode, printBastNode))
 
         log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-        val unnestedRoot: BastNode = fixture.unnestSubshells(root)
+        val unnestedRoot: BastNode = fixture.unnestSubshells(root).second
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
         assert(unnestedRoot.children[1].children.size == 2)
