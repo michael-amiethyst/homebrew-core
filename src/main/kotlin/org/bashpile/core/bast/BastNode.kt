@@ -4,7 +4,6 @@ import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.bast.statements.StatementBastNode
 import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.types.leaf.LeafBastNode
@@ -97,12 +96,6 @@ abstract class BastNode(
     open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
         // making this abstract triggers a compilation bug in Ubuntu as of July 2025
         throw UnsupportedOperationException("Should be overridden in child class")
-    }
-
-    fun List<BastNode>.toBastNode(): BastNode {
-        require(isNotEmpty())
-        val separator = if (this@BastNode is StatementBastNode) "" else " "
-        return if (size == 1) first() else InternalBastNode(this, separator)
     }
 
     fun findInTree(condition: Predicate<BastNode>) : Boolean {

@@ -2,6 +2,7 @@ package org.bashpile.core
 
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
@@ -14,9 +15,11 @@ import org.junit.jupiter.api.Test
 
 class FinishedBastFactoryTest {
     val log: Logger = LogManager.getLogger()
+    lateinit var fixture: FinishedBastFactory
     @BeforeEach
     fun setUp() {
         Main() // create for static state
+        fixture = FinishedBastFactory()
     }
 
     /** Tests print(#(ls $(printf '.'; exit 1))) */
@@ -30,7 +33,7 @@ class FinishedBastFactoryTest {
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
 
         log.info("Mermaid Graph before unnest: {}", printBastNode.mermaidGraph())
-        val unnestedRoot = printBastNode.unnestSubshells()
+        val unnestedRoot = fixture.unnestSubshells(printBastNode)
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
         assert(!unnestedRoot.children[0].render().endsWith(" "))
@@ -63,7 +66,7 @@ class FinishedBastFactoryTest {
         val root = InternalBastNode(listOf(strictNode, printBastNode))
 
         log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-        val unnestedRoot = root.unnestSubshells()
+        val unnestedRoot: BastNode = fixture.unnestSubshells(root)
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
         assert(unnestedRoot.children.size == 2)
         assert(unnestedRoot.children[1].children.size == 2)

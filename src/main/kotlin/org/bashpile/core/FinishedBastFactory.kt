@@ -1,9 +1,6 @@
 package org.bashpile.core
 
-import com.google.common.annotations.VisibleForTesting
 import org.apache.logging.log4j.LogManager
-import org.bashpile.core.FinishedBastFactory.Companion.unnestedCount
-import org.bashpile.core.FinishedBastFactory.Companion.unnestedCountLock
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
@@ -18,54 +15,6 @@ import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.types.VariableBastNode
 
 
-@VisibleForTesting
-/** @return An unnested version of the input tree */
-fun BastNode.unnestSubshells(): BastNode {
-    synchronized(unnestedCountLock) {
-        unnestedCount = 0
-        val hasLooseShellStringChild = findInTree { it is LooseShellStringBastNode }
-        if (hasLooseShellStringChild) {
-            return this
-        }
-        val unnestedRoot = unnestSubshells(isSubshellNode())
-        return if (unnestedRoot.first.isEmpty()) {
-            // no unnesting performed
-            unnestedRoot.second
-        } else {
-            InternalBastNode(unnestedRoot.first + unnestedRoot.second)
-        }
-    }
-}
-
-/**
- * Returns a list of preambles to support unnesting.
- * @return Preambles and unnested subshell.
- * @see /documentation/contributing/unnest.md
- */
-private fun BastNode.unnestSubshells(inSubshell: Boolean): UnnestTuple {
-    val unnestedChildPairs = children.map { it.unnestSubshells(inSubshell || isSubshellNode()) }
-    val unnestedPreambles = unnestedChildPairs.flatMap { it.first }
-    val unnestedChildren = unnestedChildPairs.map { it.second }
-
-    val currentNodeIsNested = inSubshell && isSubshellNode()
-    val noNestedChildren = unnestedPreambles.isEmpty()
-    return if (!currentNodeIsNested && noNestedChildren) {
-        Pair(listOf(), replaceChildren(unnestedChildren))
-    } else if (currentNodeIsNested) {
-        // create an assignment statement
-        val id = "__bp_var${unnestedCount++}"
-        val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = ShellStringBastNode(unnestedChildren))
-
-        // create VarDec node
-        val variableReference = VariableBastNode(id, UNKNOWN)
-        Pair(assignment.toList() + unnestedPreambles, variableReference)
-    } else { // current node isn't nested, but children are
-        if (this is StatementBastNode) {
-            Pair(listOf(), (unnestedPreambles + replaceChildren(unnestedChildren)).toBastNode())
-        } else Pair(unnestedPreambles, replaceChildren(listOf(unnestedChildren.toBastNode())))
-    }
-}
-
 // TODO arithmetic - document
 class FinishedBastFactory {
 
@@ -76,16 +25,65 @@ class FinishedBastFactory {
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
-    // TODO NOW - make a transformation to flatten ArithmeticBastNodes, move loosen logic here
+    // TODO NOW - make a transformation to flatten ArithmeticBastNodes
     fun transform(root: BastNode): BastNode {
         logger.info("Mermaid graph before unnesting subshells: {}", root.mermaidGraph())
-        val unnestedBast = root.unnestSubshells()
+        val unnestedBast = unnestSubshells(root)
         logger.info(
             "Mermaid graph after unnestings subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
         val looseBast = unnestedBast.loosenShellStrings().second
         logger.info(
             "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
         return looseBast
+    }
+
+    /** @return An unnested version of the input tree */
+    fun unnestSubshells(bast: BastNode): BastNode {
+        synchronized(unnestedCountLock) {
+            unnestedCount = 0
+            val hasLooseShellStringChild = bast.findInTree { bast is LooseShellStringBastNode }
+            if (hasLooseShellStringChild) {
+                return bast
+            }
+            val unnestedRoot = unnestSubshells(bast, bast.isSubshellNode())
+            return if (unnestedRoot.first.isEmpty()) {
+                // no unnesting performed
+                unnestedRoot.second
+            } else {
+                InternalBastNode(unnestedRoot.first + unnestedRoot.second)
+            }
+        }
+    }
+
+    /**
+     * Returns a list of preambles to support unnesting.
+     * @return Preambles and unnested subshell.
+     * @see /documentation/contributing/unnest.md
+     */
+    private fun unnestSubshells(bast: BastNode, inSubshell: Boolean): UnnestTuple {
+        val unnestedChildPairs = bast.children.map { unnestSubshells(it, inSubshell || bast.isSubshellNode()) }
+        val unnestedPreambles = unnestedChildPairs.flatMap { it.first }
+        val unnestedChildren = unnestedChildPairs.map { it.second }
+
+        val currentNodeIsNested = inSubshell && bast.isSubshellNode()
+        val noNestedChildren = unnestedPreambles.isEmpty()
+        return if (!currentNodeIsNested && noNestedChildren) {
+            Pair(listOf(), bast.replaceChildren(unnestedChildren))
+        } else if (currentNodeIsNested) {
+            // create an assignment statement
+            val id = "__bp_var${unnestedCount++}"
+            val assignment = VariableDeclarationBastNode(id, UNKNOWN, child = ShellStringBastNode(unnestedChildren))
+
+            // create VarDec node
+            val variableReference = VariableBastNode(id, UNKNOWN)
+            Pair(assignment.toList() + unnestedPreambles, variableReference)
+        } else { // current node isn't nested, but children are
+            if (bast is StatementBastNode) {
+                Pair(listOf(), (unnestedPreambles + bast.replaceChildren(unnestedChildren)).toBastNode(bast))
+            } else {
+                Pair(unnestedPreambles, bast.replaceChildren(listOf(unnestedChildren.toBastNode(bast))))
+            }
+        }
     }
 
     /** @return A loosened version of the input tree */
@@ -121,5 +119,11 @@ class FinishedBastFactory {
             replaceChildren(loosenedChildren)
         }
         return Pair(foundLoose, bastNode)
+    }
+
+    private fun List<BastNode>.toBastNode(parent: BastNode): BastNode {
+        require(isNotEmpty())
+        val separator = if (parent is StatementBastNode) "" else " "
+        return if (size == 1) first() else InternalBastNode(this, separator)
     }
 }
