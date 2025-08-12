@@ -1,10 +1,7 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.antlr.AstConvertingVisitor
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.Main.Companion.bashpileState
-import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.StatementBastNode
@@ -101,45 +98,6 @@ abstract class BastNode(
         // making this abstract triggers a compilation bug in Ubuntu as of July 2025
         throw UnsupportedOperationException("Should be overridden in child class")
     }
-
-    /** @return A loosened version of the input tree */
-    fun loosenShellStrings(foundLooseShellString: Boolean? = null): Pair<Boolean, BastNode> {
-        val startRecursion = foundLooseShellString == null
-        if (startRecursion) {
-            val looseChildren = children.map { it.loosenShellStrings(false).second }
-            check(looseChildren.isNotEmpty() && looseChildren[0] is StatementBastNode) {
-                "Loose child[0] was not a statement, was " + looseChildren[0].javaClass }
-            return Pair(false, replaceChildren(looseChildren))
-        }
-
-        // recursive call
-
-        val looseResult = children.map {
-            // terminal case is when children are empty
-            it.loosenShellStrings(foundLooseShellString)
-        }.fold(Pair(this is LooseShellStringBastNode, InternalBastNode())) { acc, b ->
-            Pair(acc.first || b.first,
-                acc.second.replaceChildren(acc.second.children + b.second))
-        }
-
-        val foundLoose = looseResult.first
-        val looseStatement = foundLoose && this is StatementBastNode
-        val loosenedChildren = looseResult.second.children
-        val bastNode = if (looseStatement) {
-            // reenable prior (loose) options and then reenable strict mode
-            InternalBastNode(
-                ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
-                replaceChildren(loosenedChildren),
-                ShellLineBastNode(ENABLE_STRICT))
-        } else {
-            replaceChildren(loosenedChildren)
-        }
-        return Pair(foundLoose, bastNode)
-    }
-
-    //////////
-    // helpers
-    //////////
 
     fun List<BastNode>.toBastNode(): BastNode {
         require(isNotEmpty())
