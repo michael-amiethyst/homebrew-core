@@ -77,7 +77,7 @@ class FinishedBastFactory {
         val unnestedBast = root.unnestSubshells()
         logger.info(
             "Mermaid graph after unnestings subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
-        val looseBast = unnestedBast.loosenShellStrings()
+        val looseBast = unnestedBast.loosenShellStrings().second
         logger.info(
             "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
         return looseBast

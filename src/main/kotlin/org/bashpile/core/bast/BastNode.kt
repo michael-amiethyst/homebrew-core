@@ -102,36 +102,39 @@ abstract class BastNode(
         throw UnsupportedOperationException("Should be overridden in child class")
     }
 
-    ///////////////////////////
-    // Transformation -- loosen
-    ///////////////////////////
-
     /** @return A loosened version of the input tree */
-    fun loosenShellStrings(): BastNode {
-        val looseChildren = children.map { it.loosenShellStrings(false).second }
-        check(looseChildren.isNotEmpty() && looseChildren[0] is StatementBastNode) {
-            "Loose child[0] was not a statement, was " + looseChildren[0].javaClass }
-        return replaceChildren(looseChildren)
-    }
+    fun loosenShellStrings(foundLooseShellString: Boolean? = null): Pair<Boolean, BastNode> {
+        val startRecursion = foundLooseShellString == null
+        if (startRecursion) {
+            val looseChildren = children.map { it.loosenShellStrings(false).second }
+            check(looseChildren.isNotEmpty() && looseChildren[0] is StatementBastNode) {
+                "Loose child[0] was not a statement, was " + looseChildren[0].javaClass }
+            return Pair(false, replaceChildren(looseChildren))
+        }
 
-    /**
-     * Returns a list of preambles to support unnesting.
-     * @return Preambles and unnested subshell.
-     * @see /documentation/contributing/unnest.md
-     */
-    private fun loosenShellStrings(foundLooseShellString: Boolean): Pair<Boolean, BastNode> {
-        val foundLoose = children.map {
+        // recursive call
+
+        val looseResult = children.map {
+            // terminal case is when children are empty
             it.loosenShellStrings(foundLooseShellString)
         }.fold(Pair(this is LooseShellStringBastNode, InternalBastNode())) { acc, b ->
-            Pair(acc.first || b.first, acc.second.replaceChildren(acc.second.children + b.second)) }
-        return if (foundLoose.first && this is StatementBastNode) {
-            Pair(true, InternalBastNode(
-                ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
-                replaceChildren(foundLoose.second.children),
-                ShellLineBastNode(ENABLE_STRICT)))
-        } else {
-            Pair(foundLoose.first, replaceChildren(foundLoose.second.children))
+            Pair(acc.first || b.first,
+                acc.second.replaceChildren(acc.second.children + b.second))
         }
+
+        val foundLoose = looseResult.first
+        val looseStatement = foundLoose && this is StatementBastNode
+        val loosenedChildren = looseResult.second.children
+        val bastNode = if (looseStatement) {
+            // reenable prior (loose) options and then reenable strict mode
+            InternalBastNode(
+                ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
+                replaceChildren(loosenedChildren),
+                ShellLineBastNode(ENABLE_STRICT))
+        } else {
+            replaceChildren(loosenedChildren)
+        }
+        return Pair(foundLoose, bastNode)
     }
 
     //////////
