@@ -72,7 +72,6 @@ class FinishedBastFactory {
     private val logger = LogManager.getLogger(Main::javaClass)
 
     // TODO NOW - make a transformation to flatten ArithmeticBastNodes, move loosen logic here
-    // TODO NOW -
     fun transform(root: BastNode): BastNode {
         logger.info("Mermaid graph before unnesting subshells: {}", root.mermaidGraph())
         val unnestedBast = root.unnestSubshells()

@@ -1,4 +1,4 @@
-package org.bashpile.core
+package org.bashpile.core.antlr
 
 import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStream
@@ -7,17 +7,19 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.bashpile.core.SCRIPT_SUCCESS
+import org.bashpile.core.runCommand
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
+import java.util.Hashtable
+import java.util.Locale
 import java.util.regex.Pattern
+import javax.annotation.Nonnull
 
 /**
  * Helper class for BashpileLexer.
  */
-// TODO NOW - move to antlr package
-// TODO NOW - take --version option
 class Lexers {
     companion object {
         /**
@@ -56,7 +58,7 @@ class Lexers {
          */
         @Suppress("unused")
         @JvmStatic
-        fun isLinuxCommand(@javax.annotation.Nonnull charStream: CharStream): Boolean {
+        fun isLinuxCommand(@Nonnull charStream: CharStream): Boolean {
             // guard
             if (charStream.size() == 0) {
                 return false
@@ -91,8 +93,9 @@ class Lexers {
          * @param bashLineIn A line of Bash script to check.
          * @return Checks if the parsed command is valid.
          */
-        @VisibleForTesting @JvmStatic
-        /* package */ fun isLinuxCommand(@javax.annotation.Nonnull bashLineIn: String): Boolean {
+        @VisibleForTesting
+        @JvmStatic
+        /* package */ fun isLinuxCommand(@Nonnull bashLineIn: String): Boolean {
             // guard
             var bashLine = bashLineIn
             if (StringUtils.isBlank(bashLine) || bashLine.startsWith(" ")) {

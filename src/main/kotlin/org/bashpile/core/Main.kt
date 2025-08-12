@@ -15,7 +15,6 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.antlr.ThrowingErrorListener
-import org.bashpile.core.bast.BashpileState
 import org.bashpile.core.bast.BastNode
 import org.slf4j.LoggerFactory
 import java.io.InputStream
@@ -31,6 +30,7 @@ fun main(args: Array<String>) = Main().main(args)
  * This class is primarily responsible for parsing command line arguments.
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
+// TODO arithmetic - take --version option
 class Main : CliktCommand() {
 
     companion object {
