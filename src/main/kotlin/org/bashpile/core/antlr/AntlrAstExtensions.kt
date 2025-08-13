@@ -1,6 +1,7 @@
-package org.bashpile.core
+package org.bashpile.core.antlr
 
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParser.ExpressionContext
 
 

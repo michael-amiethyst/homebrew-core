@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.bashpile.core.antlr.Lexers
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
