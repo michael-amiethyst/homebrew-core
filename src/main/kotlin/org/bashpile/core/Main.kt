@@ -9,11 +9,13 @@ import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.versionOption
 import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.logging.log4j.LogManager
-import org.bashpile.core.bast.BashpileState
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.antlr.ThrowingErrorListener
 import org.bashpile.core.bast.BastNode
 import org.slf4j.LoggerFactory
 import java.io.InputStream
@@ -32,21 +34,24 @@ fun main(args: Array<String>) = Main().main(args)
 class Main : CliktCommand() {
 
     companion object {
-        /** Singleton per Main() instance */
-        lateinit var bashpileState: BashpileState
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
-
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
+        const val VERSION = "0.11.0"
+        /** Singleton per Main() instance */
+        lateinit var bashpileState: BashpileState
     }
 
-    private val script by argument(help = "The script to compile")
+    private val scriptArgument by argument(help = "The script to compile")
 
-    private val verbosity by option("-v", "--verbose").counted(limit=2, clamp=true)
+    private val verboseOption by option("-v", "--verbose",
+        help = "Show more logs, may be specified twice with -vv").counted(limit=2, clamp=true)
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
-    init {
+    init {// Define the version string for your application
+        versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
+            message = { it })
         bashpileState = BashpileState()
     }
 
@@ -56,16 +61,16 @@ class Main : CliktCommand() {
      */
     override fun run() {
         // guard, etc
-        val scriptPath = Path.of(script)
+        val scriptPath = Path.of(scriptArgument)
         if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
         }
 
         // configure logging
-        if (verbosity > 0) {
-            configureLogging(verbosity)
+        if (verboseOption > 0) {
+            configureLogging(verboseOption)
         }
-        logger.info(STARTUP_MESSAGE + script) // first logging call after configureLogging() call
+        logger.info(STARTUP_MESSAGE + scriptArgument) // first logging call after configureLogging() call
 
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
@@ -101,14 +106,7 @@ class Main : CliktCommand() {
         // handle ASTs and render
         val antlrAst = parser.program()
         val bast = AstConvertingVisitor().visitProgram(antlrAst)
-        logger.info("Mermaid graph before unnesting subshells: {}", bast.mermaidGraph())
-        val unnestedBast = bast.unnestSubshells()
-        logger.info(
-            "Mermaid graph after unnestings subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
-        val looseBast = unnestedBast.loosenShellStrings()
-        logger.info(
-            "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
-        return looseBast
+        return FinishedBastFactory().transform(bast)
     }
 
     /**
