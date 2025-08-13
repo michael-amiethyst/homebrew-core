@@ -1,6 +1,6 @@
 package org.bashpile.core
 
-import org.bashpile.core.AstConvertingVisitor.Companion.STRICT_HEADER
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

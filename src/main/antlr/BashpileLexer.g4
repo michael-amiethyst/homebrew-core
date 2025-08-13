@@ -4,7 +4,7 @@ tokens { INDENT, DEDENT }
 
 @lexer::header {
   import com.yuvalshavit.antlr4.DenterHelper;
-  import org.bashpile.core.Lexers;
+  import org.bashpile.core.antlr.Lexers;
 }
 
 @lexer::members {
