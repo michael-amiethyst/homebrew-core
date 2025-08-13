@@ -6,7 +6,9 @@ import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.UnnestTuple
+import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.ParenthesisBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.StatementBastNode
@@ -25,18 +27,19 @@ class FinishedBastFactory {
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
-    // TODO NOW - make a transformation to flatten ArithmeticBastNodes
     fun transform(root: BastNode): BastNode {
         logger.info("Mermaid graph before unnesting subshells: {}", root.mermaidGraph())
         val unnestedResult = unnestSubshells(root)
         check(unnestedResult.first.isEmpty()) { "Preambles should be empty" }
         val unnestedBast = unnestedResult.second
         logger.info(
-            "Mermaid graph after unnesting subshells, before loose shell strings: {}", unnestedBast.mermaidGraph())
+            "Mermaid graph after unnesting subshells: {}", unnestedBast.mermaidGraph())
         val looseBast = unnestedBast.loosenShellStrings().second
         logger.info(
             "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
-        return looseBast
+        val flattenedBast = looseBast.flattenArithmetic()
+        logger.info("Mermaid graph after flattening arithmetic: {}", flattenedBast.mermaidGraph())
+        return flattenedBast
     }
 
     /**
@@ -127,6 +130,23 @@ class FinishedBastFactory {
             replaceChildren(loosenedChildren)
         }
         return Pair(foundLoose, bastNode)
+    }
+
+    private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
+        val startRecursion = inArithmetic == null
+        if (startRecursion) {
+            return replaceChildren(children.map { it.flattenArithmetic(this is ArithmeticBastNode) })
+        }
+
+        val needsFlattening = inArithmetic && this is ArithmeticBastNode
+        // terminal case is when children are empty
+        val flattenedChildren = children.map {
+            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode) }
+        return if (needsFlattening) {
+            ParenthesisBastNode(flattenedChildren, majorType)
+        } else {
+            replaceChildren(flattenedChildren)
+        }
     }
 
     private fun List<BastNode>.toBastNode(parent: BastNode): BastNode {

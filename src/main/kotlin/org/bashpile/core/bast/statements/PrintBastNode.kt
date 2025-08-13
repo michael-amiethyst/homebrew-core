@@ -1,6 +1,7 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.types.TypeEnum
 
 /** This is a Print Statement node */
 class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
@@ -10,7 +11,16 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     /** Combines all children into a single string as a pre-computation for Bash */
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
-        return "printf \"$childRenders\"\n"
+        // will only be integer if all integers
+        val type = children.map { it.majorType }.fold(TypeEnum.UNKNOWN) { acc, n -> acc.fold(n)}
+        return if (type != TypeEnum.INTEGER) {
+            "printf \"$childRenders\"\n"
+        } else {
+            """
+                printf "%d" "$childRenders"
+                
+            """.trimIndent()
+        }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): PrintBastNode {

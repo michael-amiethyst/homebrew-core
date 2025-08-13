@@ -21,7 +21,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "$((1 + 1))"
+            printf "%d" "$((1 + 1))"
             
             """.trimIndent(), render
         )
@@ -37,7 +37,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "$((1 - 1))"
+            printf "%d" "$((1 - 1))"
             
             """.trimIndent(), render
         )
@@ -53,7 +53,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "$((1 - (5 * 6)))"
+            printf "%d" "$((1 - (5 * 6)))"
             
             """.trimIndent(), render
         )

@@ -12,6 +12,6 @@ class ArithmeticBastNode(children: List<BastNode> = listOf()) : BastNode(childre
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ArithmeticBastNode {
-        return ArithmeticBastNode(nextChildren.map { it.deepCopy() })
+        return ArithmeticBastNode(nextChildren)
     }
 }
