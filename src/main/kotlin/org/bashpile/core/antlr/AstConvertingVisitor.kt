@@ -126,7 +126,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         val left = visit(ctx.children[0])
         val right = visit(ctx.children[2])
-        // TODO arithmetic - always return an arithmeticBastNode, move this logic into ArithmaticBastNode.render
         return if (left.areAllStrings() && right.areAllStrings()) {
             require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)

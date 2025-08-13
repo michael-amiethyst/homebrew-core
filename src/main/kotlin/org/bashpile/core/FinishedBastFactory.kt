@@ -17,7 +17,10 @@ import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.types.VariableBastNode
 
 
-// TODO arithmetic - document
+/**
+ * Takes a freshly created Bashpile Abstract Syntax Tree from [org.bashpile.core.antlr.AstConvertingVisitor] and
+ * performs a series of transformations on it to prepare it for rendering with [BastNode.render].
+ */
 class FinishedBastFactory {
 
     companion object {

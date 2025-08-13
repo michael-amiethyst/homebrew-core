@@ -54,6 +54,13 @@ class SystemTest {
     }
 
     @Test
+    fun system_withVersion_works() {
+        val output = "$bashpileFilename --version".runCommand()
+        assertEquals(SCRIPT_SUCCESS, output.second)
+        assertEquals(Main.VERSION + "\n", output.first)
+    }
+
+    @Test
     fun system_shebang_works() {
         val shebangPath = Path.of(shebangFilename)
         assumeTrue(shebangPath.exists(), "Shebang test file not found")
