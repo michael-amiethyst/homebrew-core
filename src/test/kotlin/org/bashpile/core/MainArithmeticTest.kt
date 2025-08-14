@@ -61,4 +61,20 @@ class MainArithmeticTest {
         assertEquals(SCRIPT_SUCCESS, results.second)
         assertEquals("-29\n", results.first)
     }
+
+    @Test
+    fun getBast_basicFloatingPointArithmatic_works() {
+        val bpScript: InputStream = """
+            print(1.0 + .5)""".trimIndent().byteInputStream()
+        val render = fixture.getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+            printf "%d" "$(bc "1.0 + .5")"
+            
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("1.5\n", results.first)
+    }
 }

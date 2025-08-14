@@ -1,10 +1,10 @@
 class Bashpile < Formula
   desc "The Bash Transpiler: Write in a modern language and run in a Bash5 shell!"
-  version "0.11.0"
+  version "0.12.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.11.0"
-  head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.12.0"
+  head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "feature/floating-point"
 
   # foundational dependencies
   depends_on "openjdk"
