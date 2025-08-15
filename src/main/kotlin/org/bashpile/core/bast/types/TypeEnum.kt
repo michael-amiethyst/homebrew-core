@@ -15,9 +15,14 @@ enum class TypeEnum {
     REFERENCE;
 
     fun coercesTo(type: TypeEnum): Boolean {
-        return this == type || this == UNKNOWN || type == UNKNOWN
+        return if (type != FLOAT) {
+            this == type || this == UNKNOWN || type == UNKNOWN
+        } else {
+            this == type || this == UNKNOWN || this == INTEGER
+        }
     }
 
+    // TODO floating-point -- verify that string of unknowns don't fold to a float?
     /** This is for reducing a list of types to what they coerce to, or EMPTY */
     fun fold(type: TypeEnum): TypeEnum {
         return if (this.coercesTo(type)) { type } else { EMPTY }

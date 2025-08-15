@@ -21,7 +21,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "%d" "$((1 + 1))"
+            printf "%s" "$((1 + 1))"
             
             """.trimIndent(), render
         )
@@ -37,7 +37,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "%d" "$((1 - 1))"
+            printf "%s" "$((1 - 1))"
             
             """.trimIndent(), render
         )
@@ -53,7 +53,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "%d" "$((1 - (5 * 6)))"
+            printf "%s" "$((1 - (5 * 6)))"
             
             """.trimIndent(), render
         )
@@ -69,7 +69,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-            printf "%d" "$(bc "1.0 + .5")"
+            printf "%s" "$(bc <<< "1.0 + 0.5")"
             
             """.trimIndent(), render
         )
@@ -77,4 +77,8 @@ class MainArithmeticTest {
         assertEquals(SCRIPT_SUCCESS, results.second)
         assertEquals("1.5\n", results.first)
     }
+
+    // TODO floating-point -- make test with parenthisis
+    // TODO floating-point -- make test with a shellstring
+    // TODO floating-point -- make test with negative numbers
 }

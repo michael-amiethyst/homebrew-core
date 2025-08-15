@@ -94,7 +94,7 @@ class FinishedBastFactory {
                     Pair(listOf(), joinedBastNodes.toBastNode(bast))
                 } else {
                     Pair(unnestedPreambles,
-                        bast.replaceChildren(listOf(unnestedChildren.toBastNode(bast))))
+                        bast.replaceChildren(unnestedChildren))
                 }
             }
         }

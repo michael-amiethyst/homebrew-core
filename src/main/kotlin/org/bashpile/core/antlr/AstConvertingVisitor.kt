@@ -125,13 +125,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         val left = visit(ctx.children[0])
+        val middle = visit(ctx.children[1])
         val right = visit(ctx.children[2])
         return if (left.areAllStrings() && right.areAllStrings()) {
             require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)
         } else if (left.majorType == TypeEnum.INTEGER && right.majorType == TypeEnum.INTEGER) {
-            val middle = visit(ctx.children[1])
             ArithmeticBastNode(left, middle, right)
+        } else if (left.majorType.coercesTo(TypeEnum.FLOAT) && right.majorType.coercesTo(TypeEnum.FLOAT)) {
+            val arithmeticNode = InternalBastNode(listOf(left, middle, right), renderSeparator = " ")
+            val bcNodes = LeafBastNode("bc <<< \"").toList() +
+                    arithmeticNode +
+                    LeafBastNode("\"")
+            ShellStringBastNode(bcNodes, TypeEnum.FLOAT)
         } else {
             throw UnsupportedOperationException(
                 "Only calculations on Strings or Integers are supported, but found ${left.majorType} and ${right.majorType}")

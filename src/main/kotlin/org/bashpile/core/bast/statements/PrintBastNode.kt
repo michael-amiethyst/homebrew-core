@@ -13,11 +13,13 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
         val childRenders = children.map { it.render() }.joinToString("")
         // will only be integer if all integers
         val type = children.map { it.majorType }.fold(TypeEnum.UNKNOWN) { acc, n -> acc.fold(n)}
-        return if (type != TypeEnum.INTEGER) {
+        val number = type == TypeEnum.INTEGER || type == TypeEnum.FLOAT
+        return if (!number) {
             "printf \"$childRenders\"\n"
         } else {
+            // treat as a String so floating point numbers work
             """
-                printf "%d" "$childRenders"
+                printf "%s" "$childRenders"
                 
             """.trimIndent()
         }
