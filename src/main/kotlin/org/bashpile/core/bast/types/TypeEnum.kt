@@ -22,7 +22,6 @@ enum class TypeEnum {
         }
     }
 
-    // TODO floating-point -- verify that string of unknowns don't fold to a float?
     /** This is for reducing a list of types to what they coerce to, or EMPTY */
     fun fold(type: TypeEnum): TypeEnum {
         return if (this.coercesTo(type)) { type } else { EMPTY }

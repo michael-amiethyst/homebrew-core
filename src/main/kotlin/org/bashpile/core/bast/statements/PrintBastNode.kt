@@ -1,7 +1,9 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.TypeEnum
+import org.bashpile.core.bast.types.TypeEnum.FLOAT
+import org.bashpile.core.bast.types.TypeEnum.INTEGER
+import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
 
 /** This is a Print Statement node */
 class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
@@ -11,9 +13,8 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     /** Combines all children into a single string as a pre-computation for Bash */
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
-        // will only be integer if all integers
-        val type = children.map { it.majorType }.fold(TypeEnum.UNKNOWN) { acc, n -> acc.fold(n)}
-        val number = type == TypeEnum.INTEGER || type == TypeEnum.FLOAT
+
+        val number = children.areNumbers()
         return if (!number) {
             "printf \"$childRenders\"\n"
         } else {
@@ -27,5 +28,15 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
 
     override fun replaceChildren(nextChildren: List<BastNode>): PrintBastNode {
         return PrintBastNode(nextChildren.map { it.deepCopy() })
+    }
+
+    private fun List<BastNode>.areNumbers(): Boolean {
+        val isInteger = find { it.majorType == INTEGER } != null &&
+                // will only be integer if all coerce to integers
+                map { it.majorType }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == INTEGER
+
+        val isFloat = find { it.majorType == FLOAT } != null &&
+                map { it.majorType }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == FLOAT
+        return isInteger || isFloat
     }
 }
