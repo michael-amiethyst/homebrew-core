@@ -31,17 +31,20 @@ class FinishedBastFactory {
     private val logger = LogManager.getLogger(Main::javaClass)
 
     fun transform(root: BastNode): BastNode {
-        logger.info("Mermaid graph before unnesting subshells: {}", root.mermaidGraph())
-        val unnestedResult = unnestSubshells(root)
+        // unnest
+        logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
+        val unnestedResult = unnestSubshells(root.flattenArithmetic())
         check(unnestedResult.first.isEmpty()) { "Preambles should be empty" }
         val unnestedBast = unnestedResult.second
-        logger.info(
-            "Mermaid graph after unnesting subshells: {}", unnestedBast.mermaidGraph())
+        logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
+
+        // loosen
         val looseBast = unnestedBast.loosenShellStrings().second
-        logger.info(
-            "Mermaid graph after loosing shell strings: {}", looseBast.mermaidGraph())
+        logger.info("Mermaid graph - shell strings loosened: {}", looseBast.mermaidGraph())
+
+        // flatten
         val flattenedBast = looseBast.flattenArithmetic()
-        logger.info("Mermaid graph after flattening arithmetic: {}", flattenedBast.mermaidGraph())
+        logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
         return flattenedBast
     }
 

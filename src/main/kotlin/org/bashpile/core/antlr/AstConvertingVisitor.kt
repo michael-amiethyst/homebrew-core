@@ -5,7 +5,8 @@ import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.expressions.ArithmeticBastNode
+import org.bashpile.core.bast.expressions.FloatArithmeticBastNode
+import org.bashpile.core.bast.expressions.IntegerArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
@@ -131,13 +132,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)
         } else if (left.majorType == TypeEnum.INTEGER && right.majorType == TypeEnum.INTEGER) {
-            ArithmeticBastNode(left, middle, right)
+            IntegerArithmeticBastNode(left, middle, right)
         } else if (left.majorType.coercesTo(TypeEnum.FLOAT) && right.majorType.coercesTo(TypeEnum.FLOAT)) {
-            val arithmeticNode = InternalBastNode(listOf(left, middle, right), renderSeparator = " ")
-            val bcNodes = LeafBastNode("bc <<< \"").toList() +
-                    arithmeticNode +
-                    LeafBastNode("\"")
-            ShellStringBastNode(bcNodes, TypeEnum.FLOAT)
+            FloatArithmeticBastNode(left, middle, right)
         } else {
             throw UnsupportedOperationException(
                 "Only calculations on Strings or Integers are supported, but found ${left.majorType} and ${right.majorType}")

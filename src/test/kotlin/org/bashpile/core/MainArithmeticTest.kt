@@ -78,7 +78,22 @@ class MainArithmeticTest {
         assertEquals("1.5\n", results.first)
     }
 
-    // TODO floating-point -- make test with parenthisis
+    @Test
+    fun getBast_floatingPointArithmatic_parenthesis_works() {
+        val bpScript: InputStream = """
+            print(1.0 - (30 * .5))""".trimIndent().byteInputStream()
+        val render = fixture.getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+                printf "%s" "${'$'}(bc <<< "1.0 - (30 * 0.5)")"
+            
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("-14.0\n", results.first)
+    }
+
     // TODO floating-point -- make test with a shellstring
     // TODO floating-point -- make test with negative numbers
 }

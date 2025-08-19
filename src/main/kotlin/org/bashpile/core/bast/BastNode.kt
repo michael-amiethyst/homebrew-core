@@ -2,6 +2,7 @@ package org.bashpile.core.bast
 
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.bashpileState
+import org.bashpile.core.bast.expressions.FloatArithmeticBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.types.*
@@ -39,7 +40,7 @@ abstract class BastNode(
     }
 
     fun isSubshellNode(): Boolean {
-        return this is ShellLineBastNode || this is ShellStringBastNode
+        return this is ShellLineBastNode || this is ShellStringBastNode || this is FloatArithmeticBastNode
     }
 
     fun toList(): List<BastNode> = listOf(this)
