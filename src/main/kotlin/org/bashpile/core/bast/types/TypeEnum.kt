@@ -15,7 +15,11 @@ enum class TypeEnum {
     REFERENCE;
 
     fun coercesTo(type: TypeEnum): Boolean {
-        return this == type || this == UNKNOWN || type == UNKNOWN
+        return if (type != FLOAT) {
+            this == type || this == UNKNOWN || type == UNKNOWN
+        } else {
+            this == type || this == UNKNOWN || this == INTEGER
+        }
     }
 
     /** This is for reducing a list of types to what they coerce to, or EMPTY */

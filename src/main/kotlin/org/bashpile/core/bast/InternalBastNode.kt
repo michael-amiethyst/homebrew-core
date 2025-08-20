@@ -15,6 +15,6 @@ class InternalBastNode(children: List<BastNode> = listOf(), val renderSeparator:
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): InternalBastNode {
-        return InternalBastNode(nextChildren.map { it.deepCopy() })
+        return InternalBastNode(nextChildren.map { it.deepCopy() }, renderSeparator)
     }
 }
