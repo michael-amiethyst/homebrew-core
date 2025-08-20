@@ -113,7 +113,7 @@ class MainTest {
     fun getBast_printFloat_works() {
         val bpScript: InputStream = "print(1.0)".byteInputStream()
         assertEquals(STRICT_HEADER + """
-            printf "1.0"
+            printf "%s" "1.0"
             
             """.trimIndent(), fixture.getBast(bpScript).render())
     }
