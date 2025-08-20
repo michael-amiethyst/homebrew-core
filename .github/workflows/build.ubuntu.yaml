@@ -5,9 +5,6 @@
 name: Java / Kotlin CI with Maven on Ubuntu
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches: [main, development]
 
