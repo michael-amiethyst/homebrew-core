@@ -85,7 +85,7 @@ class MainArithmeticTest {
         val render = fixture.getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
-                printf "%s" "${'$'}(bc <<< "1.0 - (30 * 0.5)")"
+                printf "%s" "$(bc <<< "1.0 - (30 * 0.5)")"
             
             """.trimIndent(), render
         )
@@ -94,6 +94,21 @@ class MainArithmeticTest {
         assertEquals("-14.0\n", results.first)
     }
 
-    // TODO floating-point -- make test with a shellstring
-    // TODO floating-point -- make test with negative numbers
+    @Test
+    fun getBast_floatingPointArithmatic_shellStringAndParenthesis_works() {
+        val bpScript: InputStream = """
+            print(#(expr 2 - 1) - (30 * .5))""".trimIndent().byteInputStream()
+        val render = fixture.getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+            declare __bp_var0
+            __bp_var0="$(expr 2 - 1)"
+            printf "%s" "$(bc <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
+            
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("-14.0\n", results.first)
+    }
 }
