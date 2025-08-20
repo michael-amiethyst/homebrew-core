@@ -1,6 +1,7 @@
 package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.Subshell
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 
@@ -10,7 +11,7 @@ import org.bashpile.core.bast.types.leaf.LeafBastNode
  */
 open class ShellStringBastNode(
     children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.UNKNOWN)
-    : BastNode(children, majorType = majorType) {
+    : BastNode(children, majorType = majorType), Subshell {
 
     constructor(contents: String) : this(LeafBastNode(contents).toList())
 

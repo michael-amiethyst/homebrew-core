@@ -5,6 +5,7 @@ import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
+import org.bashpile.core.bast.Subshell
 import org.bashpile.core.bast.UnnestTuple
 import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
@@ -31,9 +32,14 @@ class FinishedBastFactory {
     private val logger = LogManager.getLogger(Main::javaClass)
 
     fun transform(root: BastNode): BastNode {
-        // unnest
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
-        val unnestedResult = unnestSubshells(root.flattenArithmetic())
+
+        // flatten
+        val flattenedBast = root.flattenArithmetic()
+        logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
+
+        // unnest
+        val unnestedResult = unnestSubshells(flattenedBast)
         check(unnestedResult.first.isEmpty()) { "Preambles should be empty" }
         val unnestedBast = unnestedResult.second
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
@@ -41,11 +47,7 @@ class FinishedBastFactory {
         // loosen
         val looseBast = unnestedBast.loosenShellStrings().second
         logger.info("Mermaid graph - shell strings loosened: {}", looseBast.mermaidGraph())
-
-        // flatten
-        val flattenedBast = looseBast.flattenArithmetic()
-        logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
-        return flattenedBast
+        return looseBast
     }
 
     /**
@@ -63,7 +65,7 @@ class FinishedBastFactory {
                     return Pair(listOf(), bast)
                 }
                 // recursive call
-                val unnestedRoot = unnestSubshells(bast, bast.isSubshellNode())
+                val unnestedRoot = unnestSubshells(bast, bast is Subshell)
                 return if (unnestedRoot.first.isEmpty()) {
                     // no unnesting performed
                     unnestedRoot
@@ -74,11 +76,11 @@ class FinishedBastFactory {
 
             // recursive case
             val unnestedChildPairs = bast.children.map {
-                unnestSubshells(it, inSubshell || bast.isSubshellNode()) }
+                unnestSubshells(it, inSubshell || bast is Subshell) }
             val unnestedPreambles = unnestedChildPairs.flatMap { it.first }
             val unnestedChildren = unnestedChildPairs.map { it.second }
 
-            val currentNodeIsNested = inSubshell && bast.isSubshellNode()
+            val currentNodeIsNested = inSubshell && bast is Subshell
             val noNestedChildren = unnestedPreambles.isEmpty()
             return if (!currentNodeIsNested && noNestedChildren) {
                 Pair(listOf(), bast.replaceChildren(unnestedChildren))
