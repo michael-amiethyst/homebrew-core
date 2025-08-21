@@ -10,3 +10,4 @@
 * 0.10.0 - Automatic strict mode
 * 0.11.0 - Integer arithmetic, --verbose option
 * 0.12.0 - Floating point arithmetic
+* 0.13.0 - Typecasts
