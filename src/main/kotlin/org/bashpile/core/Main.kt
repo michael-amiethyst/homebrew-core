@@ -63,7 +63,7 @@ class Main : CliktCommand() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)
         if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
-            throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
+            throw PrintHelpMessage(this.currentContext, true, SCRIPT_ERROR__GENERIC)
         }
 
         // configure logging

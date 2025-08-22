@@ -82,12 +82,12 @@ class MainShellStringTest {
         assertEquals(STRICT_HEADER + """
             set -euo pipefail
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
+            __bp_var0="$(echo '.'; exit $SCRIPT_ERROR__GENERIC)"
             printf "$(ls ${'$'}{__bp_var0})"
             """.trimIndent() + "\n", renderedBash
         )
         val results = renderedBash.runCommand()
-        assertEquals(SCRIPT_GENERIC_ERROR, results.second)
+        assertEquals(SCRIPT_ERROR__GENERIC, results.second)
     }
 
     @Test
@@ -112,4 +112,6 @@ class MainShellStringTest {
         results = renderedBash.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
     }
+
+    // TODO type-casts -- tests for loose shell strings
 }

@@ -54,13 +54,13 @@ expression
     | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
     | <assoc=right> unaryPrimary expression
                                         # unaryPrimaryExpression
-    | expression Colon complexType      # typecastExpression
+    | <assoc=right> expression As complexType # typecastExpression
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     // operator expressions
     | OParen expression CParen          # parenthesisExpression
-    | expression op=(Multiply|Divide|Add|Minus) expression
+    | <assoc=right> expression op=(Multiply|Divide|Add|Minus) expression
                                         # calculationExpression
     | expression binaryPrimary expression
                                         # binaryPrimaryExpression

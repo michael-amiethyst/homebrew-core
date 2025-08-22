@@ -47,6 +47,61 @@ class MainArithmeticTest {
     }
 
     @Test
+    fun getBast_basicArithmatic_withTypecast_works() {
+        val bpScript: InputStream = """
+                one: string = "1"
+                print(1 - one as integer)""".trimIndent().byteInputStream()
+        val render = fixture.getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+                declare one
+                one="1"
+                printf "%s" "$((1 - ${'$'}{one}))"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("0\n", results.first)
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withBadTypecast_fails() {
+        // TODO type-casts -- make typecast node and check if string can parse to int on render()
+        val bpScript: InputStream = """
+                one: string = "one"
+                print(1 - one as integer)""".trimIndent().byteInputStream()
+        val render = fixture.getBast(bpScript).render()
+        val results = render.runCommand()
+        assertEquals(SCRIPT_ERROR__GENERIC, results.second)
+        assertFalse(results.first.contains("recursion"), "Default `bc` error message -- " + results.first)
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withTypecastAndParenthesis_works() {
+        val bpScript: InputStream = """
+                one: string = "1"
+                print(1 - (one as integer))""".trimIndent().byteInputStream()
+        val render = fixture.getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+                declare one
+                one="1"
+                printf "%s" "$((1 - ${'$'}{one}))"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("0\n", results.first)
+    }
+
+    // TODO type-casts -- make float to int test
+    // TODO type-casts -- make int to bool test
+    // TODO type-casts -- make float to bool test
+    // TODO type-casts -- make string to boolean test
+
+    @Test
     fun getBast_complexArithmatic_works() {
         val bpScript: InputStream = """
             print(1 - (5 * 6))""".trimIndent().byteInputStream()

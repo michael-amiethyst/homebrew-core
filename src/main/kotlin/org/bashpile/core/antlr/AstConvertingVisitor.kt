@@ -34,6 +34,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     companion object {
         const val OLD_OPTIONS = "__bp_old_options"
         const val ENABLE_STRICT = "set -euo pipefail"
+        // TODO add to STRICT_HEADER?
+        // declare -i s
+        // trap 's=$?; echo "Error (exit code $s) found on line $LINENO.  Command was: $BASH_COMMAND"; exit $s' ERR
         @JvmStatic
         val STRICT_HEADER = """
             declare $OLD_OPTIONS
@@ -139,6 +142,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             throw UnsupportedOperationException("Only calculations on all Strings or all numbers are supported, " +
                     "but found ${left.majorType} and ${right.majorType}")
         }
+    }
+
+    override fun visitTypecastExpression(ctx: BashpileParser.TypecastExpressionContext): BastNode {
+        require(ctx.children.size == 3)
+        val nextType = TypeEnum.valueOf(ctx.children[2].text.uppercase())
+        return InternalBastNode(listOf(visit(ctx.children[0])), nextType)
     }
 
     // Leaf nodes (parts of expressions)

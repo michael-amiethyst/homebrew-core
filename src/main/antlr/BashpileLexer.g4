@@ -64,14 +64,14 @@ Increment: '++';
 Decrement: '--';
 Not     : 'not';
 Arrow   : '->';
-// cast in parser
 Multiply: '*';
 Divide  : '/';
 Add     : '+';
 Minus   : '-';
-Exists   : 'exists';
-DoesNotExist   : 'doesNotExist';
-IsEmpty   : 'isEmpty';
+As      : 'as';
+Exists  : 'exists';
+DoesNotExist: 'doesNotExist';
+IsEmpty : 'isEmpty';
 NotEmpty: 'isNotEmpty';
 FileExists: 'fileExists';
 RegularFileExists: 'regularFileExists';

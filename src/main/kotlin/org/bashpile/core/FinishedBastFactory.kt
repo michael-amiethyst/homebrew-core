@@ -55,6 +55,11 @@ class FinishedBastFactory {
      * @return Preambles and an unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
+    // TODO add: if [ "$__bp_exitCode0" -ne 0 ]; then exit "$__bp_exitCode0"; fi
+    //if [ "${__bp_subshellReturn0}" -eq 1 ]; then
+    //  # print statement, Bashpile line 2
+    //  printf -- "true\n"
+    //fi
     fun unnestSubshells(bast: BastNode, inSubshell: Boolean? = null): UnnestTuple {
         synchronized(unnestedCountLock) {
             val startRecursion = inSubshell == null
@@ -160,6 +165,6 @@ class FinishedBastFactory {
     private fun List<BastNode>.toBastNode(parent: BastNode): BastNode {
         require(isNotEmpty())
         val separator = if (parent is StatementBastNode) "" else " "
-        return if (size == 1) first() else InternalBastNode(this, separator)
+        return if (size == 1) first() else InternalBastNode(this, renderSeparator = separator)
     }
 }

@@ -44,7 +44,7 @@ class FinishedBastFactoryTest {
         val render = unnestedRoot.render()
         assertEquals("""
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
+            __bp_var0="$(echo '.'; exit $SCRIPT_ERROR__GENERIC)"
             printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
@@ -75,11 +75,11 @@ class FinishedBastFactoryTest {
         assertEquals("""
             set -euo pipefail
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
+            __bp_var0="$(echo '.'; exit $SCRIPT_ERROR__GENERIC)"
             printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
 
-        assertEquals(SCRIPT_GENERIC_ERROR, render.runCommand().second)
+        assertEquals(SCRIPT_ERROR__GENERIC, render.runCommand().second)
     }
 }
