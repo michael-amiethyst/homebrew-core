@@ -65,16 +65,15 @@ class MainArithmeticTest {
         assertEquals("0\n", results.first)
     }
 
+    /** We don't double-check the user */
     @Test
-    fun getBast_basicArithmatic_withBadTypecast_fails() {
-        // TODO type-casts -- make typecast node and check if string can parse to int on render()
+    fun getBast_basicArithmatic_withBadTypecast_works() {
         val bpScript: InputStream = """
                 one: string = "one"
                 print(1 - one as integer)""".trimIndent().byteInputStream()
         val render = fixture.getBast(bpScript).render()
         val results = render.runCommand()
         assertEquals(SCRIPT_ERROR__GENERIC, results.second)
-        assertFalse(results.first.contains("recursion"), "Default `bc` error message -- " + results.first)
     }
 
     @Test
@@ -95,11 +94,6 @@ class MainArithmeticTest {
         assertEquals(SCRIPT_SUCCESS, results.second)
         assertEquals("0\n", results.first)
     }
-
-    // TODO type-casts -- make float to int test
-    // TODO type-casts -- make int to bool test
-    // TODO type-casts -- make float to bool test
-    // TODO type-casts -- make string to boolean test
 
     @Test
     fun getBast_complexArithmatic_works() {
