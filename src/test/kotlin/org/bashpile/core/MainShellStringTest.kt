@@ -52,6 +52,17 @@ class MainShellStringTest {
     }
 
     @Test
+    fun getBast_looseShellstring_works() {
+        val script: InputStream = "##(printf \"newline\"; exit 1)".byteInputStream()
+        assertEquals(STRICT_HEADER + """
+            eval "${'$'}__bp_old_options"
+            $(printf "newline"; exit 1)
+            set -euo pipefail
+            
+            """.trimIndent(), fixture.getBast(script).render())
+    }
+
+    @Test
     fun getBast_shellstring_withConcat_works() {
         val script: InputStream = """
             print("Hello " + #(printf 'shellstring!'))""".trim().byteInputStream()
@@ -112,6 +123,4 @@ class MainShellStringTest {
         results = renderedBash.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
     }
-
-    // TODO type-casts -- tests for loose shell strings
 }

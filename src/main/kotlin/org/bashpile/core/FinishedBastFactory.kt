@@ -45,7 +45,7 @@ class FinishedBastFactory {
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
 
         // loosen
-        val looseBast = unnestedBast.loosenShellStrings().second
+        val looseBast = unnestedBast.loosenShellStrings()
         logger.info("Mermaid graph - shell strings loosened: {}", looseBast.mermaidGraph())
         return looseBast
     }
@@ -111,38 +111,20 @@ class FinishedBastFactory {
     }
 
     /** @return A loosened version of the input tree */
-    private fun BastNode.loosenShellStrings(foundLooseShellString: Boolean? = null): Pair<Boolean, BastNode> {
-        val startRecursion = foundLooseShellString == null
-        if (startRecursion) {
-            val looseChildren = children.map { it.loosenShellStrings(false).second }
-            check(looseChildren.isNotEmpty() && looseChildren[0] is StatementBastNode) {
-                "Loose child[0] was not a statement, was " + looseChildren[0].javaClass }
-            return Pair(false, replaceChildren(looseChildren))
+    private fun BastNode.loosenShellStrings(): BastNode {
+        // no recursion
+        val loosenedStatements = children.map {
+            val hasLooseShellStringBastNode = it.allNodes().any { child -> child is LooseShellStringBastNode }
+            if (hasLooseShellStringBastNode) {
+                InternalBastNode(
+                    ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
+                    it,
+                    ShellLineBastNode(ENABLE_STRICT))
+            } else {
+                it
+            }
         }
-
-        // recursive call
-
-        val looseResult = children.map {
-            // terminal case is when children are empty
-            it.loosenShellStrings(foundLooseShellString)
-        }.fold(Pair(this is LooseShellStringBastNode, InternalBastNode())) { acc, b ->
-            Pair(acc.first || b.first,
-                acc.second.replaceChildren(acc.second.children + b.second))
-        }
-
-        val foundLoose = looseResult.first
-        val looseStatement = foundLoose && this is StatementBastNode
-        val loosenedChildren = looseResult.second.children
-        val bastNode = if (looseStatement) {
-            // reenable prior (loose) options and then reenable strict mode
-            InternalBastNode(
-                ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
-                replaceChildren(loosenedChildren),
-                ShellLineBastNode(ENABLE_STRICT))
-        } else {
-            replaceChildren(loosenedChildren)
-        }
-        return Pair(foundLoose, bastNode)
+        return replaceChildren(loosenedStatements)
     }
 
     private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
@@ -160,6 +142,13 @@ class FinishedBastFactory {
         } else {
             replaceChildren(flattenedChildren)
         }
+    }
+
+    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
+    private fun BastNode.allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
+        childrenSet.addAll(children)
+        childrenSet.addAll(children.flatMap { it.allNodes() })
+        return childrenSet
     }
 
     private fun List<BastNode>.toBastNode(parent: BastNode): BastNode {
