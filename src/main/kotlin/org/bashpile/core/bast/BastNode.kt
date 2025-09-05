@@ -19,6 +19,8 @@ typealias UnnestTuple = Pair<List<BastNode>, BastNode>
  */
 abstract class BastNode(
     val children: List<BastNode>,
+    /** Should only be null for the root of the AST */
+    val parent: BastNode? = null,
     val id: String? = null,
     /** The type at creation time see class KDoc for more info */
     val majorType: TypeEnum = UNKNOWN
@@ -86,6 +88,15 @@ abstract class BastNode(
         return replaceChildren(this.children)
     }
 
+    // Depth-first recursive collection of parents (path from root to node)
+    fun allParents(parentsList: List<BastNode> = listOf()): List<BastNode> {
+        return if (parent != null) {
+            parent.allParents(parentsList) + parent
+        } else {
+            emptyList()
+        }
+    }
+
     /**
      * @param nextChildren Contents will not be modified
      * @return A new instance of a BastNode subclass with the same fields, besides the children
@@ -93,6 +104,13 @@ abstract class BastNode(
     open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
         // making this abstract triggers a compilation bug in Ubuntu as of July 2025
         throw UnsupportedOperationException("Should be overridden in child class")
+    }
+
+    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
+    fun allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
+        childrenSet.addAll(children)
+        childrenSet.addAll(children.flatMap { it.allNodes() })
+        return childrenSet
     }
 
     fun findInTree(condition: Predicate<BastNode>) : Boolean {

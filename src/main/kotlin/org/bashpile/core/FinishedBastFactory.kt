@@ -9,7 +9,6 @@ import org.bashpile.core.bast.Subshell
 import org.bashpile.core.bast.UnnestTuple
 import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
-import org.bashpile.core.bast.expressions.ParenthesisBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.StatementBastNode
@@ -35,7 +34,8 @@ class FinishedBastFactory {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
         // flatten
-        val flattenedBast = root.flattenArithmetic()
+        val linkedBast = root.linkChildren()
+        val flattenedBast = linkedBast.flattenArithmetic()
         logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
 
         // unnest
@@ -48,6 +48,11 @@ class FinishedBastFactory {
         val looseBast = unnestedBast.loosenShellStrings()
         logger.info("Mermaid graph - shell strings loosened: {}", looseBast.mermaidGraph())
         return looseBast
+    }
+
+    private fun BastNode.linkChildren(): BastNode {
+        // TODO now - impl
+        return this
     }
 
     /**
@@ -138,17 +143,10 @@ class FinishedBastFactory {
         val flattenedChildren = children.map {
             it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode) }
         return if (needsFlattening) {
-            ParenthesisBastNode(flattenedChildren, majorType)
+            InternalBastNode(flattenedChildren, majorType, " ")
         } else {
             replaceChildren(flattenedChildren)
         }
-    }
-
-    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
-    private fun BastNode.allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
-        childrenSet.addAll(children)
-        childrenSet.addAll(children.flatMap { it.allNodes() })
-        return childrenSet
     }
 
     private fun List<BastNode>.toBastNode(parent: BastNode): BastNode {

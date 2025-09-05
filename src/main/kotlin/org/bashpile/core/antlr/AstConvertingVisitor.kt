@@ -8,6 +8,7 @@ import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.FloatArithmeticBastNode
 import org.bashpile.core.bast.expressions.IntegerArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.ParenthesisBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ReassignmentBastNode
@@ -34,6 +35,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     companion object {
         const val OLD_OPTIONS = "__bp_old_options"
         const val ENABLE_STRICT = "set -euo pipefail"
+        /** Only set after all visits are done */
+        @JvmStatic
+        lateinit var rootNode: BastNode
         // TODO add to STRICT_HEADER?
         // declare -i s
         // trap 's=$?; echo "Error (exit code $s) found on line $LINENO.  Command was: $BASH_COMMAND"; exit $s' ERR
@@ -48,7 +52,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
         val childNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
-        return InternalBastNode(childNodes)
+        rootNode = InternalBastNode(childNodes)
+        return rootNode
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode {
@@ -95,9 +100,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {
-        // strip parenthesis until calc implemented
         check(ctx.childCount == 3)
-        return visit(ctx.children[1])
+        val child = visit(ctx.children[1])
+        return ParenthesisBastNode(listOf(child), child.majorType)
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {
