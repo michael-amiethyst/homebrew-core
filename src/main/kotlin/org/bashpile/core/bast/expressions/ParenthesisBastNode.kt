@@ -8,7 +8,7 @@ class ParenthesisBastNode(children: List<BastNode> = listOf(), majorType: TypeEn
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString(" ")
-        return if (allParents().any { it is ArithmeticBastNode}) {
+        return if (allParents().any { it is ArithmeticBastNode }) {
             "($childRenders)"
         } else {
             childRenders

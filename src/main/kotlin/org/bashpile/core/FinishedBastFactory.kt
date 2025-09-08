@@ -50,17 +50,12 @@ class FinishedBastFactory {
         return looseBast
     }
 
-    private fun BastNode.linkChildren(): BastNode {
-        // TODO now - impl
-        return this
-    }
-
     /**
      * Returns a list of preambles to support unnesting.
      * @return Preambles and an unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
-    // TODO add: if [ "$__bp_exitCode0" -ne 0 ]; then exit "$__bp_exitCode0"; fi
+    // TODO type-casts -- add: if [ "$__bp_exitCode0" -ne 0 ]; then exit "$__bp_exitCode0"; fi
     //if [ "${__bp_subshellReturn0}" -eq 1 ]; then
     //  # print statement, Bashpile line 2
     //  printf -- "true\n"

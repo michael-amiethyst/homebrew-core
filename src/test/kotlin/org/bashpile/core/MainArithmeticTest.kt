@@ -86,7 +86,7 @@ class MainArithmeticTest {
             STRICT_HEADER + """
                 declare one
                 one="1"
-                printf "%s" "$((1 - ${'$'}{one}))"
+                printf "%s" "$((1 - (${'$'}{one})))"
 
             """.trimIndent(), render
         )

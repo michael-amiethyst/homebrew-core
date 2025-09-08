@@ -19,8 +19,6 @@ typealias UnnestTuple = Pair<List<BastNode>, BastNode>
  */
 abstract class BastNode(
     val children: List<BastNode>,
-    /** Should only be null for the root of the AST */
-    val parent: BastNode? = null,
     val id: String? = null,
     /** The type at creation time see class KDoc for more info */
     val majorType: TypeEnum = UNKNOWN
@@ -28,6 +26,14 @@ abstract class BastNode(
     companion object {
         private var mermaidNodeIds = HashMap<String, Int>()
         private val mermaidNodeIdsLock = Any()
+    }
+
+    /** Should only be null for the root of the AST */
+    var parent: BastNode? = null
+        private set
+
+    init {
+        children.forEach { it.parent = this }
     }
 
     fun coercesTo(type: TypeEnum): Boolean = majorType.coercesTo(type)
@@ -88,13 +94,18 @@ abstract class BastNode(
         return replaceChildren(this.children)
     }
 
+    fun linkChildren(parent: BastNode? = null): BastNode {
+        this.parent = parent
+        return replaceChildren(children.map { it.linkChildren(this) })
+    }
+
     // Depth-first recursive collection of parents (path from root to node)
     fun allParents(parentsList: List<BastNode> = listOf()): List<BastNode> {
         return if (parent != null) {
-            parent.allParents(parentsList) + parent
+            parent!!.allParents(parentsList) + parent
         } else {
             emptyList()
-        }
+        }.filter { it != null }.map { it!! }
     }
 
     /**
