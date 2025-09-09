@@ -51,8 +51,8 @@ class FinishedBastFactory {
      * @return An unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
-    // TODO type-casts -- add: if [ "$__bp_exitCode0" -ne 0 ]; then exit "$__bp_exitCode0"; fi -- add test for it
     fun unnestSubshells(bast: BastNode): BastNode {
+        // TODO convert to extension function
         synchronized(unnestedCountLock) {
             return bast.replaceChildren(bast.children.flatMap { statementNode ->
                 val nestedSubshells = statementNode.allNodes().filter {
@@ -91,6 +91,7 @@ class FinishedBastFactory {
     }
 
     private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
+        // TODO reimplement
         val startRecursion = inArithmetic == null
         if (startRecursion) {
             return replaceChildren(children.map { it.flattenArithmetic(this is ArithmeticBastNode) })

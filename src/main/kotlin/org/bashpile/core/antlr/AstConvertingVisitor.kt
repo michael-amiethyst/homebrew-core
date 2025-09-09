@@ -34,15 +34,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     companion object {
         const val OLD_OPTIONS = "__bp_old_options"
+
+        /** See [Unofficial Bash Strict Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/) */
         const val ENABLE_STRICT = "set -euo pipefail"
+
         /** Only set after all visits are done */
         @JvmStatic
         lateinit var rootNode: BastNode
-        // TODO add to STRICT_HEADER?
-        // declare -i s
-        // trap 's=$?; echo "Error (exit code $s) found on line $LINENO.  Command was: $BASH_COMMAND"; exit $s' ERR
+
         @JvmStatic
         val STRICT_HEADER = """
+            declare -i s
+            trap 's=$?; echo "Error (exit code ${'$'}s) found on line ${'$'}LINENO of generated Bash.\
+              Command was: ${'$'}BASH_COMMAND"; exit ${'$'}s' ERR
             declare $OLD_OPTIONS
             $OLD_OPTIONS=$(set +o)
             $ENABLE_STRICT
@@ -150,9 +154,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitTypecastExpression(ctx: BashpileParser.TypecastExpressionContext): BastNode {
-        require(ctx.children.size == 3)
-        val nextType = TypeEnum.valueOf(ctx.children[2].text.uppercase())
-        return InternalBastNode(listOf(visit(ctx.children[0])), nextType)
+        val aastChildren = ctx.children
+        require(aastChildren.size == 3)
+        val typecastTo = aastChildren[2].text
+        val nextType = TypeEnum.valueOf(typecastTo.uppercase())
+        val bastExpression = visit(aastChildren[0])
+        return InternalBastNode(bastExpression.toList(), nextType)
     }
 
     // Leaf nodes (parts of expressions)

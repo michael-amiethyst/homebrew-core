@@ -105,6 +105,7 @@ class MainShellStringTest {
         )
         val results = renderedBash.runCommand()
         assertEquals(SCRIPT_ERROR__GENERIC, results.second)
+        assertTrue(results.first.contains("Error (exit code $SCRIPT_ERROR__GENERIC) found"))
     }
 
     @Test
