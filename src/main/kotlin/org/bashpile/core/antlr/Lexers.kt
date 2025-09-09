@@ -50,13 +50,12 @@ class Lexers {
 
         /**
          * Checks if the command portion of the input Bash line is a valid Bash command.
-         * <br></br>
-         * Running 'type' to verify is expensive so we both check if the command is valid with a Regex and cache results.
+         *
+         * Running 'type' to verify is expensive, so we both check if the command is valid with a Regex and cache results.
          *
          * @param charStream From the `_input` of a Semantic Predicate in the BashpileLexer
          * @return Checks if the parsed command is valid.
          */
-        @Suppress("unused")
         @JvmStatic
         fun isLinuxCommand(@Nonnull charStream: CharStream): Boolean {
             // guard
@@ -78,7 +77,7 @@ class Lexers {
             }
             return if (startOfLine) {
                 // chop off everything before charStream's index
-                isLinuxCommand(charStream.getText(Interval.of(charStream.index(), charStream.size())))
+                _isLinuxCommand(charStream.getText(Interval.of(charStream.index(), charStream.size())))
             } else {
                 false
             }
@@ -95,7 +94,8 @@ class Lexers {
          */
         @VisibleForTesting
         @JvmStatic
-        /* package */ fun isLinuxCommand(@Nonnull bashLineIn: String): Boolean {
+        @Suppress("functionName")
+        fun _isLinuxCommand(@Nonnull bashLineIn: String): Boolean {
             // guard
             var bashLine = bashLineIn
             if (StringUtils.isBlank(bashLine) || bashLine.startsWith(" ")) {

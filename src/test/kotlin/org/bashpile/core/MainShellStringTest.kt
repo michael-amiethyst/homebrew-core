@@ -27,7 +27,7 @@ class MainShellStringTest {
         assertEquals(STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture.getBast(script).render())
+            """.trimIndent(), fixture._getBast(script).render())
     }
 
     @Test
@@ -36,7 +36,7 @@ class MainShellStringTest {
         assertEquals(STRICT_HEADER + """
             test_var=5 printf "${'$'}test_var"
             
-            """.trimIndent(), fixture.getBast(script).render())
+            """.trimIndent(), fixture._getBast(script).render())
     }
 
     @Test
@@ -45,7 +45,7 @@ class MainShellStringTest {
         assertEquals(STRICT_HEADER + """
             printf "newline"
             
-            """.trimIndent(), fixture.getBast(script).render())
+            """.trimIndent(), fixture._getBast(script).render())
     }
 
     @Test
@@ -54,7 +54,7 @@ class MainShellStringTest {
         assertEquals(STRICT_HEADER + """
             $(printf "newline")
             
-            """.trimIndent(), fixture.getBast(script).render())
+            """.trimIndent(), fixture._getBast(script).render())
     }
 
     @Test
@@ -65,7 +65,7 @@ class MainShellStringTest {
             $(printf "newline"; exit 1)
             set -euo pipefail
             
-            """.trimIndent(), fixture.getBast(script).linkChildren().render())
+            """.trimIndent(), fixture._getBast(script).linkChildren().render())
     }
 
     @Test
@@ -74,14 +74,14 @@ class MainShellStringTest {
             print("Hello " + #(printf 'shellstring!'))""".trim().byteInputStream()
         assertEquals(STRICT_HEADER + """
             printf "Hello $(printf 'shellstring!')"
-            """.trimIndent() + "\n", fixture.getBast(script).render())
+            """.trimIndent() + "\n", fixture._getBast(script).render())
     }
 
     @Test
     fun getBast_shellstring_nestedSubshells_works() {
         val script: InputStream = """
             print(#(ls $(echo '.')))""".trim().byteInputStream()
-        val renderedBash = fixture.getBast(script).render()
+        val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
             declare __bp_var0
             __bp_var0="$(echo '.')"
@@ -95,7 +95,7 @@ class MainShellStringTest {
     fun getBast_shellstring_nestedSubshells_withInnerError_fails() {
         val pathname = "src/test/resources/bpsScripts/nestedSubshells.bps"
         val script: InputStream =  File(pathname).readText().trim().byteInputStream()
-        val renderedBash = fixture.getBast(script).render()
+        val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
             set -euo pipefail
             declare __bp_var0
@@ -112,7 +112,7 @@ class MainShellStringTest {
     fun getBast_shellstring_withShellStringConcat_works() {
         val script: InputStream = """
             print(#(printf "$(printf 'Hello ') $(printf 'shellstring!')"))""".trim().byteInputStream()
-        val render = fixture.getBast(script).render()
+        val render = fixture._getBast(script).render()
         var renderedBash = render
         assertEquals(STRICT_HEADER + """
             declare __bp_var0

@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import com.google.common.annotations.VisibleForTesting
 import org.apache.logging.log4j.LogManager
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
@@ -37,7 +38,7 @@ class FinishedBastFactory {
         logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
 
         // unnest
-        val unnestedBast = unnestSubshells(flattenedBast)
+        val unnestedBast = flattenedBast.unnestSubshells()
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
 
         // loosen
@@ -46,13 +47,16 @@ class FinishedBastFactory {
         return looseBast
     }
 
+    private fun BastNode.unnestSubshells(): BastNode = _unnestSubshells(this)
+
     /**
      * Returns a list of preambles to support unnesting.
      * @return An unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
-    fun unnestSubshells(bast: BastNode): BastNode {
-        // TODO convert to extension function
+    @VisibleForTesting
+    @Suppress("functionName")
+    fun _unnestSubshells(bast: BastNode): BastNode {
         synchronized(unnestedCountLock) {
             return bast.replaceChildren(bast.children.flatMap { statementNode ->
                 val nestedSubshells = statementNode.allNodes().filter {

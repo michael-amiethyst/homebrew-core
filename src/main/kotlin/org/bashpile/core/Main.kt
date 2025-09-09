@@ -74,7 +74,7 @@ class Main : CliktCommand() {
 
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
-        val bastRoot: BastNode = getBast(script.byteInputStream())
+        val bastRoot: BastNode = _getBast(script.byteInputStream())
         echo(bastRoot.render(), false)
     }
 
@@ -90,7 +90,8 @@ class Main : CliktCommand() {
 
     /** Invokes ANTLR to parse the script and convert it to a Bashpile AST (BAST) */
     @VisibleForTesting
-    internal fun getBast(stream: InputStream): BastNode {
+    @Suppress("functionName")
+    internal fun _getBast(stream: InputStream): BastNode {
         // setup lexer
         val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = BashpileLexer(charStream)
