@@ -11,3 +11,4 @@
 * 0.11.0 - Integer arithmetic, --verbose option
 * 0.12.0 - Floating point arithmetic
 * 0.13.0 - Typecasts
+* 0.13.1 - ReplaceChildren does deepcopy for all BastNodes, minor refactors

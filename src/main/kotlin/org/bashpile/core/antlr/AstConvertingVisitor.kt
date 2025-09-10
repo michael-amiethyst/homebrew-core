@@ -105,7 +105,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {
         check(ctx.childCount == 3)
         val child = visit(ctx.children[1])
-        return ParenthesisBastNode(listOf(child), child.majorType)
+        return ParenthesisBastNode(child.toList(), child.majorType)
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {

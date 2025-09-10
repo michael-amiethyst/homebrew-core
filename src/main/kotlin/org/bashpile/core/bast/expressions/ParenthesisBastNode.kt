@@ -16,6 +16,6 @@ class ParenthesisBastNode(children: List<BastNode> = listOf(), majorType: TypeEn
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ParenthesisBastNode {
-        return ParenthesisBastNode(nextChildren)
+        return ParenthesisBastNode(nextChildren.map { it.deepCopy() })
     }
 }

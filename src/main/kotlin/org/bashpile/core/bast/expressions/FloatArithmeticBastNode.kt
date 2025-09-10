@@ -15,6 +15,6 @@ class FloatArithmeticBastNode(children: List<BastNode> = listOf())
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): FloatArithmeticBastNode {
-        return FloatArithmeticBastNode(nextChildren)
+        return FloatArithmeticBastNode(nextChildren.map { it.deepCopy() })
     }
 }
