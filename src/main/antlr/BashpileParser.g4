@@ -74,8 +74,8 @@ expression
     | Id                                # idExpression
     ;
 
-literal : StringValues | NumberValues | BoolValues | Empty;
-types    : Empty | Boolean | Number | Integer | Float | String | List | Map | Reference;
+literal : StringValues | NumberValues | BoolValues;
+types    : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;

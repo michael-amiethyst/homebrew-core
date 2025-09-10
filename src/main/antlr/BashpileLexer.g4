@@ -25,9 +25,7 @@ tokens { INDENT, DEDENT }
 }
 
 // keywords
-Empty    : 'empty';
 Boolean  : 'boolean';
-Number   : 'number';
 Integer  : 'integer';
 Float    : 'float';
 String   : 'string';

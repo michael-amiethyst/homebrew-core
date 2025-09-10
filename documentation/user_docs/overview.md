@@ -53,12 +53,17 @@ JVM project to run as a fast native program!  I've seen a start of 5 seconds go 
 
 * Quick compiles!  Within a second
 * White space agnostic (except for Python style indentation)
+  * Bash is white space sensitive and inconsistent about it too!
 * `print("Any String here")`, [print statements](statements/print-statements.md)
 * `"string" + "concatination"` [calculation expressions](expressions/calculation-expressions.md)
   * Integer and Floating Point arithmatic supported
 * [Types!](types.md)
 * `varName: str = "variable"` [variable declaration statements](statements/variable-declaration-statements.md)
-  * `SOME_CONSTANT: readonly str = "const"`
+  * `SOME_CONSTANT: readonly string = "const"`
+  * `SOME_CONSTANT: readonly exported str = "const"` exported is the same as Bash's `export`
+* Typecasts
+  * `one: string = "1"`
+  * `(one as integer) + 1`
 * `varName = "reassign"` [reassignment statements](statements/reassignment-statements.md)
 * Automatic [strict mode](strict-mode.md) handling
   * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax
