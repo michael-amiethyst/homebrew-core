@@ -7,6 +7,9 @@ Any script setup (e.g., for SDKMAN) should be reachable from .profile
 
 Ensure your IDE can display Mermaid syntax.
 
+If you need to test the Homebrew formula locally make a soft link (`ln -s`) from HOMEBREW_CELLAR/bashpile-local
+to your project root.
+
 ### Build
 `./gradlew clean check`
 Native executable is generated to bin/bashpile
