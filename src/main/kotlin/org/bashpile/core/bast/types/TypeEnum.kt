@@ -26,9 +26,4 @@ enum class TypeEnum {
     fun fold(type: TypeEnum): TypeEnum {
         return if (this.coercesTo(type)) { type } else { EMPTY }
     }
-
-    /** This is for reducing a list of types to what they coerce to, or EMPTY */
-    fun fold(type: TypeEnum): TypeEnum {
-        return if (this.coercesTo(type)) { type } else { EMPTY }
-    }
 }
