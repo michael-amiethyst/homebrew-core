@@ -54,13 +54,13 @@ expression
     | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
     | <assoc=right> unaryPrimary expression
                                         # unaryPrimaryExpression
-    | expression Colon complexType      # typecastExpression
+    | <assoc=right> expression As complexType # typecastExpression
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
     // operator expressions
     | OParen expression CParen          # parenthesisExpression
-    | expression op=(Multiply|Divide|Add|Minus) expression
+    | <assoc=right> expression op=(Multiply|Divide|Add|Minus) expression
                                         # calculationExpression
     | expression binaryPrimary expression
                                         # binaryPrimaryExpression
@@ -74,8 +74,8 @@ expression
     | Id                                # idExpression
     ;
 
-literal : StringValues | NumberValues | BoolValues | Empty;
-types    : Empty | Boolean | Number | Integer | Float | String | List | Map | Reference;
+literal : StringValues | NumberValues | BoolValues;
+types    : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;

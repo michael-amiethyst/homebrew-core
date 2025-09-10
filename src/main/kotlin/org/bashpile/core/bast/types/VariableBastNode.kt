@@ -2,7 +2,7 @@ package org.bashpile.core.bast.types
 
 import org.bashpile.core.bast.BastNode
 
-class VariableBastNode(id: String, majorType: TypeEnum) : BastNode(listOf(), id, majorType) {
+class VariableBastNode(id: String, majorType: TypeEnum) : BastNode(mutableListOf(), id, majorType) {
 
     override fun render(): String {
         return "${'$'}{$id}"

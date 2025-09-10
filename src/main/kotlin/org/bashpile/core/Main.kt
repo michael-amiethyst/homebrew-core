@@ -37,7 +37,7 @@ class Main : CliktCommand() {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.11.0"
+        const val VERSION = "0.13.0"
         /** Singleton per Main() instance */
         lateinit var bashpileState: BashpileState
     }
@@ -63,7 +63,7 @@ class Main : CliktCommand() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)
         if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
-            throw PrintHelpMessage(this.currentContext, true, SCRIPT_GENERIC_ERROR)
+            throw PrintHelpMessage(this.currentContext, true, SCRIPT_ERROR__GENERIC)
         }
 
         // configure logging
@@ -74,7 +74,7 @@ class Main : CliktCommand() {
 
         // get and render BAST tree
         val script = Files.readString(scriptPath).stripShebang()
-        val bastRoot: BastNode = getBast(script.byteInputStream())
+        val bastRoot: BastNode = _getBast(script.byteInputStream())
         echo(bastRoot.render(), false)
     }
 
@@ -90,7 +90,8 @@ class Main : CliktCommand() {
 
     /** Invokes ANTLR to parse the script and convert it to a Bashpile AST (BAST) */
     @VisibleForTesting
-    internal fun getBast(stream: InputStream): BastNode {
+    @Suppress("functionName")
+    internal fun _getBast(stream: InputStream): BastNode {
         // setup lexer
         val charStream = stream.use { CharStreams.fromStream(it) }
         val lexer = BashpileLexer(charStream)

@@ -38,7 +38,8 @@ If you've used Bashpile a bit and want faster execution times, read this section
 To make a faster execution time you can pull the code and build on your machine.  The magic of Graal will let this
 JVM project to run as a fast native program!  I've seen a start of 5 seconds go to milliseconds
 1. Pull the code from our repo at https://github.com/michael-amiethyst/homebrew-core
-2. At the project root run 'make install', it will install a bashpile binary to `/usr/local/bin/bashpile`
+2. At the project root run 'make install' with a Graal 21 VM, it will install a bashpile binary to `/usr/local/bin/bashpile`
+   1. You can install with sdkman or jenv
 3. `echo "print('Hello World')" > /tmp/hello && bashpile /tmp/hello` should run much quicker
    1. Note to OSX users, you may need to jump through some security hoops to allow the program to run
 
@@ -52,10 +53,17 @@ JVM project to run as a fast native program!  I've seen a start of 5 seconds go 
 
 * Quick compiles!  Within a second
 * White space agnostic (except for Python style indentation)
-* `print("Any String here")`, single quotes allowed with no special difference
-* `"string" + "concatination"`
-* `varName: str = "variable"`
-* `SOME_CONSTANT: readonly str = "const"`
-* `varName = "reassign"`
-* Automatic strict mode handling
+  * Bash is white space sensitive and inconsistent about it too!
+* `print("Any String here")`, [print statements](statements/print-statements.md)
+* `"string" + "concatination"` [calculation expressions](expressions/calculation-expressions.md)
+  * Integer and Floating Point arithmatic supported
+* [Types!](types.md)
+* `varName: str = "variable"` [variable declaration statements](statements/variable-declaration-statements.md)
+  * `SOME_CONSTANT: readonly string = "const"`
+  * `SOME_CONSTANT: readonly exported str = "const"` exported is the same as Bash's `export`
+* Typecasts
+  * `one: string = "1"`
+  * `(one as integer) + 1`
+* `varName = "reassign"` [reassignment statements](statements/reassignment-statements.md)
+* Automatic [strict mode](strict-mode.md) handling
   * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax
