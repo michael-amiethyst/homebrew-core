@@ -94,8 +94,8 @@ class FinishedBastFactory {
         return replaceChildren(loosenedStatements)
     }
 
+    /** Replaces nested arithmetic nodes with internal nodes */
     private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
-        // TODO reimplement
         val startRecursion = inArithmetic == null
         if (startRecursion) {
             return replaceChildren(children.map { it.flattenArithmetic(this is ArithmeticBastNode) })
