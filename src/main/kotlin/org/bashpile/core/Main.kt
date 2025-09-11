@@ -37,7 +37,7 @@ class Main : CliktCommand() {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.13.1"
+        const val VERSION = "0.14.0"
         /** Singleton per Main() instance */
         lateinit var bashpileState: BashpileState
     }
