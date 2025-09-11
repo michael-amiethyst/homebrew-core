@@ -9,7 +9,7 @@ import java.lang.UnsupportedOperationException
 
 
 /**
- * Tests Clikt and [Main.getBast], does not test logging.
+ * Tests Clikt and [Main._getBast], does not test logging.
  * See SystemTest for logger framework tests.
  */
 class MainTest {
@@ -67,7 +67,7 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture.getBast(script).render())
+            """.trimIndent(), fixture._getBast(script).render())
     }
 
     @Test
@@ -76,7 +76,7 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture.getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render())
     }
 
     @Test
@@ -86,7 +86,7 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture.getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render())
     }
 
     @Test
@@ -96,7 +96,7 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture.getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render())
     }
 
     @Test
@@ -106,7 +106,7 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!  It's awesome!"
             
-            """.trimIndent(), fixture.getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render())
     }
 
     @Test
@@ -115,14 +115,14 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "%s" "1.0"
             
-            """.trimIndent(), fixture.getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render())
     }
 
     @Test
     fun getBast_printFloat_plusString_fails() {
         val bpScript: InputStream = "print(1.0 + \" apples please\")".byteInputStream()
         assertThrows(UnsupportedOperationException::class.java) {
-            fixture.getBast(bpScript).render()
+            fixture._getBast(bpScript).render()
         }
     }
 
@@ -130,7 +130,7 @@ class MainTest {
     fun getBast_printString_plusBool_fails() {
         val bpScript: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
         assertThrows(UnsupportedOperationException::class.java) {
-            fixture.getBast(bpScript).render()
+            fixture._getBast(bpScript).render()
         }
     }
 }

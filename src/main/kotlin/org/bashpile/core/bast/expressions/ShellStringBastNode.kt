@@ -11,7 +11,7 @@ import org.bashpile.core.bast.types.leaf.LeafBastNode
  */
 open class ShellStringBastNode(
     children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.UNKNOWN)
-    : BastNode(children, majorType = majorType), Subshell {
+    : BastNode(children.toMutableList(), majorType = majorType), Subshell {
 
     constructor(contents: String) : this(LeafBastNode(contents).toList())
 

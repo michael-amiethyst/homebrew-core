@@ -1,4 +1,5 @@
-.gradle
+.gradle/
+.kotlin/
 build/
 **/gen/**
 src/main/antlr/BashpileLexer.tokens

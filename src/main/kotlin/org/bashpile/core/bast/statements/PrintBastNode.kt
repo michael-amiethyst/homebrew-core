@@ -19,6 +19,8 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
             "printf \"$childRenders\"\n"
         } else {
             // treat as a String so floating point numbers work
+            // we do the formatting on the Kotlin layer (we're not using %f for that reason)
+            // we need the %s so Bash doesn't interpret negative numbers as options to the program
             """
                 printf "%s" "$childRenders"
                 
@@ -31,11 +33,11 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     }
 
     private fun List<BastNode>.areNumbers(): Boolean {
-        val isInteger = find { it.majorType == INTEGER } != null &&
+        val isInteger = any { it.majorType == INTEGER } &&
                 // will only be integer if all coerce to integers
                 map { it.majorType }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == INTEGER
 
-        val isFloat = find { it.majorType == FLOAT } != null &&
+        val isFloat = any { it.majorType == FLOAT } &&
                 map { it.majorType }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == FLOAT
         return isInteger || isFloat
     }

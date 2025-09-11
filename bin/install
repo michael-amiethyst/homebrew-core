@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
+#
+# There should be a soft link from $HOMEBREW_CELLAR/bashpile-local to your project root
+#
+
 # uninstall
 brew uninstall bashpile || true
 
 # install
-brew install --HEAD --verbose Formula/bashpile.rb
+brew install --HEAD --verbose "${HOMEBREW_CELLAR:-/usr/local/Cellar}"/bashpile-local/Formula/bashpile.rb

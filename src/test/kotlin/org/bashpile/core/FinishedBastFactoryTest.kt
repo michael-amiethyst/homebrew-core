@@ -14,12 +14,16 @@ import org.junit.jupiter.api.Test
 
 
 class FinishedBastFactoryTest {
+
     val log: Logger = LogManager.getLogger()
+
     lateinit var fixture: FinishedBastFactory
+
     @BeforeEach
     fun setUp() {
         Main() // create for static state
         fixture = FinishedBastFactory()
+        FinishedBastFactory.unnestedCount = 0
     }
 
     /** Tests print(#(ls $(printf '.'; exit 1))) */
@@ -31,20 +35,16 @@ class FinishedBastFactoryTest {
         val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1")))
         shellString = shellString.replaceChildren(listOf(ls, subshell))
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
+        val root = InternalBastNode(printBastNode).linkChildren()
 
-        log.info("Mermaid Graph before unnest: {}", printBastNode.mermaidGraph())
-        val unnestedRoot = fixture.unnestSubshells(printBastNode).second
+        log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
+        val unnestedRoot = fixture._unnestSubshells(root)
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
-        assert(unnestedRoot.children.size == 2)
-        assert(!unnestedRoot.children[0].render().endsWith(" "))
-        assert(unnestedRoot.children[1].children.size == 1)
-        assert(!unnestedRoot.children[1].render().startsWith(" "))
-        assert(!unnestedRoot.children[1].render().endsWith(" "))
 
         val render = unnestedRoot.render()
         assertEquals("""
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
+            __bp_var0="$(echo '.'; exit $SCRIPT_ERROR__GENERIC)"
             printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
@@ -63,23 +63,21 @@ class FinishedBastFactoryTest {
 
         // create parent of printNode and sibling
         val strictNode = ShellLineBastNode(listOf(LeafBastNode("set -euo pipefail")))
-        val root = InternalBastNode(listOf(strictNode, printBastNode))
+        val root = InternalBastNode(listOf(strictNode, printBastNode)).linkChildren()
 
         log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-        val unnestedRoot: BastNode = fixture.unnestSubshells(root).second
+        val unnestedRoot: BastNode = fixture._unnestSubshells(root)
         log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
-        assert(unnestedRoot.children.size == 2)
-        assert(unnestedRoot.children[1].children.size == 2)
 
         val render = unnestedRoot.render()
         assertEquals("""
             set -euo pipefail
             declare __bp_var0
-            __bp_var0="$(echo '.'; exit $SCRIPT_GENERIC_ERROR)"
+            __bp_var0="$(echo '.'; exit $SCRIPT_ERROR__GENERIC)"
             printf "$(ls ${'$'}{__bp_var0})"
             
         """.trimIndent(), render)
 
-        assertEquals(SCRIPT_GENERIC_ERROR, render.runCommand().second)
+        assertEquals(SCRIPT_ERROR__GENERIC, render.runCommand().second)
     }
 }

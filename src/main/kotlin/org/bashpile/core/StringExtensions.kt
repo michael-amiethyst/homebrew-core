@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 /** Shell script success (0), all other numbers are errors.  Generally 1-255. */
 const val SCRIPT_SUCCESS = 0
-const val SCRIPT_GENERIC_ERROR = 1
+const val SCRIPT_ERROR__GENERIC = 1
 
 private val executors = Executors.newFixedThreadPool(8)
 

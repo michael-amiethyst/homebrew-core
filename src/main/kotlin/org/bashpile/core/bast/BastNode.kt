@@ -9,8 +9,6 @@ import org.bashpile.core.bast.types.leaf.LeafBastNode
 import java.util.function.Predicate
 
 
-typealias UnnestTuple = Pair<List<BastNode>, BastNode>
-
 /**
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
@@ -18,7 +16,7 @@ typealias UnnestTuple = Pair<List<BastNode>, BastNode>
  * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [org.bashpile.core.BashpileState].
  */
 abstract class BastNode(
-    val children: List<BastNode>,
+    protected val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
     /** The type at creation time see class KDoc for more info */
     val majorType: TypeEnum = UNKNOWN
@@ -26,6 +24,17 @@ abstract class BastNode(
     companion object {
         private var mermaidNodeIds = HashMap<String, Int>()
         private val mermaidNodeIdsLock = Any()
+    }
+
+    /** Should only be null for the root of the AST */
+    var parent: BastNode? = null
+        private set
+
+    val children: List<BastNode>
+        get() = mutableChildren.toList()
+
+    init {
+        children.forEach { it.parent = this }
     }
 
     fun coercesTo(type: TypeEnum): Boolean = majorType.coercesTo(type)
@@ -86,6 +95,29 @@ abstract class BastNode(
         return replaceChildren(this.children)
     }
 
+    fun linkChildren(parent: BastNode? = null): BastNode {
+        this.parent = parent
+        return replaceChildren(children.map { it.linkChildren(this) })
+    }
+
+    /** Depth-first recursive collection of parents (path from root to node) */
+    fun allParents(parentsList: List<BastNode> = listOf()): List<BastNode> {
+        return if (parent != null) {
+            parent!!.allParents(parentsList) + parent
+        } else {
+            emptyList()
+        }.filter { it != null }.map { it!! }
+    }
+
+    /** Mutates the children list of parent */
+    fun replaceWith(replacement: BastNode) {
+        val siblings = parent!!.mutableChildren
+        val nestedIndex = siblings.indexOf(this)
+        check (nestedIndex >= 0) { "Not found" }
+        replacement.parent = parent
+        siblings[nestedIndex] = replacement
+    }
+
     /**
      * @param nextChildren Contents will not be modified
      * @return A new instance of a BastNode subclass with the same fields, besides the children
@@ -93,6 +125,13 @@ abstract class BastNode(
     open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
         // making this abstract triggers a compilation bug in Ubuntu as of July 2025
         throw UnsupportedOperationException("Should be overridden in child class")
+    }
+
+    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
+    fun allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
+        childrenSet.addAll(children)
+        childrenSet.addAll(children.flatMap { it.allNodes() })
+        return childrenSet
     }
 
     fun findInTree(condition: Predicate<BastNode>) : Boolean {
