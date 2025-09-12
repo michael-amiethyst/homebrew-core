@@ -66,7 +66,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
         val node = visit(ctx.expression())
-        // TODO stdin -- enforce readonly
         val readonly = ctx.modifiers().any { it.text == "readonly" }
         val export = ctx.modifiers().any { it.text == "exported" }
         val id = ctx.id().text

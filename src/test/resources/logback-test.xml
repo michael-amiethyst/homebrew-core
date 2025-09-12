@@ -30,4 +30,6 @@
         <appender-ref ref="Console" />
         <appender-ref ref="AsyncLogFile" />
     </root>
+
+    <logger name="org.bashpile" level="debug" />
 </configuration>

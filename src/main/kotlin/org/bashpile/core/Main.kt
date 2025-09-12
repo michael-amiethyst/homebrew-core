@@ -7,8 +7,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
@@ -31,6 +33,8 @@ fun main(args: Array<String>) = Main().main(args)
  * This class is primarily responsible for parsing command line arguments.
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
+// TODO stdin -- update docs with new easy way to test installed Bashpile
+// TODO stdin -- emit shebang line, test that  `$(bashpile -c "...")` runs well
 class Main : CliktCommand() {
 
     companion object {
@@ -42,14 +46,26 @@ class Main : CliktCommand() {
         lateinit var bashpileState: BashpileState
     }
 
-    private val scriptArgument by argument(help = "The script to compile")
+    /** Uses a backing field and a getter because setting in init block not supported by Clikt */
+    private val scriptArgument: String
+        get() = _scriptArgument ?: ""
 
-    private val verboseOption by option("-v", "--verbose",
+    /** Backs [scriptArgument] */
+    private val _scriptArgument: String? by argument(help = "The script to compile").optional()
+
+    private val verboseOption: Int by option("-v", "--verbose",
         help = "Show more logs, may be specified twice with -vv").counted(limit=2, clamp=true)
+
+    private val commandOption: String
+        get() = _commandOption ?: ""
+
+    /** Backs [commandOption] */
+    private val _commandOption: String? by option("-c", "--command",
+        help = "Runs the literal command or from STDIN if no argument").optionalValue("")
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
-    init {// Define the version string for your application
+    init {
         versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
             message = { it })
         bashpileState = BashpileState()
@@ -62,7 +78,9 @@ class Main : CliktCommand() {
     override fun run() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)
-        if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
+        val badPath = !Files.exists(scriptPath) || !Files.isRegularFile(scriptPath)
+        val badCommand = commandOption.isEmpty() && System.`in`.available() == 0
+        if (badPath && badCommand) {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_ERROR__GENERIC)
         }
 
@@ -72,8 +90,13 @@ class Main : CliktCommand() {
         }
         logger.info(STARTUP_MESSAGE + scriptArgument) // first logging call after configureLogging() call
 
-        // get and render BAST tree
-        val script = Files.readString(scriptPath).stripShebang()
+        // get and render the BAST tree
+        val script = if (scriptArgument.isNotEmpty()) {
+            Files.readString(scriptPath).stripShebang()
+        } else commandOption.ifEmpty {
+            // read all stdin lines
+            generateSequence(::readLine).joinToString("\n")
+        }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
         echo(bastRoot.render(), false)
     }

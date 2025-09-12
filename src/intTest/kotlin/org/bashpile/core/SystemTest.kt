@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
@@ -24,15 +25,18 @@ class SystemTest {
         assertNotEquals(SCRIPT_SUCCESS, output.second)
         assertTrue(output.first.startsWith("Usage:"))
     }
+    @Test
+    fun system_withNoFilename_printsHelp() {
+        val output = bashpileFilename.runCommand()
+        assertNotEquals(SCRIPT_SUCCESS, output.second)
+        assertTrue(output.first.startsWith("Usage:"))
+    }
 
     @Test
     fun systemWorks() {
         val output = "$bashpileFilename '$HELLO_FILENAME'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        val bashLines = output.first.split("\n").filter { it.isNotBlank() }
-        assertTrue(bashLines.size > 1) { "Didn't have INFO logs, no extra lines for logs" }
-        assertTrue(output.first.contains("INFO")) { "Didn't have INFO logs" }
-        assertEquals("printf \"Hello Bashpile!\"", bashLines.last())
+        assertEquals(STRICT_HEADER + "printf \"Hello Bashpile!\"\n", output.first)
     }
 
     @Test
@@ -58,6 +62,27 @@ class SystemTest {
         val output = "$bashpileFilename --version".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
         assertEquals(Main.VERSION + "\n", output.first)
+    }
+
+    @Test
+    fun system_withCommandString_works() {
+        val output = "$bashpileFilename -c \"print('Hello World')\"".runCommand()
+        assertEquals(STRICT_HEADER + "printf \"Hello World\"\n", output.first)
+        assertEquals(SCRIPT_SUCCESS, output.second)
+    }
+
+    @Test
+    fun system_withCommandStdin_works() {
+        val output = "$bashpileFilename -c <<< \"print('Hello World')\"".runCommand()
+        assertEquals(STRICT_HEADER + "printf \"Hello World\"\n", output.first)
+        assertEquals(SCRIPT_SUCCESS, output.second)
+    }
+
+    @Test
+    fun system_withCommandPrintfStdin_works() {
+        val output = "printf \"print('Hello World')\" | $bashpileFilename -c".runCommand()
+        assertEquals(STRICT_HEADER + "printf \"Hello World\"\n", output.first)
+        assertEquals(SCRIPT_SUCCESS, output.second)
     }
 
     @Test
