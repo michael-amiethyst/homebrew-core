@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.system.exitProcess
 
 
 fun main(args: Array<String>) = Main().main(args)
@@ -34,7 +35,7 @@ fun main(args: Array<String>) = Main().main(args)
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
 // TODO stdin -- update docs with new easy way to test installed Bashpile
-// TODO stdin -- emit shebang line, test that  `$(bashpile -c "...")` runs well
+// TODO stdin -- emit shebang line on non-commandMode
 class Main : CliktCommand() {
 
     companion object {
@@ -91,15 +92,29 @@ class Main : CliktCommand() {
         logger.info(STARTUP_MESSAGE + scriptArgument) // first logging call after configureLogging() call
 
         // get and render the BAST tree
-        val script = if (scriptArgument.isNotEmpty()) {
+        val script = if (!commandMode()) {
             Files.readString(scriptPath).stripShebang()
         } else commandOption.ifEmpty {
             // read all stdin lines
             generateSequence(::readLine).joinToString("\n")
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        echo(bastRoot.render(), false)
+        val bash: String = bastRoot.render()
+        if (!commandMode()) {
+            echo(bash, false)
+        } else {
+            val commandResults = bash.runCommand()
+            check(commandResults.second == SCRIPT_SUCCESS) {
+                "Compile failed with return code ${commandResults.second} and text:\n${commandResults.first}"
+            }
+            echo(commandResults.first)
+        }
+
+        // Sometimes the Clikt framework hangs without an explicit exit
+        exitProcess(SCRIPT_SUCCESS)
     }
+
+    private fun commandMode(): Boolean = scriptArgument.isEmpty()
 
     /** The initial shebang line isn't part of the Bashpile script. */
     private fun String.stripShebang(): String {
