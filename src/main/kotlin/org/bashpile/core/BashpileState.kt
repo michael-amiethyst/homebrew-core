@@ -7,7 +7,7 @@ import org.bashpile.core.bast.types.VariableTypeInfo
  * Sometimes the type of a node is known at creation, so the type may be in [org.bashpile.core.bast.BastNode] as well.
  */
 class BashpileState {
-    // TODO move AstConvertingVisitor.rootNode to this class
+
     val stackframe: MutableList<VariableTypeInfo> = mutableListOf()
 
     fun addVariableInfo(id: String, type: TypeEnum, subtype: TypeEnum, readonly: Boolean) {

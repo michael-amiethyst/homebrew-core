@@ -38,10 +38,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         /** See [Unofficial Bash Strict Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/) */
         const val ENABLE_STRICT = "set -euo pipefail"
 
-        /** Only set after all visits are done */
-        @JvmStatic
-        lateinit var rootNode: BastNode
-
         @JvmStatic
         val STRICT_HEADER = """
             declare -i s
@@ -55,9 +51,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
-        val childNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
-        rootNode = InternalBastNode(childNodes)
-        return rootNode
+        val statementNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
+        return InternalBastNode(statementNodes)
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode {
