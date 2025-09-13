@@ -7,8 +7,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.google.common.annotations.VisibleForTesting
 import org.antlr.v4.runtime.CharStreams
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.system.exitProcess
 
 
 fun main(args: Array<String>) = Main().main(args)
@@ -31,25 +34,38 @@ fun main(args: Array<String>) = Main().main(args)
  * This class is primarily responsible for parsing command line arguments.
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
+// TODO emit shebang line on non-commandMode
 class Main : CliktCommand() {
 
     companion object {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.13.1"
+        const val VERSION = "0.14.0"
         /** Singleton per Main() instance */
         lateinit var bashpileState: BashpileState
     }
 
-    private val scriptArgument by argument(help = "The script to compile")
+    /** Uses a backing field and a getter because setting in init block not supported by Clikt */
+    private val scriptArgument: String
+        get() = _scriptArgument ?: ""
 
-    private val verboseOption by option("-v", "--verbose",
+    /** Backs [scriptArgument] */
+    private val _scriptArgument: String? by argument(help = "The script to compile").optional()
+
+    private val verboseOption: Int by option("-v", "--verbose",
         help = "Show more logs, may be specified twice with -vv").counted(limit=2, clamp=true)
+
+    private val commandOption: String
+        get() = _commandOption ?: ""
+
+    /** Backs [commandOption] */
+    private val _commandOption: String? by option("-c", "--command",
+        help = "Runs the literal command or from STDIN if no argument").optionalValue("")
 
     private val logger = LogManager.getLogger(Main::javaClass)
 
-    init {// Define the version string for your application
+    init {
         versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
             message = { it })
         bashpileState = BashpileState()
@@ -62,7 +78,9 @@ class Main : CliktCommand() {
     override fun run() {
         // guard, etc
         val scriptPath = Path.of(scriptArgument)
-        if (Files.notExists(scriptPath) || !Files.isRegularFile(scriptPath)) {
+        val badPath = !Files.exists(scriptPath) || !Files.isRegularFile(scriptPath)
+        val badCommand = commandOption.isEmpty() && System.`in`.available() == 0
+        if (badPath && badCommand) {
             throw PrintHelpMessage(this.currentContext, true, SCRIPT_ERROR__GENERIC)
         }
 
@@ -72,11 +90,30 @@ class Main : CliktCommand() {
         }
         logger.info(STARTUP_MESSAGE + scriptArgument) // first logging call after configureLogging() call
 
-        // get and render BAST tree
-        val script = Files.readString(scriptPath).stripShebang()
+        // get and render the BAST tree
+        val script = if (!commandMode()) {
+            Files.readString(scriptPath).stripShebang()
+        } else commandOption.ifEmpty {
+            // read all stdin lines
+            generateSequence(::readLine).joinToString("\n")
+        }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        echo(bastRoot.render(), false)
+        val bash: String = bastRoot.render()
+        if (!commandMode()) {
+            echo(bash, false)
+        } else {
+            val commandResults = bash.runCommand()
+            check(commandResults.second == SCRIPT_SUCCESS) {
+                "Compile failed with return code ${commandResults.second} and text:\n${commandResults.first}"
+            }
+            echo(commandResults.first)
+        }
+
+        // Sometimes the Clikt framework hangs without an explicit exit
+        exitProcess(SCRIPT_SUCCESS)
     }
+
+    private fun commandMode(): Boolean = scriptArgument.isEmpty()
 
     /** The initial shebang line isn't part of the Bashpile script. */
     private fun String.stripShebang(): String {
