@@ -26,11 +26,13 @@ fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
                 .redirectErrorStream(true)
                 .start()
 
-            proc2.waitFor(10, TimeUnit.SECONDS)
+            if (!proc2.waitFor(10, TimeUnit.SECONDS)) {
+                proc2.destroyForcibly()
+            }
             return@Callable proc2
         }
 
-        proc = executors.submit(callable).get()
+        proc = executors.submit(callable).get(10, TimeUnit.SECONDS)
 
         // strip out blank lines and lines from sdkman, add newline back
         val text = proc.inputStream.bufferedReader().readText().trim()
