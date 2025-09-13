@@ -35,6 +35,7 @@ fun main(args: Array<String>) = Main().main(args)
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
 // TODO emit shebang line on non-commandMode
+// TODO check why StringExtensionsKtTest.kt not run during gradle clean test
 class Main : CliktCommand() {
 
     companion object {
