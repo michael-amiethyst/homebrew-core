@@ -10,7 +10,7 @@ import java.lang.UnsupportedOperationException
 
 /**
  * Tests Clikt and [Main._getBast], does not test logging.
- * See SystemTest for logger framework tests.
+ * See SystemTest for logger framework related tests (e.g. for `-vv` option).
  */
 class MainTest {
 
