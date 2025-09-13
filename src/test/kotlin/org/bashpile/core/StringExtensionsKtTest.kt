@@ -3,7 +3,7 @@ package org.bashpile.core
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class StringExtensionsTest {
+class StringExtensionsKtTest {
     @Test
     fun runCommand_withMultiline_works() {
         val result = "echo 'Hello \n world'".runCommand()

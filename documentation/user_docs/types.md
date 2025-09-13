@@ -7,3 +7,8 @@
 * list - on roadmap
 * map - on roadmap
 * reference - on roadmap
+
+## Typecasts
+
+Values are not checked at runtime, but only at compile time.  Syntax is 'VAR as TYPE', with 
+the same precedence as Java.
