@@ -13,4 +13,3 @@
 * 0.13.0 - Typecasts
 * 0.13.1 - ReplaceChildren does deepcopy for all BastNodes, minor refactors
 * 0.14.0 - `-c` option to read string or from stdin
-* 
