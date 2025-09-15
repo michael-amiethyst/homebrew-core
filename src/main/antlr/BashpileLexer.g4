@@ -50,6 +50,8 @@ Exported : 'exported';
 Readonly : 'readonly';
 ListOf   : 'listOf';
 While    : 'while';
+For      : 'for';
+In       : 'in';
 Import   : 'import';
 
 // operators, in precidence order

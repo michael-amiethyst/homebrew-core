@@ -10,6 +10,7 @@ import org.bashpile.core.bast.expressions.IntegerArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ParenthesisBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
+import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ReassignmentBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
@@ -59,6 +60,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ShellLineBastNode(ctx.children.map { visit(it) })
     }
 
+    override fun visitForeachFileLineLoopStatement(ctx: BashpileParser.ForeachFileLineLoopStatementContext): BastNode {
+        val children = ctx.statements().map { visit(it) }
+        val columns = ctx.typedId().map { visit(it) as VariableBastNode }
+        return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
+    }
+
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
         val node = visit(ctx.expression())
         val readonly = ctx.modifiers().any { it.text == "readonly" }
@@ -92,7 +99,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
-        require(ctx.children.size == 1) { "TypedId must have exactly one child" }
         val primaryTypeString = ctx.majorType().text
         val typeEnum = TypeEnum.valueOf(primaryTypeString.uppercase())
         return VariableBastNode(ctx.Id().text, typeEnum)
@@ -140,7 +146,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             InternalBastNode(left, right)
         } else if (left.majorType == TypeEnum.INTEGER && right.majorType == TypeEnum.INTEGER) {
             IntegerArithmeticBastNode(left, middle, right)
-        } else if (left.majorType.coercesTo(TypeEnum.FLOAT) && right.majorType.coercesTo(TypeEnum.FLOAT)) {
+        } else if (left.coercesTo(TypeEnum.FLOAT) && right.coercesTo(TypeEnum.FLOAT)) {
             FloatArithmeticBastNode(left, middle, right)
         } else {
             throw UnsupportedOperationException(

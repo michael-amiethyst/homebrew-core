@@ -85,7 +85,10 @@ abstract class BastNode(
      */
     fun areAllStrings(): Boolean {
         return if (children.isEmpty()) {
-            this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
+            // TODO foreach - make "stringy" tag interface
+            val stringyBastNode = this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
+            val stringTypedNode = this is VariableBastNode && this.coercesTo(TypeEnum.STRING)
+            stringyBastNode || stringTypedNode
         } else {
             children.all { it.areAllStrings() }
         }

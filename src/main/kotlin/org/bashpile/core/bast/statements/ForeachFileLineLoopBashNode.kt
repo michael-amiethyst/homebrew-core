@@ -1,34 +1,51 @@
 package org.bashpile.core.bast.statements
 
+import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.types.TypeEnum
+import org.bashpile.core.bast.types.TypeEnum.EMPTY
+import org.bashpile.core.bast.types.VariableBastNode
 
 /**
  * for(FirstName: string, LastName: string in 'src/test/resources/example.csv')
  */
-// TODO make IFS configurable, "withDelimiter" keyword?  Just `with`?
+// TODO foreach -- make IFS configurable, "withDelimiter" keyword?  Just `with`?
 class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
     val filepath: String,
-    vararg val columnNames: String) : BastNode(children.toMutableList()) {
+    val columns: List<VariableBastNode>) : BastNode(children.toMutableList()) {
 
     init {
-        require(!columnNames.any { it.contains("\\s".toRegex()) }) { "Whitespace not allowed in column names" }
+        require(columns.all { it.coercesTo(TypeEnum.STRING) }) { "Non string type detected"}
+        require(!columns.map { it.id!! }.any { it.contains("\\s".toRegex())}) {
+            "Whitespace not allowed in column names"
+        }
+        check(filepath.startsWith("\"") || filepath.endsWith("\"")) {
+            "Filepath should be quoted"
+        }
+        columns.forEach {
+            Main.bashpileState.addVariableInfo(it.id!!, it.majorType, EMPTY, readonly = true)
+        }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBashNode {
-        return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, filepath, *columnNames)
+        return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, filepath, columns)
     }
 
     override fun render(): String {
-        val columnNamesJoined = columnNames.joinToString(" ")
-        val childRenders = children.map {
-            it.render()
-        }.joinToString("", prefix = "    ").removeSuffix("\n")
+        val columnNamesJoined = columns.map { it.id }.joinToString(" ")
+        val childRenderList = children.map { child ->
+            child.render().lines().filter { it.isNotBlank() }.map { "    $it" }.joinToString("\n", postfix = "\n")
+        }
+        val childRenders = childRenderList.joinToString("").removeSuffix("\n")
+        // .trimIndent fails with $childRenders so we need to munge whitespace manually
         return """
-            cat "$filepath" | while IFS=',' read -r $columnNamesJoined; do
+            cat $filepath | while IFS=',' read -r $columnNamesJoined; do
             $childRenders
             done
 
-        """.trimIndent()
+        """.lines().filter { it.isNotBlank() }.map{
+            it.removePrefix("            ")
+        }.joinToString("\n", postfix = "\n")
     }
 }

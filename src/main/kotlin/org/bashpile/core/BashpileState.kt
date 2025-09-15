@@ -8,6 +8,7 @@ import org.bashpile.core.bast.types.VariableTypeInfo
  */
 class BashpileState {
 
+    // TODO foreach -- make full stack
     val stackframe: MutableList<VariableTypeInfo> = mutableListOf()
 
     fun addVariableInfo(id: String, type: TypeEnum, subtype: TypeEnum, readonly: Boolean) {
