@@ -41,10 +41,10 @@ class LoopsTest {
             TOKEN: readonly exported string = "OAUTH_TOKEN"
             for(firstName: string, middleName: string, lastName: string, email: string, landline: string, cell: string in "src/test/resources/data/example_extended.csv"):
                 // set progress status too
-                landlineShort: exported string = #(printf "${'$'}landline" | cut -d " " -f 2)
+                cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
-                print("Updating phone # " + landlineShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
-                curl -sL -H "..." -H "..." "https://${'$'}HOST/" -d "{ \"landlineShort\": ${'$'}landlineShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\"}"
+                print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
+                print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
@@ -52,21 +52,26 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            pwd
             cat "src/test/resources/data/example_extended.csv" | sed '1d' | while IFS=',' read -r firstName middleName lastName email landline cell; do
-                declare -x landlineShort
-                landlineShort="$(printf "${'$'}landline" | cut -d " " -f 2)"
+                declare -x cellShort
+                cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
                 regionId="13"
-                printf "Updating phone # ${'$'}{landlineShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
-                curl -sL -H "..." -H "..." "https://${'$'}HOST/" -d "{ \"landlineShort\": ${'$'}landlineShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\"}"
+                printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
+                printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
             """.trimIndent(), renderedBash)
 
         val bashResult = renderedBash.runCommand()
         assertEquals("""
-            
+            Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
+            { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
+            Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
+            { "cellShort": 555-5679, "lastName": "Johnson" "cell": "(555) 555-5679", "regionId": "13" }
+            Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
+            { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
+
         """.trimIndent(), bashResult.first)
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
@@ -82,7 +87,7 @@ class LoopsTest {
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
-                print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\"}")
+                print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
@@ -96,13 +101,21 @@ class LoopsTest {
                 declare -x regionId
                 regionId="13"
                 printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
-                printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\"}"
+                printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
             """.trimIndent(), renderedBash)
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("", bashResult.first)
+        assertEquals("""
+            Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
+            { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
+            Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
+            { "cellShort": 555-5679, "lastName": "Johnson" "cell": "(555) 555-5679", "regionId": "13" }
+            Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
+            { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
+
+        """.trimIndent(), bashResult.first)
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
