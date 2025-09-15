@@ -59,5 +59,38 @@ class LoopsTest {
             """.trimIndent(), result)
     }
 
-    // TODO foreach -- make test with non-string column variable
+    @Test
+    fun foreach_fileLine_multistatement_with_float_works() {
+        val script = """
+            // Real world example
+            HOST: readonly exported string = "HOST_NAME"
+            TOKEN: readonly exported string = "OAUTH_TOKEN"
+            for(firstName: string, middleName: string, lastName: string, email: string, landline: float, cell: string in "src/test/resources/data/example_extended.csv"):
+                // set progress status too
+                cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
+                regionId: exported integer = 13
+                print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
+                curl -sL -H “...” -H “..." \
+                  “https://${'$'}HOST/” \
+                  -d “{ \“cellShort\“: ${'$'}cellShort, \“lastName\“: \“${'$'}lastName\” \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\"}“
+        """.trimIndent().byteInputStream()
+        val result = fixture._getBast(script).render()
+        assertEquals(STRICT_HEADER + """
+            declare -x HOST
+            HOST="HOST_NAME"
+            declare -x TOKEN
+            TOKEN="OAUTH_TOKEN"
+            cat "src/test/resources/data/example_extended.csv" | while IFS=',' read -r firstName middleName lastName email landline cell; do
+                declare -x cellShort
+                cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
+                declare -x regionId
+                regionId="13"
+                printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
+                curl -sL -H “...” -H “..." \
+                      “https://${'$'}HOST/” \
+                      -d “{ \“cellShort\“: ${'$'}cellShort, \“lastName\“: \“${'$'}lastName\” \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\"}“
+            done
+            
+            """.trimIndent(), result)
+    }
 }

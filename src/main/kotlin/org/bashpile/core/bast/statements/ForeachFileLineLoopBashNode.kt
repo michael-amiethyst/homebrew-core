@@ -2,7 +2,6 @@ package org.bashpile.core.bast.statements
 
 import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.EMPTY
 import org.bashpile.core.bast.types.VariableBastNode
 
@@ -16,7 +15,6 @@ class ForeachFileLineLoopBashNode(
     val columns: List<VariableBastNode>) : BastNode(children.toMutableList()) {
 
     init {
-        require(columns.all { it.coercesTo(TypeEnum.STRING) }) { "Non string type detected"}
         require(!columns.map { it.id!! }.any { it.contains("\\s".toRegex())}) {
             "Whitespace not allowed in column names"
         }
