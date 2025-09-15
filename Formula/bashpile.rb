@@ -17,7 +17,7 @@ class Bashpile < Formula
   # depends_on "shellcheck"
 
   # tooling dependencies for generated scripts
-  # depends_on "gnu-sed"
+  depends_on "gnu-sed"
   depends_on "bc"
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
 

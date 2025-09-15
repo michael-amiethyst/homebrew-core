@@ -8,7 +8,6 @@ import org.bashpile.core.bast.types.VariableBastNode
 /**
  * for(FirstName: string, LastName: string in 'src/test/resources/example.csv')
  */
-// TODO foreach -- make IFS configurable, "withDelimiter" keyword?  Just `with`?
 class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
     val filepath: String,
@@ -38,7 +37,7 @@ class ForeachFileLineLoopBashNode(
         val childRenders = childRenderList.joinToString("").removeSuffix("\n")
         // .trimIndent fails with $childRenders so we need to munge whitespace manually
         return """
-            cat $filepath | while IFS=',' read -r $columnNamesJoined; do
+            cat $filepath | sed '1d' | while IFS=',' read -r $columnNamesJoined; do
             $childRenders
             done
 
