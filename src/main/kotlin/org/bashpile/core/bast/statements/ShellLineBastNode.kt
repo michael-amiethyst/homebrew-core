@@ -1,6 +1,6 @@
 package org.bashpile.core.bast.statements
 
-import org.apache.commons.lang3.Strings
+import org.bashpile.core.appendIfMissing
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.Subshell
 import org.bashpile.core.bast.types.leaf.LeafBastNode
@@ -17,9 +17,5 @@ class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
         return ShellLineBastNode(nextChildren.map { it.deepCopy() })
-    }
-
-    private fun String.appendIfMissing(suffix: String): String {
-        return Strings.CS.appendIfMissing(this, suffix)
     }
 }

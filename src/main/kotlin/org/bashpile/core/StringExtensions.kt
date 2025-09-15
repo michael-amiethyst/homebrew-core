@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.apache.commons.lang3.Strings
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.Callable
@@ -14,6 +15,8 @@ private val executors = Executors.newFixedThreadPool(8)
 
 /** Strip initial logging line */
 fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
+
+fun String.appendIfMissing(suffix: String): String = Strings.CS.appendIfMissing(this, suffix)
 
 fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
     var proc: Process? = null

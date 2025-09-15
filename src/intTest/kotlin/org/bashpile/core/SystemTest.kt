@@ -39,7 +39,8 @@ class SystemTest {
     fun systemWorks() {
         val output = "$BASHPILE_EXECUTABLE '$HELLO_FILENAME'".runCommand()
         assertEquals(SCRIPT_SUCCESS, output.second)
-        assertEquals(STRICT_HEADER + "printf \"Hello Bashpile!\"\n", output.first)
+        val expected = Main.SHEBANG_HEADER + STRICT_HEADER + "printf \"Hello Bashpile!\"\n"
+        assertEquals(expected, output.first)
     }
 
     @Test

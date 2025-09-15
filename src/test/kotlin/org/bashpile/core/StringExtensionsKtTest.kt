@@ -43,7 +43,7 @@ class StringExtensionsKtTest {
             declare __bp_old_options
             __bp_old_options=$(set +o)
             set -euo pipefail
-            cat src/test/resources/example.csv | while IFS=',' read -r FirstName LastName Email Phone; do
+            cat src/test/resources/data/example.csv | while IFS=',' read -r FirstName LastName Email Phone; do
                 printf "${'$'}FirstName ${'$'}LastName ${'$'}Email ${'$'}Phone\n"
             done
         """.trimIndent().runCommand()

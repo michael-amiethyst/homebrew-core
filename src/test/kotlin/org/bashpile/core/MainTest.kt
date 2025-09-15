@@ -1,6 +1,7 @@
 package org.bashpile.core
 
 import com.github.ajalt.clikt.testing.test
+import org.bashpile.core.Main.Companion.SHEBANG_HEADER
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -35,7 +36,7 @@ class MainTest {
         val output = fixture.test(arrayOf("src/test/resources/bpsScripts/hello.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
-        assertEquals(STRICT_HEADER + """
+        assertEquals(SHEBANG_HEADER + STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), output.stdout)
@@ -46,7 +47,7 @@ class MainTest {
         val output = fixture.test(arrayOf("src/test/resources/bpsScripts/helloWithConcat.bps"))
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
-        assertEquals(STRICT_HEADER + """
+        assertEquals(SHEBANG_HEADER + STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), output.stdout)

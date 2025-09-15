@@ -12,7 +12,7 @@ class ForeachFileLineLoopBashNodeTest {
     fun render_withPrint_works() {
         val child = PrintBastNode(VariableBastNode("col1", STRING))
         val fixture = ForeachFileLineLoopBashNode(
-            child.toList(),"file.csv", listOf(VariableBastNode("col1", STRING)))
+            child.toList(),"\"file.csv\"", listOf(VariableBastNode("col1", STRING)))
         assertEquals("""
             cat "file.csv" | while IFS=',' read -r col1; do
                 printf "${'$'}{col1}"
@@ -27,7 +27,7 @@ class ForeachFileLineLoopBashNodeTest {
         val child = VariableDeclarationBastNode(
             "col1", STRING, TypeEnum.EMPTY, child = LeafBastNode("exampleValue"))
         val fixture = ForeachFileLineLoopBashNode(
-            child.toList(),"file.csv", listOf(VariableBastNode("col1", STRING)))
+            child.toList(),"\"file.csv\"", listOf(VariableBastNode("col1", STRING)))
         assertEquals("""
             cat "file.csv" | while IFS=',' read -r col1; do
                 declare col1
