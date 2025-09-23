@@ -14,7 +14,7 @@ class ForeachFileLineLoopBashNodeTest {
         val fixture = ForeachFileLineLoopBashNode(
             child.toList(),"\"file.csv\"", listOf(VariableBastNode("col1", STRING)))
         assertEquals("""
-            cat "file.csv" | sed '1d' | while IFS=',' read -r col1; do
+            cat "file.csv" | sed '1d' | sed 's/\r//g' | while IFS=',' read -r col1; do
                 printf "${'$'}{col1}"
             done
 
@@ -29,7 +29,7 @@ class ForeachFileLineLoopBashNodeTest {
         val fixture = ForeachFileLineLoopBashNode(
             child.toList(),"\"file.csv\"", listOf(VariableBastNode("col1", STRING)))
         assertEquals("""
-            cat "file.csv" | sed '1d' | while IFS=',' read -r col1; do
+            cat "file.csv" | sed '1d' | sed 's/\r//g' | while IFS=',' read -r col1; do
                 declare col1
                 col1="exampleValue"
             done

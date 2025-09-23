@@ -37,7 +37,7 @@ class ForeachFileLineLoopBashNode(
         val childRenders = childRenderList.joinToString("").removeSuffix("\n")
         // .trimIndent fails with $childRenders so we need to munge whitespace manually
         return """
-            cat $filepath | sed '1d' | while IFS=',' read -r $columnNamesJoined; do
+            cat $filepath | sed '1d' | sed 's/\r//g' | while IFS=',' read -r $columnNamesJoined; do
             $childRenders
             done
 

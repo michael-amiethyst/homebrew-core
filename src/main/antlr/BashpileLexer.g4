@@ -105,11 +105,12 @@ IntegerValues: NON_ZERO_DIGIT DIGIT* | '0';
 FloatValues: INT_PART? FRACTION | INT_PART '.';
 
 // newlines, whitespace and comments
-Newline      : '\r'? '\n' ' '*;
-Whitespace   : [ \t] -> skip;
-BashpileDoc  : '/**' .*? '*/' -> skip;
-Comment      : '//' ~[\r\n\f]* -> skip;
-BlockComment : '/*' ( BlockComment | . )*? '*/' -> skip;
+Newline       : '\r'? '\n' ' '*;
+Whitespace    : [ \t\f] -> skip;
+EscapedNewline: '\\' '\r'? '\n' ' '* -> skip;
+BashpileDoc   : '/**' .*? '*/' -> skip;
+Comment       : '//' ~[\r\n\f]* -> skip;
+BlockComment  : '/*' ( BlockComment | . )*? '*/' -> skip;
 
 // small tokens
 
