@@ -17,7 +17,7 @@ class LoopsTest {
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
-            cat "src/test/resources/data/example.csv" | sed '1d' | sed 's/\r//g' | while IFS=',' read -r first last email phone; do
+            cat "src/test/resources/data/example.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
@@ -45,8 +45,8 @@ class LoopsTest {
                 cellShort: exported string = #(printf "${'$'}cell" | cut -d " " -f 2)
                 regionId: exported integer = 13
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
-                print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \
-                    \"regionId\": \"${'$'}regionId\" }\n")
+                print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", " + \
+                    "\"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
@@ -54,7 +54,7 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | sed '1d' | sed 's/\r//g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -98,7 +98,7 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | sed '1d' | sed 's/\r//g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -142,7 +142,7 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | sed '1d' | sed 's/\r//g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -161,6 +161,54 @@ class LoopsTest {
             { "cellShort": 555-5679, "lastName": "Johnson" "cell": "(555) 555-5679", "regionId": "13" }
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
+
+        """.trimIndent(), bashResult.first)
+        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+    }
+
+    @Test
+    fun foreach_fileLine_non_csv_works() {
+        val filename = "src/test/resources/data/plain.txt"
+        val script = """
+            for(line: string in "$filename"):
+                print(line + "\n")
+        """.trimIndent().byteInputStream()
+        val renderedBash = fixture._getBast(script).render()
+        assertEquals(STRICT_HEADER + """
+            cat "$filename" | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                printf "${'$'}{line}\n"
+            done
+            
+            """.trimIndent(), renderedBash)
+
+        val bashResult = renderedBash.runCommand()
+        assertEquals("""
+            lorum
+            ipsum
+
+        """.trimIndent(), bashResult.first)
+        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+    }
+
+    @Test
+    fun foreach_fileLine_non_csv_no_trailing_newline_works() {
+        val filename = "src/test/resources/data/plain_no_trailing_newline.txt"
+        val script = """
+            for(line: string in "$filename"):
+                print(line + "\n")
+        """.trimIndent().byteInputStream()
+        val renderedBash = fixture._getBast(script).render()
+        assertEquals(STRICT_HEADER + """
+            cat "$filename" | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                printf "${'$'}{line}\n"
+            done
+            
+            """.trimIndent(), renderedBash)
+
+        val bashResult = renderedBash.runCommand()
+        assertEquals("""
+            lorum
+            ipsum
 
         """.trimIndent(), bashResult.first)
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
