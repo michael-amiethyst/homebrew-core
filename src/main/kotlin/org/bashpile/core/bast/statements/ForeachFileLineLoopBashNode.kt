@@ -36,8 +36,8 @@ class ForeachFileLineLoopBashNode(
         }
         val childRenders = childRenderList.joinToString("").removeSuffix("\n")
         // TODO foreach -- use gsed -e -e -e instead of multiple calls to sed
-        val skipFirstLine = if (doubleQuotedfilepath.endsWith(".csv\"")) "sed '1d' | " else ""
-        val convertWindowsLineEndings = "sed 's/\\r//g' | "
+        val skipFirstLine = if (doubleQuotedfilepath.endsWith(".csv\"")) "gsed '1d' | " else ""
+        val convertWindowsLineEndings = "gsed 's/\\r//g' | "
         // -z '$' means EOF, not end of line.
         // for files that do not end with a newline ('/\n$/!s') replace EOF with \n EOF
         val appendTrailingNewline = """

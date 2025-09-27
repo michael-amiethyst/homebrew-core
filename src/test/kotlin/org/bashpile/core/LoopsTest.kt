@@ -17,7 +17,7 @@ class LoopsTest {
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
-            cat "src/test/resources/data/example.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
+            cat "src/test/resources/data/example.csv" | gsed '1d' | gsed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
@@ -54,7 +54,7 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | gsed '1d' | gsed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -98,7 +98,7 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | gsed '1d' | gsed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -142,7 +142,7 @@ class LoopsTest {
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | sed '1d' | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | gsed '1d' | gsed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -175,7 +175,7 @@ class LoopsTest {
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
-            cat "$filename" | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cat "$filename" | gsed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 printf "${'$'}{line}\n"
             done
             
@@ -199,7 +199,7 @@ class LoopsTest {
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
         assertEquals(STRICT_HEADER + """
-            cat "$filename" | sed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+            cat "$filename" | gsed 's/\r//g' | gsed -z '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 printf "${'$'}{line}\n"
             done
             
