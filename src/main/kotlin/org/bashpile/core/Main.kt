@@ -34,7 +34,6 @@ fun main(args: Array<String>) = Main().main(args)
  * This class is primarily responsible for parsing command line arguments.
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
-// TODO emit shebang line on non-commandMode
 class Main : CliktCommand() {
 
     companion object {

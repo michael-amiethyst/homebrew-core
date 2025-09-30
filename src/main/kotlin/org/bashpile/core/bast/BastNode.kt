@@ -85,7 +85,7 @@ abstract class BastNode(
      */
     fun areAllStrings(): Boolean {
         return if (children.isEmpty()) {
-            // TODO foreach - make "stringy" tag interface
+            // make "stringy" tag interface if this next line exceeds 3 classes
             val stringyBastNode = this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
             val stringTypedNode = this is VariableBastNode && this.coercesTo(TypeEnum.STRING)
             stringyBastNode || stringTypedNode
