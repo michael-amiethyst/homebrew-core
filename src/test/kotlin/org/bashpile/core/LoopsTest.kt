@@ -213,6 +213,4 @@ class LoopsTest {
         """.trimIndent(), bashResult.first)
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
-
-    // TODO foreach -- make test for non-csv
 }
