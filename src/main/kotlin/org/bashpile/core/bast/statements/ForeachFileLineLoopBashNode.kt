@@ -35,23 +35,32 @@ class ForeachFileLineLoopBashNode(
             child.render().lines().filter { it.isNotBlank() }.map { "    $it" }.joinToString("\n", postfix = "\n")
         }
         val childRenders = childRenderList.joinToString("").removeSuffix("\n")
-        // TODO foreach -- use gsed -e -e -e instead of multiple calls to sed
-        val skipFirstLine = if (doubleQuotedfilepath.endsWith(".csv\"")) "gsed '1d' | " else ""
-        val convertWindowsLineEndings = "gsed 's/\\r//g' | "
-        // -z '$' means EOF, not end of line.
-        // for files that do not end with a newline ('/\n$/!s') replace EOF with \n EOF
-        val appendTrailingNewline = """
-            gsed -z '/\n$/!s/$/\n$/g'""".trimIndent()
         val ifs = if (doubleQuotedfilepath.endsWith(".csv\"")) "," else ""
-        // .trimIndent fails with $childRenders so we need to munge whitespace manually
-        val mungeStream = "${skipFirstLine}${convertWindowsLineEndings}${appendTrailingNewline}"
         return """
-            cat $doubleQuotedfilepath | $mungeStream | while IFS='$ifs' read -r $columnNamesJoined; do
+            cat $doubleQuotedfilepath | ${mungeStream()} | while IFS='$ifs' read -r $columnNamesJoined; do
             $childRenders
             done
 
-        """.lines().filter { it.isNotBlank() }.map{
-            it.removePrefix("            ")
-        }.joinToString("\n", postfix = "\n")
+        """.trimScriptIndent("            ")
     }
+
+    private fun mungeStream(): String {
+        // 1 (line) delete
+        val skipFirstLine = if (doubleQuotedfilepath.endsWith(".csv\"")) "-e '1d' " else ""
+        // remove all '\r'
+        val convertWindowsLineEndings = "-e 's/\\r//g'"
+
+        // -z causes '$' to means EOF, not end of line.
+        // for files that do not end with a newline ('/\n$/!s') replace EOF with \n EOF
+        val appendTrailingNewline = """
+                -ze '/\n$/!s/$/\n$/g'""".trimIndent()
+
+        // need to have two gsed calls due to the -z option
+        return "gsed ${skipFirstLine}${convertWindowsLineEndings} | gsed $appendTrailingNewline"
+    }
+
+    /** .trimIndent fails with $childRenders so we need to munge whitespace manually */
+    private fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
+        it.removePrefix(trim)
+    }.joinToString("\n", postfix = "\n")
 }
