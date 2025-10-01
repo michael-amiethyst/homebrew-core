@@ -3,6 +3,7 @@ package org.bashpile.core
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 
 class LoopsTest {
@@ -212,5 +213,18 @@ class LoopsTest {
 
         """.trimIndent(), bashResult.first)
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
+    }
+
+    @Test
+    fun foreach_fileLine_scoping_works() {
+        val filename = "src/test/resources/data/plain.txt"
+        val script = """
+            for(line: string in "$filename"):
+                scoped: string = "Hello World"
+                print(line + "\n")
+            print(scoped + "\n")
+        """.trimIndent().byteInputStream()
+        val thrown: IllegalStateException? = assertThrows { fixture._getBast(script).render() }
+        assertNotNull(thrown)
     }
 }

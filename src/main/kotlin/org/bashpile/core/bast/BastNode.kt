@@ -113,6 +113,7 @@ abstract class BastNode(
     }
 
     /** Mutates the children list of parent */
+    // TODO make a MutableBastNode / .getMutableBastNode() method, or .freeze()/.thaw()
     fun replaceWith(replacement: BastNode) {
         val siblings = parent!!.mutableChildren
         val nestedIndex = siblings.indexOf(this)
