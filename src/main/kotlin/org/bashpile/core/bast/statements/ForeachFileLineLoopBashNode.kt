@@ -3,7 +3,7 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.types.TypeEnum.EMPTY
-import org.bashpile.core.bast.types.VariableBastNode
+import org.bashpile.core.bast.types.VariableReferenceBastNode
 
 /**
  * for(FirstName: string, LastName: string in 'src/test/resources/example.csv')
@@ -11,7 +11,7 @@ import org.bashpile.core.bast.types.VariableBastNode
 class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
     val doubleQuotedfilepath: String,
-    val columns: List<VariableBastNode>) : BastNode(children.toMutableList()) {
+    val columns: List<VariableReferenceBastNode>) : BastNode(children.toMutableList()) {
 
     init {
         require(!columns.map { it.id!! }.any { it.contains("\\s".toRegex())}) {
@@ -20,9 +20,6 @@ class ForeachFileLineLoopBashNode(
         check(doubleQuotedfilepath.startsWith("\"") || doubleQuotedfilepath.endsWith("\"")) {
             "Filepath should be quoted"
         }
-        columns.forEach {
-            Main.bashpileState.addVariableInfo(it.id!!, it.majorType, EMPTY, readonly = true)
-        }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBashNode {
@@ -30,18 +27,27 @@ class ForeachFileLineLoopBashNode(
     }
 
     override fun render(): String {
-        val columnNamesJoined = columns.map { it.id }.joinToString(" ")
-        val childRenderList = children.map { child ->
-            child.render().lines().filter { it.isNotBlank() }.map { "    $it" }.joinToString("\n", postfix = "\n")
-        }
-        val childRenders = childRenderList.joinToString("").removeSuffix("\n")
-        val ifs = if (doubleQuotedfilepath.endsWith(".csv\"")) "," else ""
-        return """
-            cat $doubleQuotedfilepath | ${mungeStream()} | while IFS='$ifs' read -r $columnNamesJoined; do
-            $childRenders
-            done
+        Main.bashpileState.use { state ->
+            state.pushStackframe()
+            columns.forEach {
+                Main.bashpileState.addVariableInfo(it.id!!, it.majorType, EMPTY, readonly = true)
+            }
 
-        """.trimScriptIndent("            ")
+            val columnNamesJoined = columns.map { it.id }.joinToString(" ")
+            val childRenderList = children.map { child ->
+                child.render().lines().filter { it.isNotBlank() }.map {
+                    "    $it"
+                }.joinToString("\n", postfix = "\n")
+            }
+            val childRenders = childRenderList.joinToString("").removeSuffix("\n")
+            val ifs = if (doubleQuotedfilepath.endsWith(".csv\"")) "," else ""
+            return """
+                cat $doubleQuotedfilepath | ${mungeStream()} | while IFS='$ifs' read -r $columnNamesJoined; do
+                $childRenders
+                done
+    
+            """.trimScriptIndent("                ")
+        }
     }
 
     private fun mungeStream(): String {

@@ -2,7 +2,7 @@ package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.STRING
-import org.bashpile.core.bast.types.VariableBastNode
+import org.bashpile.core.bast.types.VariableReferenceBastNode
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test
 class ForeachFileLineLoopBashNodeTest {
     @Test
     fun render_withPrint_works() {
-        val child = PrintBastNode(VariableBastNode("col1", STRING))
+        val child = PrintBastNode(VariableReferenceBastNode("col1", STRING))
         val fixture = ForeachFileLineLoopBashNode(
-            child.toList(),"\"file.csv\"", listOf(VariableBastNode("col1", STRING)))
+            child.toList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
             cat "file.csv" | gsed -e '1d' -e 's/\r//g' | gsed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
@@ -28,7 +28,7 @@ class ForeachFileLineLoopBashNodeTest {
         val child = VariableDeclarationBastNode(
             "col1", STRING, TypeEnum.EMPTY, child = LeafBastNode("exampleValue"))
         val fixture = ForeachFileLineLoopBashNode(
-            child.toList(),"\"file.csv\"", listOf(VariableBastNode("col1", STRING)))
+            child.toList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
             cat "file.csv" | gsed -e '1d' -e 's/\r//g' | gsed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
@@ -39,4 +39,5 @@ class ForeachFileLineLoopBashNodeTest {
         """.trimIndent(), fixture.render())
     }
 
+    // TODO foreach -- tests for shadowed var, var in outer scope,  nested loops
 }

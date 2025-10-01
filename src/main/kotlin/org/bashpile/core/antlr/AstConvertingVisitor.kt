@@ -20,13 +20,14 @@ import org.bashpile.core.bast.types.FloatLiteralBastNode
 import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
 import org.bashpile.core.bast.types.TypeEnum
-import org.bashpile.core.bast.types.VariableBastNode
+import org.bashpile.core.bast.types.VariableReferenceBastNode
 import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
+ * Holds minimal logic; most logic is in the BAST nodes.
  * Created by [org.bashpile.core.Main].
  * Is in two major sections - Statements and Expressions.
  * Code is arranged from complex at the top to simple at the bottom.
@@ -62,7 +63,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitForeachFileLineLoopStatement(ctx: BashpileParser.ForeachFileLineLoopStatementContext): BastNode {
         val children = ctx.statements().map { visit(it) }
-        val columns = ctx.typedId().map { visit(it) as VariableBastNode }
+        val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
         return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
     }
 
@@ -95,13 +96,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
         require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
-        return VariableBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
+        return VariableReferenceBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
     }
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
         val primaryTypeString = ctx.majorType().text
         val typeEnum = TypeEnum.valueOf(primaryTypeString.uppercase())
-        return VariableBastNode(ctx.Id().text, typeEnum)
+        return VariableReferenceBastNode(ctx.Id().text, typeEnum)
     }
 
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {

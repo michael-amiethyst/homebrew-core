@@ -13,7 +13,7 @@ import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.types.VariableBastNode
+import org.bashpile.core.bast.types.VariableReferenceBastNode
 
 
 /**
@@ -66,7 +66,7 @@ class FinishedBastFactory {
                 }
                 nestedSubshells.map { nestedSubshell ->
                     val id = "__bp_var${unnestedCount++}"
-                    nestedSubshell.replaceWith(VariableBastNode(id, UNKNOWN))
+                    nestedSubshell.replaceWith(VariableReferenceBastNode(id, UNKNOWN))
                     VariableDeclarationBastNode(
                         id,
                         UNKNOWN,

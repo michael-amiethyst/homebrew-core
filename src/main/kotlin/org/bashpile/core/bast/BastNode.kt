@@ -44,8 +44,9 @@ abstract class BastNode(
         return bashpileState.variableInfo(id)?.majorType ?: majorType
     }
 
-    fun variableInfo(): VariableTypeInfo? {
-        return bashpileState.variableInfo(id)
+    fun variableInfo(): VariableTypeInfo {
+        check(id != null) { "Tried to get variable info for null variable ID" }
+        return bashpileState.variableInfo(id)!!
     }
 
     fun toList(): List<BastNode> = listOf(this)
@@ -87,7 +88,7 @@ abstract class BastNode(
         return if (children.isEmpty()) {
             // make "stringy" tag interface if this next line exceeds 3 classes
             val stringyBastNode = this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
-            val stringTypedNode = this is VariableBastNode && this.coercesTo(TypeEnum.STRING)
+            val stringTypedNode = this is VariableReferenceBastNode && this.coercesTo(TypeEnum.STRING)
             stringyBastNode || stringTypedNode
         } else {
             children.all { it.areAllStrings() }
