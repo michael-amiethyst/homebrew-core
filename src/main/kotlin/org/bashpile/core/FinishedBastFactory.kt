@@ -65,7 +65,9 @@ class FinishedBastFactory {
                 }
                 nestedSubshells.map { nestedSubshell ->
                     val id = "__bp_var${unnestedCount++}"
-                    nestedSubshell.replaceWith(VariableReferenceBastNode(id, UNKNOWN))
+                    nestedSubshell.thaw()
+                        .replaceWith(VariableReferenceBastNode(id, UNKNOWN))
+                        .freeze()
                     VariableDeclarationBastNode(
                         id,
                         UNKNOWN,

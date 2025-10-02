@@ -34,6 +34,8 @@ abstract class BastNode(
         // shallow copy
         get() = mutableChildren.toList()
 
+    private var mutable = false
+
     init {
         children.forEach { it.parent = this }
     }
@@ -109,14 +111,26 @@ abstract class BastNode(
         }.filter { it != null }.map { it!! }
     }
 
+    /** Makes this node mutable */
+    fun thaw(): BastNode {
+        mutable = true
+        return this
+    }
+
+    fun freeze(): BastNode {
+        mutable = false
+        return this
+    }
+
     /** Mutates the children list of parent */
-    // TODO make a MutableBastNode / .getMutableBastNode() method, or .freeze()/.thaw()
-    fun replaceWith(replacement: BastNode) {
+    fun replaceWith(replacement: BastNode): BastNode {
+        check (mutable) { "Cannot use mutating call on frozen node, call thaw() first" }
         val siblings = parent!!.mutableChildren
         val nestedIndex = siblings.indexOf(this)
         check (nestedIndex >= 0) { "Not found" }
         replacement.parent = parent
         siblings[nestedIndex] = replacement
+        return this
     }
 
     /**
