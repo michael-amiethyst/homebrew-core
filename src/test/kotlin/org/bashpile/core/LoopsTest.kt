@@ -247,5 +247,24 @@ class LoopsTest {
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
-    // TODO foreach -- tests for shadowed var, nested loops
+    @Test
+    fun foreach_fileLine_scoping_variableShadowing_works() {
+        val filename = "src/test/resources/data/plain.txt"
+        val script = """
+            line: string = "Who's line is it Anyway?"
+            for(line: string in "$filename"):
+                print(line + "\n")
+        """.trimIndent().byteInputStream()
+        val renderedBash = fixture._getBast(script).render()
+
+        val bashResult = renderedBash.runCommand()
+        assertEquals("""
+            lorum
+            ipsum
+
+        """.trimIndent(), bashResult.first)
+        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+    }
+
+    // TODO foreach -- nested loops
 }
