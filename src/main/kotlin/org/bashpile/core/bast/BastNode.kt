@@ -13,12 +13,11 @@ import java.util.function.Predicate
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
  * The root is created by the [AstConvertingVisitor].
- * Sometimes the type of a node isn't known at creation time, so the type is on the [org.bashpile.core.CallStack].
  */
 abstract class BastNode(
     protected val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
-    /** The type at creation time see class KDoc for more info */
+    /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
     val majorType: TypeEnum = UNKNOWN
 ) {
     companion object {
@@ -40,7 +39,7 @@ abstract class BastNode(
         children.forEach { it.parent = this }
     }
 
-    fun coercesTo(type: TypeEnum): Boolean = majorType.coercesTo(type)
+    fun coercesTo(type: TypeEnum): Boolean = resolvedMajorType().coercesTo(type)
 
     fun resolvedMajorType(): TypeEnum {
         // check call stack, fall back on node's type
