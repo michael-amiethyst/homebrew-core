@@ -15,7 +15,7 @@ class VariableDeclarationBastNode(
 ) : StatementBastNode(child, id, type) {
 
     override fun render(): String {
-        Main.Companion.bashpileState.addVariableInfo(id!!, majorType, subtype, readonly)
+        Main.Companion.callStack.addVariableInfo(id!!, majorType, subtype, readonly)
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""

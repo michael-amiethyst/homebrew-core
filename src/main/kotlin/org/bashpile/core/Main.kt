@@ -43,7 +43,7 @@ class Main : CliktCommand() {
         const val VERSION = "0.15.0"
         const val SHEBANG_HEADER = "#!/usr/bin/env bash\n\n"
         /** Singleton per Main() instance */
-        lateinit var bashpileState: BashpileState
+        lateinit var callStack: CallStack
     }
 
     /** Uses a backing field and a getter because setting in init block not supported by Clikt */
@@ -68,7 +68,7 @@ class Main : CliktCommand() {
     init {
         versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
             message = { it })
-        bashpileState = BashpileState()
+        callStack = CallStack()
     }
 
     /**

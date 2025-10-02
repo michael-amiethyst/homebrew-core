@@ -27,10 +27,10 @@ class ForeachFileLineLoopBashNode(
     }
 
     override fun render(): String {
-        Main.bashpileState.use { state ->
+        Main.callStack.use { state ->
             state.pushStackframe()
             columns.forEach {
-                Main.bashpileState.addVariableInfo(it.id!!, it.majorType, EMPTY, readonly = true)
+                Main.callStack.addVariableInfo(it.id!!, it.majorType, EMPTY, readonly = true)
             }
 
             val columnNamesJoined = columns.map { it.id }.joinToString(" ")

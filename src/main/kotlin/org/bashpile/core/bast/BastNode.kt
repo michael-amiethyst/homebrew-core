@@ -1,7 +1,7 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.antlr.AstConvertingVisitor
-import org.bashpile.core.Main.Companion.bashpileState
+import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
@@ -13,7 +13,7 @@ import java.util.function.Predicate
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
  * The root is created by the [AstConvertingVisitor].
- * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [org.bashpile.core.BashpileState].
+ * Sometimes the type of a node isn't known at creation time, so the type is on the [org.bashpile.core.CallStack].
  */
 abstract class BastNode(
     protected val mutableChildren: MutableList<BastNode>,
@@ -44,12 +44,12 @@ abstract class BastNode(
 
     fun resolvedMajorType(): TypeEnum {
         // check call stack, fall back on node's type
-        return bashpileState.variableInfo(id)?.majorType ?: majorType
+        return callStack.variableInfo(id)?.majorType ?: majorType
     }
 
     fun variableInfo(): VariableTypeInfo {
         check(id != null) { "Tried to get variable info for null variable ID" }
-        return bashpileState.variableInfo(id)!!
+        return callStack.requireOnStack(id)
     }
 
     fun toList(): List<BastNode> = listOf(this)
