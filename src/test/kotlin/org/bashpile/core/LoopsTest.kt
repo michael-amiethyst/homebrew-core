@@ -292,5 +292,29 @@ class LoopsTest {
         assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
-    // TODO foreach -- nested loops with variable conflict
+    @Test
+    fun foreach_fileLine_nested_withShadowing_works() {
+        val outerFilename = "src/test/resources/data/labeled_lines.txt"
+        val innerFilename = "src/test/resources/data/plain.txt"
+        val script = """
+            line: string = "Who's line is it Anyway?"
+            for(line: string in "$outerFilename"):
+                print(line + "\n")
+                for(line: string in "$innerFilename"):
+                    print(line + "\n")
+        """.trimIndent().byteInputStream()
+        val renderedBash = fixture._getBast(script).render()
+
+        val bashResult = renderedBash.runCommand()
+        assertEquals("""
+            row1
+            lorum
+            ipsum
+            row2
+            lorum
+            ipsum
+
+        """.trimIndent(), bashResult.first)
+        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+    }
 }
