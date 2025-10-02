@@ -14,7 +14,8 @@ class BashpileState: AutoCloseable {
     val stack: MutableList<Stackframe> = mutableListOf(mutableListOf())
 
     fun addVariableInfo(id: String, type: TypeEnum, subtype: TypeEnum, readonly: Boolean) {
-        stack.top().add(VariableTypeInfo(id, type, subtype, readonly))
+        val top: Stackframe = stack.last()
+        top.add(VariableTypeInfo(id, type, subtype, readonly))
     }
 
     fun assertInScope(id: String) {
@@ -27,7 +28,8 @@ class BashpileState: AutoCloseable {
             return null
         }
 
-        val info = stack.top().find { it.id == id }
+        val topmostStackframeWithId = stack.findLast { frame -> frame.any { it.id == id } }
+        val info = topmostStackframeWithId?.find { it.id == id }
         check (info != null) { "Could not find $id on current stackframe"}
         return info
     }
@@ -42,6 +44,4 @@ class BashpileState: AutoCloseable {
         check(stack.isNotEmpty()) { "You cannot pop every frame off of stack" }
     }
 
-    /** Gets the top stackframe.  Peeks at the Stack */
-    private fun MutableList<Stackframe>.top(): Stackframe = this[this.size - 1]
 }

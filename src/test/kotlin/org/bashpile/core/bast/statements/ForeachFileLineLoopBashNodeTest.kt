@@ -38,6 +38,4 @@ class ForeachFileLineLoopBashNodeTest {
 
         """.trimIndent(), fixture.render())
     }
-
-    // TODO foreach -- tests for shadowed var, var in outer scope,  nested loops
 }

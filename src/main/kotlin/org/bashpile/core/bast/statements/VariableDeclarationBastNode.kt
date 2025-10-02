@@ -26,6 +26,7 @@ class VariableDeclarationBastNode(
 
         """.trimIndent()
     }
+
     override fun replaceChildren(nextChildren: List<BastNode>): VariableDeclarationBastNode {
         return VariableDeclarationBastNode(id!!, majorType, subtype, readonly, export, nextChildren[0].deepCopy())
     }

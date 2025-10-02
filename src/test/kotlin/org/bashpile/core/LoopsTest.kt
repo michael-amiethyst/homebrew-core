@@ -227,4 +227,25 @@ class LoopsTest {
         val thrown: IllegalStateException? = assertThrows { fixture._getBast(script).render() }
         assertNotNull(thrown)
     }
+
+    @Test
+    fun foreach_fileLine_scoping_referenceOuterScope_works() {
+        val filename = "src/test/resources/data/plain.txt"
+        val script = """
+            outerScope: string = "Hello Mars"
+            for(line: string in "$filename"):
+                print(outerScope + "\n")
+        """.trimIndent().byteInputStream()
+        val renderedBash = fixture._getBast(script).render()
+
+        val bashResult = renderedBash.runCommand()
+        assertEquals("""
+            Hello Mars
+            Hello Mars
+
+        """.trimIndent(), bashResult.first)
+        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+    }
+
+    // TODO foreach -- tests for shadowed var, nested loops
 }
