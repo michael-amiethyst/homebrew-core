@@ -26,6 +26,27 @@ class FinishedBastFactoryTest {
         FinishedBastFactory.unnestedCount = 0
     }
 
+    @Test
+    fun mermaidGraph_works() {
+        val child = ShellStringBastNode()
+        val root = PrintBastNode(child)
+        val graph = with(fixture) { root.mermaidGraph() }
+        assertFalse(graph.contains("reflection", true))
+        assertFalse(graph.contains("BastNode"))
+        log.info("Mermaid Graph: {}", graph)
+    }
+
+    @Test
+    fun mermaidGraph_nodeNumbering_works() {
+        val printNode = PrintBastNode(ShellStringBastNode("ls"), ShellStringBastNode("pwd"))
+        val root = InternalBastNode(printNode)
+        val graph = with(fixture) { root.mermaidGraph() }
+        assertFalse(graph.contains("reflection", true))
+        assertFalse(graph.contains("BastNode"))
+        assertTrue(graph.contains("ShellString1"))
+        log.info("Mermaid Graph: {}", graph)
+    }
+
     /** Tests print(#(ls $(printf '.'; exit 1))) */
     @Test
     fun unnest_withPrint_works() {
@@ -37,9 +58,12 @@ class FinishedBastFactoryTest {
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
         val root = InternalBastNode(printBastNode)
 
-        log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-        val unnestedRoot = fixture._unnestSubshells(root)
-        log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
+        val unnestedRoot = with(fixture) {
+            log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
+            val unnested = fixture._unnestSubshells(root)
+            log.info("Mermaid Graph after unnest: {}", unnested.mermaidGraph())
+            unnested
+        }
 
         val render = unnestedRoot.render()
         assertEquals("""
@@ -65,9 +89,12 @@ class FinishedBastFactoryTest {
         val strictNode = ShellLineBastNode(listOf(LeafBastNode("set -euo pipefail")))
         val root = InternalBastNode(listOf(strictNode, printBastNode))
 
-        log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-        val unnestedRoot: BastNode = fixture._unnestSubshells(root)
-        log.info("Mermaid Graph after unnest: {}", unnestedRoot.mermaidGraph())
+        val unnestedRoot: BastNode = with(fixture) {
+            log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
+            val unnested: BastNode = fixture._unnestSubshells(root)
+            log.info("Mermaid Graph after unnest: {}", unnested.mermaidGraph())
+            unnested
+        }
 
         val render = unnestedRoot.render()
         assertEquals("""

@@ -20,10 +20,6 @@ abstract class BastNode(
     /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
     val majorType: TypeEnum = UNKNOWN
 ) {
-    companion object {
-        private var mermaidNodeIds = HashMap<String, Int>()
-        private val mermaidNodeIdsLock = Any()
-    }
 
     /** Should only be null for the root of the AST */
     var parent: BastNode? = null
@@ -39,6 +35,10 @@ abstract class BastNode(
         children.forEach { it.parent = this }
     }
 
+    ///////////////////////
+    // type related methods
+    ///////////////////////
+
     fun coercesTo(type: TypeEnum): Boolean = resolvedMajorType().coercesTo(type)
 
     fun resolvedMajorType(): TypeEnum {
@@ -51,6 +51,8 @@ abstract class BastNode(
         return callStack.requireOnStack(id)
     }
 
+    // misc methods
+
     fun toList(): List<BastNode> = listOf(this)
 
     /**
@@ -58,28 +60,6 @@ abstract class BastNode(
      */
     open fun render(): String {
         return children.joinToString("") { it.render() }
-    }
-
-    fun mermaidGraph(parentNodeName: String = ""): String {
-        synchronized(mermaidNodeIdsLock) {
-            if (parentNodeName.isEmpty()) {
-                // initial case
-                mermaidNodeIds.clear()
-                return "graph TD;" + mermaidGraph("root")
-            } else {
-                // terminating cose: no children
-                var mermaid = ""
-                children.forEach { child ->
-                    val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
-                    val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
-                    val nodeName = nodeTypeName + nodeId
-                    mermaidNodeIds[nodeTypeName] = nodeId + 1
-                    mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
-                }
-                return mermaid
-            }
-
-        }
     }
 
     /**
@@ -110,6 +90,29 @@ abstract class BastNode(
         }.filter { it != null }.map { it!! }
     }
 
+    /**
+     * @param nextChildren Contents will not be modified
+     * @return A new instance of a BastNode subclass with the same fields, besides the children
+     */
+    open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
+        // making this abstract triggers a compilation bug in Ubuntu as of July 2025
+        throw UnsupportedOperationException("Should be overridden in child class")
+    }
+
+    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
+    fun allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
+        childrenSet.addAll(children)
+        childrenSet.addAll(children.flatMap { it.allNodes() })
+        return childrenSet
+    }
+
+    /** Gets all nodes that match [condition] in this subtree */
+    fun findInTree(condition: Predicate<BastNode>) : Boolean {
+        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
+    }
+
+    // mutation related methods
+
     /** Makes this node mutable */
     fun thaw(): BastNode {
         mutable = true
@@ -130,25 +133,5 @@ abstract class BastNode(
         replacement.parent = parent
         siblings[nestedIndex] = replacement
         return this
-    }
-
-    /**
-     * @param nextChildren Contents will not be modified
-     * @return A new instance of a BastNode subclass with the same fields, besides the children
-     */
-    open fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        // making this abstract triggers a compilation bug in Ubuntu as of July 2025
-        throw UnsupportedOperationException("Should be overridden in child class")
-    }
-
-    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
-    fun allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
-        childrenSet.addAll(children)
-        childrenSet.addAll(children.flatMap { it.allNodes() })
-        return childrenSet
-    }
-
-    fun findInTree(condition: Predicate<BastNode>) : Boolean {
-        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
     }
 }

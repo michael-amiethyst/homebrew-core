@@ -46,6 +46,28 @@ class FinishedBastFactory {
         return looseBast
     }
 
+    @VisibleForTesting
+    internal fun BastNode.mermaidGraph(parentNodeName: String = "", mermaidNodeIds: HashMap<String, Int> = HashMap())
+    : String {
+        if (parentNodeName.isEmpty()) {
+            // initial case
+            mermaidNodeIds.clear()
+            return "graph TD;" + mermaidGraph("root")
+        } else {
+            // terminating cose: no children
+            var mermaid = ""
+            children.forEach { child ->
+                val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
+                val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
+                val nodeName = nodeTypeName + nodeId
+                mermaidNodeIds[nodeTypeName] = nodeId + 1
+                mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
+            }
+            return mermaid
+        }
+    }
+
+    // TODO clean this us
     private fun BastNode.unnestSubshells(): BastNode = _unnestSubshells(this)
 
     /**
