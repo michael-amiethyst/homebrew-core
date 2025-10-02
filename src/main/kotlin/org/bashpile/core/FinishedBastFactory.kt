@@ -22,11 +22,6 @@ import org.bashpile.core.bast.types.VariableReferenceBastNode
  */
 class FinishedBastFactory {
 
-    companion object {
-        internal var unnestedCount = 0
-        internal val unnestedCountLock = Any()
-    }
-
     private val logger = LogManager.getLogger(Main::javaClass)
 
     fun transform(root: BastNode): BastNode {
@@ -67,37 +62,35 @@ class FinishedBastFactory {
         }
     }
 
-    // TODO clean this us
-    private fun BastNode.unnestSubshells(): BastNode = _unnestSubshells(this)
-
     /**
      * Returns a list of preambles to support unnesting.
      * @return An unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
     @VisibleForTesting
-    @Suppress("functionName")
-    fun _unnestSubshells(bast: BastNode): BastNode {
-        synchronized(unnestedCountLock) {
-            return bast.replaceChildren(bast.children.flatMap { statementNode ->
-                val nestedSubshells = statementNode.allNodes().filter {
-                    it is Subshell
-                }.filter { subshells ->
-                    subshells.allParents().any { it is Subshell }
-                }
-                nestedSubshells.map { nestedSubshell ->
-                    val id = "__bp_var${unnestedCount++}"
-                    nestedSubshell.thaw()
-                        .replaceWith(VariableReferenceBastNode(id, UNKNOWN))
-                        .freeze()
-                    VariableDeclarationBastNode(
-                        id,
-                        UNKNOWN,
-                        child = ShellStringBastNode(nestedSubshell.children)
-                    )
-                } + statementNode
-            })
+    internal fun BastNode.unnestSubshells(): BastNode {
+        var unnestedCount = 0
+        val unnestedChildren = children.flatMap { statementNode ->
+            // the recursion is hidden in .allNodes(), it's linear from there
+            val nestedSubshells = statementNode.allNodes().filter {
+                it is Subshell
+            }.filter { subshells ->
+                subshells.allParents().any { it is Subshell }
+            }
+            val variableDeclarationBastNodes = nestedSubshells.map { nestedSubshell ->
+                val id = "__bp_var${unnestedCount++}"
+                nestedSubshell.thaw()
+                    .replaceWith(VariableReferenceBastNode(id, UNKNOWN))
+                    .freeze()
+                VariableDeclarationBastNode(
+                    id,
+                    UNKNOWN,
+                    child = ShellStringBastNode(nestedSubshell.children)
+                )
+            }
+            variableDeclarationBastNodes + statementNode
         }
+        return replaceChildren(unnestedChildren)
     }
 
     /** @return A loosened version of the input tree */
@@ -121,7 +114,8 @@ class FinishedBastFactory {
     private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
         val startRecursion = inArithmetic == null
         if (startRecursion) {
-            return replaceChildren(children.map { it.flattenArithmetic(this is ArithmeticBastNode) })
+            val flattenedChildren = children.map { it.flattenArithmetic(this is ArithmeticBastNode) }
+            return replaceChildren(flattenedChildren)
         }
 
         val needsFlattening = inArithmetic && this is ArithmeticBastNode

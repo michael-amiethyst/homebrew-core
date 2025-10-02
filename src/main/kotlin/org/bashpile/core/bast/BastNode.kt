@@ -106,7 +106,7 @@ abstract class BastNode(
         return childrenSet
     }
 
-    /** Gets all nodes that match [condition] in this subtree */
+    // TODO rename to anyInTree... or just .any
     fun findInTree(condition: Predicate<BastNode>) : Boolean {
         return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
     }

@@ -23,7 +23,6 @@ class FinishedBastFactoryTest {
     fun setUp() {
         Main() // create for static state
         fixture = FinishedBastFactory()
-        FinishedBastFactory.unnestedCount = 0
     }
 
     @Test
@@ -60,7 +59,7 @@ class FinishedBastFactoryTest {
 
         val unnestedRoot = with(fixture) {
             log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-            val unnested = fixture._unnestSubshells(root)
+            val unnested = root.unnestSubshells()
             log.info("Mermaid Graph after unnest: {}", unnested.mermaidGraph())
             unnested
         }
@@ -91,7 +90,7 @@ class FinishedBastFactoryTest {
 
         val unnestedRoot: BastNode = with(fixture) {
             log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
-            val unnested: BastNode = fixture._unnestSubshells(root)
+            val unnested: BastNode = root.unnestSubshells()
             log.info("Mermaid Graph after unnest: {}", unnested.mermaidGraph())
             unnested
         }
