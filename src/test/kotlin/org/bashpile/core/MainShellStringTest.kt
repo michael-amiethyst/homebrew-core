@@ -65,7 +65,7 @@ class MainShellStringTest {
             $(printf "newline"; exit 1)
             set -euo pipefail
             
-            """.trimIndent(), fixture._getBast(script).linkChildren().render())
+            """.trimIndent(), fixture._getBast(script).render())
     }
 
     @Test

@@ -33,8 +33,7 @@ class FinishedBastFactory {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
         // flatten
-        val linkedBast = root.linkChildren()
-        val flattenedBast = linkedBast.flattenArithmetic()
+        val flattenedBast = root.flattenArithmetic()
         logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
 
         // unnest

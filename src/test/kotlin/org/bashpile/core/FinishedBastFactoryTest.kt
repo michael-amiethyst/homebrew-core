@@ -35,7 +35,7 @@ class FinishedBastFactoryTest {
         val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1")))
         shellString = shellString.replaceChildren(listOf(ls, subshell))
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
-        val root = InternalBastNode(printBastNode).linkChildren()
+        val root = InternalBastNode(printBastNode)
 
         log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
         val unnestedRoot = fixture._unnestSubshells(root)
@@ -63,7 +63,7 @@ class FinishedBastFactoryTest {
 
         // create parent of printNode and sibling
         val strictNode = ShellLineBastNode(listOf(LeafBastNode("set -euo pipefail")))
-        val root = InternalBastNode(listOf(strictNode, printBastNode)).linkChildren()
+        val root = InternalBastNode(listOf(strictNode, printBastNode))
 
         log.info("Mermaid Graph before unnest: {}", root.mermaidGraph())
         val unnestedRoot: BastNode = fixture._unnestSubshells(root)

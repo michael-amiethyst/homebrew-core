@@ -100,11 +100,6 @@ abstract class BastNode(
         return replaceChildren(this.children)
     }
 
-    fun linkChildren(parent: BastNode? = null): BastNode {
-        this.parent = parent
-        return replaceChildren(children.map { it.linkChildren(this) })
-    }
-
     /** Depth-first recursive collection of parents (path from root to node) */
     fun allParents(parentsList: List<BastNode> = listOf()): List<BastNode> {
         return if (parent != null) {
