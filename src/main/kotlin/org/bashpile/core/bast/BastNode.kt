@@ -31,6 +31,7 @@ abstract class BastNode(
         private set
 
     val children: List<BastNode>
+        // shallow copy
         get() = mutableChildren.toList()
 
     init {
