@@ -13,7 +13,7 @@ open class ShellStringBastNode(
     children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.STRING)
     : BastNode(children.toMutableList(), majorType = majorType), Subshell
 {
-    constructor(contents: String) : this(LeafBastNode(contents, TypeEnum.STRING).toList())
+    constructor(contents: String) : this(LeafBastNode(contents, TypeEnum.STRING).asList())
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")

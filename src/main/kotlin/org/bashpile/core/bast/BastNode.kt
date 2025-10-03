@@ -52,25 +52,19 @@ abstract class BastNode(
 
     // misc methods
 
-    fun toList(): List<BastNode> = listOf(this)
+    /** Converts this tree to a list */
+    fun toList(): List<BastNode> {
+        return asList() + children.flatMap { it.toList() }
+    }
+
+    /** Converts this node to a list of size 1 */
+    fun asList(): List<BastNode> = listOf(this)
 
     /**
      * Should be just string manipulation to make final Bashpile text, no logic.
      */
     open fun render(): String {
         return children.joinToString("") { it.render() }
-    }
-
-    /**
-     * Are all the leaves of the AST string literals?
-     * Used to ensure that string concatenation is possible.
-     */
-    fun areAllStrings(): Boolean {
-        return if (children.isEmpty()) {
-            this.coercesTo(TypeEnum.STRING)
-        } else {
-            children.all { it.areAllStrings() }
-        }
     }
 
     fun deepCopy(): BastNode {

@@ -1,30 +1,12 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.bast.types.BooleanLiteralBastNode
-import org.bashpile.core.bast.types.IntegerLiteralBastNode
 import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
 
 class BastNodeTest {
-
-    @Test
-    fun areAllStrings() {
-        val stringLiteral = StringLiteralBastNode("\"hello\"")
-        val intLiteral = IntegerLiteralBastNode(1.toBigInteger())
-        val booleanLiteral = BooleanLiteralBastNode(true)
-
-        assertTrue(stringLiteral.areAllStrings())
-        assertFalse(intLiteral.areAllStrings())
-        assertFalse(booleanLiteral.areAllStrings())
-
-        val listOfStringLiterals = InternalBastNode(listOf(stringLiteral, stringLiteral))
-        assertTrue(listOfStringLiterals.areAllStrings())
-
-        val listWithIntAndString = InternalBastNode(listOf(stringLiteral, intLiteral))
-        assertFalse(listWithIntAndString.areAllStrings())
-    }
 
     @Test
     fun deepCopyWorks() {

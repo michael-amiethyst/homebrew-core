@@ -9,5 +9,5 @@ open class StatementBastNode(children: List<BastNode> = listOf(), id: String? = 
 
     /** Takes a single node as a child */
     constructor(child: BastNode, id: String? = null, majorType: TypeEnum = UNKNOWN)
-            : this(child.toList(), id, majorType)
+            : this(child.asList(), id, majorType)
 }

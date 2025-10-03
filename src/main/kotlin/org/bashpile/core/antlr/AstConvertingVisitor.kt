@@ -41,7 +41,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
-        val statementNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
+        val statementNodes = ShellLineBastNode(STRICT_HEADER).asList() + ctx.children.map { visit(it) }
         return InternalBastNode(statementNodes)
     }
 
@@ -96,7 +96,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {
         check(ctx.childCount == 3)
         val child = visit(ctx.children[1])
-        return ParenthesisBastNode(child.toList(), child.majorType())
+        return ParenthesisBastNode(child.asList(), child.majorType())
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {
@@ -130,7 +130,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val left: BastNode = visit(ctx.children[0])
         val middle = visit(ctx.children[1])
         val right = visit(ctx.children[2])
-        return if (left.areAllStrings() && right.areAllStrings()) {
+        val areAllStrings =
+            left.toList().all { it.coercesTo(TypeEnum.STRING) } && right.toList().all { it.coercesTo(TypeEnum.STRING) }
+        return if (areAllStrings) {
             require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)
         } else if (left.majorType() == TypeEnum.INTEGER && right.majorType() == TypeEnum.INTEGER) {
@@ -150,7 +152,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val typecastTo = aastChildren[2].text
         val nextType = TypeEnum.valueOf(typecastTo.uppercase())
         val bastExpression = visit(aastChildren[0])
-        return InternalBastNode(bastExpression.toList(), nextType)
+        return InternalBastNode(bastExpression.asList(), nextType)
     }
 
     // Leaf nodes (parts of expressions)
