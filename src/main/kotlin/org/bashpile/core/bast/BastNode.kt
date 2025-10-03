@@ -120,11 +120,12 @@ abstract class BastNode(
     /** Mutates the children list of parent */
     fun replaceWith(replacement: BastNode): BastNode {
         check (mutable) { "Cannot use mutating call on frozen node, call thaw() first" }
-        val siblings = parent!!.mutableChildren
-        val nestedIndex = siblings.indexOf(this)
-        check (nestedIndex >= 0) { "Not found" }
+        check (parent != null) { "Cannot be called on root node" }
+
         replacement.parent = parent
-        siblings[nestedIndex] = replacement
-        return this
+
+        val myGeneration = parent!!.mutableChildren
+        myGeneration[myGeneration.indexOf(this)] = replacement
+        return parent!!
     }
 }
