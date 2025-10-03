@@ -20,6 +20,6 @@ class InternalBastNode(
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): InternalBastNode {
-        return InternalBastNode(nextChildren.map { it.deepCopy() }, majorType, renderSeparator)
+        return InternalBastNode(nextChildren.map { it.deepCopy() }, majorType(), renderSeparator)
     }
 }

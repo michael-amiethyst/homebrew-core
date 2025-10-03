@@ -6,6 +6,11 @@ import org.bashpile.core.BashpileParser.ExpressionContext
 
 
 /** Encapsulates Antlr API to preserve the Law of Demeter */
+fun BashpileParser.ForeachFileLineLoopStatementContext.statements(): List<BashpileParser.StatementContext> {
+    return indentedStatements().statement()
+}
+
+/** Encapsulates Antlr API to preserve the Law of Demeter */
 fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
     return argumentList().expression()
 }

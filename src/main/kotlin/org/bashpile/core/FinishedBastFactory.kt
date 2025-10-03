@@ -13,7 +13,7 @@ import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.types.VariableBastNode
+import org.bashpile.core.bast.types.VariableReferenceBastNode
 
 
 /**
@@ -22,19 +22,13 @@ import org.bashpile.core.bast.types.VariableBastNode
  */
 class FinishedBastFactory {
 
-    companion object {
-        internal var unnestedCount = 0
-        internal val unnestedCountLock = Any()
-    }
-
     private val logger = LogManager.getLogger(Main::javaClass)
 
     fun transform(root: BastNode): BastNode {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
         // flatten
-        val linkedBast = root.linkChildren()
-        val flattenedBast = linkedBast.flattenArithmetic()
+        val flattenedBast = root.flattenArithmetic()
         logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
 
         // unnest
@@ -47,7 +41,26 @@ class FinishedBastFactory {
         return looseBast
     }
 
-    private fun BastNode.unnestSubshells(): BastNode = _unnestSubshells(this)
+    @VisibleForTesting
+    internal fun BastNode.mermaidGraph(parentNodeName: String = "", mermaidNodeIds: HashMap<String, Int> = HashMap())
+    : String {
+        if (parentNodeName.isEmpty()) {
+            // initial case
+            mermaidNodeIds.clear()
+            return "graph TD;" + mermaidGraph("root")
+        } else {
+            // terminating cose: no children
+            var mermaid = ""
+            children.forEach { child ->
+                val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
+                val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
+                val nodeName = nodeTypeName + nodeId
+                mermaidNodeIds[nodeTypeName] = nodeId + 1
+                mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
+            }
+            return mermaid
+        }
+    }
 
     /**
      * Returns a list of preambles to support unnesting.
@@ -55,33 +68,36 @@ class FinishedBastFactory {
      * @see /documentation/contributing/unnest.md
      */
     @VisibleForTesting
-    @Suppress("functionName")
-    fun _unnestSubshells(bast: BastNode): BastNode {
-        synchronized(unnestedCountLock) {
-            return bast.replaceChildren(bast.children.flatMap { statementNode ->
-                val nestedSubshells = statementNode.allNodes().filter {
-                    it is Subshell
-                }.filter { subshells ->
-                    subshells.allParents().any { it is Subshell }
-                }
-                nestedSubshells.map { nestedSubshell ->
-                    val id = "__bp_var${unnestedCount++}"
-                    nestedSubshell.replaceWith(VariableBastNode(id, UNKNOWN))
-                    VariableDeclarationBastNode(
-                        id,
-                        UNKNOWN,
-                        child = ShellStringBastNode(nestedSubshell.children)
-                    )
-                } + statementNode
-            })
+    internal fun BastNode.unnestSubshells(): BastNode {
+        var unnestedCount = 0
+        val unnestedChildren = children.flatMap { statementNode ->
+            // the recursion is hidden in .allNodes(), it's linear from there
+            val nestedSubshells = statementNode.all().filter {
+                it is Subshell
+            }.filter { subshells ->
+                subshells.parents().any { it is Subshell }
+            }
+            val variableDeclarationBastNodes = nestedSubshells.map { nestedSubshell ->
+                val id = "__bp_var${unnestedCount++}"
+                nestedSubshell.thaw()
+                    .replaceWith(VariableReferenceBastNode(id, UNKNOWN))
+                    .freeze()
+                VariableDeclarationBastNode(
+                    id,
+                    UNKNOWN,
+                    child = ShellStringBastNode(nestedSubshell.children)
+                )
+            }
+            variableDeclarationBastNodes + statementNode
         }
+        return replaceChildren(unnestedChildren)
     }
 
     /** @return A loosened version of the input tree */
     private fun BastNode.loosenShellStrings(): BastNode {
         // no recursion
         val loosenedStatements = children.map {
-            val hasLooseShellStringBastNode = it.allNodes().any { child -> child is LooseShellStringBastNode }
+            val hasLooseShellStringBastNode = it.any { child -> child is LooseShellStringBastNode }
             if (hasLooseShellStringBastNode) {
                 InternalBastNode(
                     ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
@@ -95,18 +111,14 @@ class FinishedBastFactory {
     }
 
     /** Replaces nested arithmetic nodes with internal nodes */
-    private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
-        val startRecursion = inArithmetic == null
-        if (startRecursion) {
-            return replaceChildren(children.map { it.flattenArithmetic(this is ArithmeticBastNode) })
+    private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
+        val flattenedChildren = children.map {
+            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode)
         }
 
-        val needsFlattening = inArithmetic && this is ArithmeticBastNode
-        // terminal case is when children are empty
-        val flattenedChildren = children.map {
-            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode) }
-        return if (needsFlattening) {
-            InternalBastNode(flattenedChildren, majorType, " ")
+        return if (inArithmetic && this is ArithmeticBastNode) {
+            // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
+            InternalBastNode(flattenedChildren, majorType(), " ")
         } else {
             replaceChildren(flattenedChildren)
         }

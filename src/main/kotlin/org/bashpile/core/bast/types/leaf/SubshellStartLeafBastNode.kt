@@ -1,13 +1,9 @@
 package org.bashpile.core.bast.types.leaf
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.types.TypeEnum
 
-class SubshellStartLeafBastNode : LeafBastNode( SUBSHELL_START) {
-    companion object {
-        @JvmStatic
-        val SUBSHELL_START = "$("
-    }
-
+class SubshellStartLeafBastNode : LeafBastNode( "${'$'}{", TypeEnum.STRING) {
     override fun replaceChildren(nextChildren: List<BastNode>): SubshellStartLeafBastNode {
         return SubshellStartLeafBastNode()
     }

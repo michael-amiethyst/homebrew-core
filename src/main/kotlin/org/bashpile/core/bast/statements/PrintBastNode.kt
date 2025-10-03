@@ -33,12 +33,12 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     }
 
     private fun List<BastNode>.areNumbers(): Boolean {
-        val isInteger = any { it.majorType == INTEGER } &&
+        val isInteger = any { it.majorType() == INTEGER } &&
                 // will only be integer if all coerce to integers
-                map { it.majorType }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == INTEGER
+                map { it.majorType() }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == INTEGER
 
-        val isFloat = any { it.majorType == FLOAT } &&
-                map { it.majorType }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == FLOAT
+        val isFloat = any { it.majorType() == FLOAT } &&
+                map { it.majorType() }.fold(UNKNOWN) { acc, n -> acc.fold(n) } == FLOAT
         return isInteger || isFloat
     }
 }

@@ -1,6 +1,7 @@
 .gradle/
 .kotlin/
 build/
+src/main/build/**
 **/gen/**
 src/main/antlr/BashpileLexer.tokens
 !gradle/wrapper/gradle-wrapper.jar
