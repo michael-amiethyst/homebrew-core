@@ -99,16 +99,17 @@ abstract class BastNode(
         throw UnsupportedOperationException("Should be overridden in child class")
     }
 
-    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
-    fun allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
+    /** All nodes in this subtree */
+    fun all(): Set<BastNode> {
+        val childrenSet: MutableSet<BastNode> = mutableSetOf(this)
         childrenSet.addAll(children)
-        childrenSet.addAll(children.flatMap { it.allNodes() })
+        childrenSet.addAll(children.flatMap { it.all() })
         return childrenSet
     }
 
-    // TODO rename to anyInTree... or just .any
-    fun findInTree(condition: Predicate<BastNode>) : Boolean {
-        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
+    /** Returns true if any node in this subtree matches [condition] */
+    fun any(condition: Predicate<BastNode>) : Boolean {
+        return condition.test(this) || children.filter { it.any(condition) }.isNotEmpty()
     }
 
     // mutation related methods

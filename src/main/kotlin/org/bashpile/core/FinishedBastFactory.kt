@@ -72,7 +72,7 @@ class FinishedBastFactory {
         var unnestedCount = 0
         val unnestedChildren = children.flatMap { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
-            val nestedSubshells = statementNode.allNodes().filter {
+            val nestedSubshells = statementNode.all().filter {
                 it is Subshell
             }.filter { subshells ->
                 subshells.allParents().any { it is Subshell }
@@ -97,7 +97,7 @@ class FinishedBastFactory {
     private fun BastNode.loosenShellStrings(): BastNode {
         // no recursion
         val loosenedStatements = children.map {
-            val hasLooseShellStringBastNode = it.allNodes().any { child -> child is LooseShellStringBastNode }
+            val hasLooseShellStringBastNode = it.any { child -> child is LooseShellStringBastNode }
             if (hasLooseShellStringBastNode) {
                 InternalBastNode(
                     ShellLineBastNode("eval \"$${OLD_OPTIONS}\""),
