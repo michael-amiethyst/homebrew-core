@@ -1,6 +1,6 @@
 package org.bashpile.core.bast.statements
 
-import org.bashpile.core.Main
+import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.types.TypeEnum.EMPTY
@@ -12,31 +12,32 @@ import org.bashpile.core.runCommand
  */
 class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
-    val doubleQuotedfilepath: String,
-    val columns: List<VariableReferenceBastNode>) : BastNode(children.toMutableList()) {
-
+    val doubleQuotedFilepath: String,
+    val columns: List<VariableReferenceBastNode>) : StatementBastNode(children.toMutableList())
+{
     companion object {
         val sed: String = if ("which gsed".runCommand().second == SCRIPT_SUCCESS) "gsed" else "sed"
     }
 
     init {
-        require(!columns.map { it.id!! }.any { it.contains("\\s".toRegex())}) {
+        require(!columns.map { it.id!! }.any { it.contains("\\s".toRegex()) }) {
             "Whitespace not allowed in column names"
         }
-        check(doubleQuotedfilepath.startsWith("\"") || doubleQuotedfilepath.endsWith("\"")) {
+        check(doubleQuotedFilepath.startsWith("\"") || doubleQuotedFilepath.endsWith("\"")) {
             "Filepath should be quoted"
         }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBashNode {
-        return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, doubleQuotedfilepath, columns)
+        return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, doubleQuotedFilepath, columns)
     }
 
     override fun render(): String {
-        Main.callStack.use { state ->
-            state.pushStackframe()
+        callStack.use { stack ->
+            stack.pushStackframe()
+
             columns.forEach {
-                Main.callStack.addVariableInfo(it.id!!, it.majorType(), EMPTY, readonly = true)
+                callStack.addVariableInfo(it.id!!, it.majorType(), EMPTY, readonly = true)
             }
 
             val columnNamesJoined = columns.map { it.id }.joinToString(" ")
@@ -46,9 +47,9 @@ class ForeachFileLineLoopBashNode(
                 }.joinToString("\n", postfix = "\n")
             }
             val childRenders = childRenderList.joinToString("").removeSuffix("\n")
-            val ifs = if (doubleQuotedfilepath.endsWith(".csv\"")) "," else ""
+            val ifs = if (doubleQuotedFilepath.endsWith(".csv\"")) "," else ""
             return """
-                cat $doubleQuotedfilepath | ${mungeStream()} | while IFS='$ifs' read -r $columnNamesJoined; do
+                cat $doubleQuotedFilepath | ${mungeStream()} | while IFS='$ifs' read -r $columnNamesJoined; do
                 $childRenders
                 done
     
@@ -58,7 +59,7 @@ class ForeachFileLineLoopBashNode(
 
     private fun mungeStream(): String {
         // 1 (line) delete
-        val skipFirstLine = if (doubleQuotedfilepath.endsWith(".csv\"")) "-e '1d' " else ""
+        val skipFirstLine = if (doubleQuotedFilepath.endsWith(".csv\"")) "-e '1d' " else ""
         // remove all '\r'
         val convertWindowsLineEndings = "-e 's/\\r//g'"
 
