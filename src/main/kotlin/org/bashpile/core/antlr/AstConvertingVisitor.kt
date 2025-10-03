@@ -1,26 +1,14 @@
 package org.bashpile.core.antlr
 
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.expressions.FloatArithmeticBastNode
-import org.bashpile.core.bast.expressions.IntegerArithmeticBastNode
-import org.bashpile.core.bast.expressions.LooseShellStringBastNode
-import org.bashpile.core.bast.expressions.ParenthesisBastNode
-import org.bashpile.core.bast.expressions.ShellStringBastNode
-import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode
-import org.bashpile.core.bast.statements.PrintBastNode
-import org.bashpile.core.bast.statements.ReassignmentBastNode
-import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.bast.types.BooleanLiteralBastNode
-import org.bashpile.core.bast.types.FloatLiteralBastNode
-import org.bashpile.core.bast.types.IntegerLiteralBastNode
-import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.TypeEnum
-import org.bashpile.core.bast.types.VariableReferenceBastNode
+import org.bashpile.core.bast.expressions.*
+import org.bashpile.core.bast.statements.*
+import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode
@@ -190,11 +178,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
     }
 
+    /**
+     * Returns a LeafBastNode.  This is the catch-all when a more specific literal does not match.
+     * @see visitLiteral
+     * @see visitNumberExpression
+     */
     override fun visitTerminal(node: TerminalNode): BastNode {
-        return when (node.text) {
-            SubshellStartLeafBastNode.Companion.SUBSHELL_START -> SubshellStartLeafBastNode()
-            ClosingParenthesisLeafBastNode.Companion.CLOSING_PARENTHESIS -> ClosingParenthesisLeafBastNode()
-            else -> return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
+        return when (node.symbol.type) {
+            BashpileLexer.DollarOParen -> SubshellStartLeafBastNode()
+            BashpileLexer.CParen -> ClosingParenthesisLeafBastNode()
+            else -> LeafBastNode(
+                node.text.replace("^newline$".toRegex(), "\n"),
+                TypeEnum.STRING
+            )
         }
     }
 }

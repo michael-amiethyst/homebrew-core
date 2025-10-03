@@ -7,6 +7,7 @@ import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
+import org.bashpile.core.bast.types.TypeEnum.STRING
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -51,8 +52,8 @@ class FinishedBastFactoryTest {
     fun unnest_withPrint_works() {
         var printBastNode = PrintBastNode()
         var shellString = ShellStringBastNode()
-        val ls = LeafBastNode("ls ")
-        val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1")))
+        val ls = LeafBastNode("ls ", STRING)
+        val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1", STRING)))
         shellString = shellString.replaceChildren(listOf(ls, subshell))
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
         val root = InternalBastNode(printBastNode)
@@ -79,13 +80,13 @@ class FinishedBastFactoryTest {
         // create printNode
         var printBastNode = PrintBastNode()
         var shellString = ShellStringBastNode()
-        val ls = LeafBastNode("ls ")
-        val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1")))
+        val ls = LeafBastNode("ls ", STRING)
+        val subshell = ShellStringBastNode(listOf(LeafBastNode("echo '.'; exit 1", STRING)))
         shellString = shellString.replaceChildren(listOf(ls, subshell))
         printBastNode = printBastNode.replaceChildren(listOf(shellString))
 
         // create parent of printNode and sibling
-        val strictNode = ShellLineBastNode(listOf(LeafBastNode("set -euo pipefail")))
+        val strictNode = ShellLineBastNode(listOf(LeafBastNode("set -euo pipefail", STRING)))
         val root = InternalBastNode(listOf(strictNode, printBastNode))
 
         val unnestedRoot: BastNode = with(fixture) {

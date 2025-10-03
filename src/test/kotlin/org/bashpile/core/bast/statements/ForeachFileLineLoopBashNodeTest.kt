@@ -27,7 +27,7 @@ class ForeachFileLineLoopBashNodeTest {
     @Test
     fun render_withVariableDeclaration_works() {
         val child = VariableDeclarationBastNode(
-            "col1", STRING, TypeEnum.EMPTY, child = LeafBastNode("exampleValue"))
+            "col1", STRING, TypeEnum.EMPTY, child = LeafBastNode("exampleValue", STRING))
         val fixture = ForeachFileLineLoopBashNode(
             child.toList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(

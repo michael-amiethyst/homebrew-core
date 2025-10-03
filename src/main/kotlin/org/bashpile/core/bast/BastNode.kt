@@ -1,11 +1,10 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.Main.Companion.callStack
-import org.bashpile.core.bast.expressions.ShellStringBastNode
-import org.bashpile.core.bast.types.*
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.types.leaf.LeafBastNode
+import org.bashpile.core.bast.types.VariableTypeInfo
 import java.util.function.Predicate
 
 
@@ -68,10 +67,7 @@ abstract class BastNode(
      */
     fun areAllStrings(): Boolean {
         return if (children.isEmpty()) {
-            // make "stringy" tag interface if this next line exceeds 3 classes
-            val stringyBastNode = this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
-            val stringTypedNode = this is VariableReferenceBastNode && this.coercesTo(TypeEnum.STRING)
-            stringyBastNode || stringTypedNode
+            this.coercesTo(TypeEnum.STRING)
         } else {
             children.all { it.areAllStrings() }
         }

@@ -162,7 +162,7 @@ class MainArithmeticTest {
     @Test
     fun getBast_floatingPointArithmatic_shellStringAndParenthesis_works() {
         val bpScript: InputStream = """
-            print(#(expr 2 - 1) - (30 * .5))""".trimIndent().byteInputStream()
+            print(#(expr 2 - 1) as integer - (30 * .5))""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """

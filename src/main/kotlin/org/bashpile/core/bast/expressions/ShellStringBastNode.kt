@@ -10,10 +10,10 @@ import org.bashpile.core.bast.types.leaf.LeafBastNode
  * A full line of bash is a [org.bashpile.core.bast.statements.ShellLineBastNode].
  */
 open class ShellStringBastNode(
-    children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.UNKNOWN)
-    : BastNode(children.toMutableList(), majorType = majorType), Subshell {
-
-    constructor(contents: String) : this(LeafBastNode(contents).toList())
+    children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.STRING)
+    : BastNode(children.toMutableList(), majorType = majorType), Subshell
+{
+    constructor(contents: String) : this(LeafBastNode(contents, TypeEnum.STRING).toList())
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
