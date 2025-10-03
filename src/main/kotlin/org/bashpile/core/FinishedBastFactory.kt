@@ -111,18 +111,14 @@ class FinishedBastFactory {
     }
 
     /** Replaces nested arithmetic nodes with internal nodes */
-    private fun BastNode.flattenArithmetic(inArithmetic: Boolean? = null): BastNode {
-        val startRecursion = inArithmetic == null
-        if (startRecursion) {
-            val flattenedChildren = children.map { it.flattenArithmetic(this is ArithmeticBastNode) }
-            return replaceChildren(flattenedChildren)
-        }
-
+    private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
+        // TODO refactor out needsFlattening
         val needsFlattening = inArithmetic && this is ArithmeticBastNode
         // terminal case is when children are empty
         val flattenedChildren = children.map {
             it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode) }
         return if (needsFlattening) {
+            // replaces this type (ArithmeticBastNode) with a generic InternalBastNode
             InternalBastNode(flattenedChildren, majorType, " ")
         } else {
             replaceChildren(flattenedChildren)
