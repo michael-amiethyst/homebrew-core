@@ -75,7 +75,7 @@ class FinishedBastFactory {
             val nestedSubshells = statementNode.all().filter {
                 it is Subshell
             }.filter { subshells ->
-                subshells.allParents().any { it is Subshell }
+                subshells.parents().any { it is Subshell }
             }
             val variableDeclarationBastNodes = nestedSubshells.map { nestedSubshell ->
                 val id = "__bp_var${unnestedCount++}"

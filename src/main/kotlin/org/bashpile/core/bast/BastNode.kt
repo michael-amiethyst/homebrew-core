@@ -71,13 +71,15 @@ abstract class BastNode(
         return replaceChildren(this.children)
     }
 
-    /** Depth-first recursive collection of parents (path from root to node) */
-    fun allParents(parentsList: List<BastNode> = listOf()): List<BastNode> {
-        return if (parent != null) {
-            parent!!.allParents(parentsList) + parent
-        } else {
-            emptyList()
-        }.filter { it != null }.map { it!! }
+    /** Returns all parents starting from the bottom of the tree */
+    fun parents(): List<BastNode> {
+        if (parent == null) return emptyList()
+
+        val parents = mutableListOf(parent!!)
+        while (parents.last().parent != null) {
+            parents.add(parents.last().parent!!)
+        }
+        return parents.toList()
     }
 
     /**
