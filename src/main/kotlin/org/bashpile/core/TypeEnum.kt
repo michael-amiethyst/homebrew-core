@@ -1,4 +1,4 @@
-package org.bashpile.core.bast.types
+package org.bashpile.core
 
 enum class TypeEnum {
     /** Does not coerce to anything */

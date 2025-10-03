@@ -1,10 +1,10 @@
-package org.bashpile.core.bast.types.leaf
+package org.bashpile.core.bast.expressions.literals
 
+import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.TypeEnum
 
 /** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitTerminal] */
-// TODO 0.16.0 -- unify Leaf and Literal concepts, flatten this package and rename this class to `LiteralBastNode`.  Move TypeEnum, VariableRefereceBastNode and VariableTypeInfo to other packages
+// TODO 0.16.0 -- Rename Leaf classes to Terminals
 open class LeafBastNode(private val text: String, majorType: TypeEnum)
     : BastNode(mutableListOf(), majorType = majorType)
 {

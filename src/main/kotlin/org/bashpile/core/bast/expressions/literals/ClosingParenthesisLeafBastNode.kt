@@ -1,7 +1,7 @@
-package org.bashpile.core.bast.types.leaf
+package org.bashpile.core.bast.expressions.literals
 
+import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.TypeEnum
 
 class ClosingParenthesisLeafBastNode : LeafBastNode(")", TypeEnum.STRING) {
     override fun replaceChildren(nextChildren: List<BastNode>): ClosingParenthesisLeafBastNode {

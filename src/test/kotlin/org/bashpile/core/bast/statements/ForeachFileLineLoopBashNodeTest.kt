@@ -1,10 +1,10 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
-import org.bashpile.core.bast.types.TypeEnum
-import org.bashpile.core.bast.types.TypeEnum.STRING
-import org.bashpile.core.bast.types.VariableReferenceBastNode
-import org.bashpile.core.bast.types.leaf.LeafBastNode
+import org.bashpile.core.TypeEnum
+import org.bashpile.core.TypeEnum.STRING
+import org.bashpile.core.bast.expressions.VariableReferenceBastNode
+import org.bashpile.core.bast.expressions.literals.LeafBastNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

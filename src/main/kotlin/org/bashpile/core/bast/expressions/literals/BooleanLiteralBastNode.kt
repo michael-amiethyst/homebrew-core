@@ -1,5 +1,6 @@
-package org.bashpile.core.bast.types
+package org.bashpile.core.bast.expressions.literals
 
+import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 
 /** May be true or false, not null */

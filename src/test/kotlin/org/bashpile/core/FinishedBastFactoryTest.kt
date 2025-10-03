@@ -7,8 +7,8 @@ import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.bast.types.TypeEnum.STRING
-import org.bashpile.core.bast.types.leaf.LeafBastNode
+import org.bashpile.core.TypeEnum.STRING
+import org.bashpile.core.bast.expressions.literals.LeafBastNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
