@@ -8,4 +8,4 @@
 brew uninstall bashpile || true
 
 # install
-brew install --HEAD --verbose "${HOMEBREW_CELLAR:-/usr/local/Cellar}"/bashpile-local/Formula/bashpile.rb
+brew install --HEAD --verbose bashpile
