@@ -8,6 +8,8 @@ statement
     : Import StringValues                       # importStatement
     | ShellLine Newline                         # shellLineStatement
     | While expression Colon indentedStatements # whileStatement
+    | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements
+                                                # foreachFileLineLoopStatement
     | Function Id paramaters (Arrow complexType)?
                                                 # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)?

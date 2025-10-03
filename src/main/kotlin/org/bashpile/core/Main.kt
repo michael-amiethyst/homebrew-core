@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level.DEBUG
 import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.LoggerContext
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
@@ -23,7 +24,6 @@ import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.system.exitProcess
 
 
 fun main(args: Array<String>) = Main().main(args)
@@ -34,16 +34,16 @@ fun main(args: Array<String>) = Main().main(args)
  * This class is primarily responsible for parsing command line arguments.
  * See `SystemTest` in `src/intTest/kotlin` for systems integration tests.
  */
-// TODO emit shebang line on non-commandMode
 class Main : CliktCommand() {
 
     companion object {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.14.0"
+        const val VERSION = "0.15.0"
+        const val SHEBANG_HEADER = "#!/usr/bin/env bash\n\n"
         /** Singleton per Main() instance */
-        lateinit var bashpileState: BashpileState
+        lateinit var callStack: CallStack
     }
 
     /** Uses a backing field and a getter because setting in init block not supported by Clikt */
@@ -68,7 +68,7 @@ class Main : CliktCommand() {
     init {
         versionOption(VERSION, names = setOf("--version"), help = "Show the application version and exit.",
             message = { it })
-        bashpileState = BashpileState()
+        callStack = CallStack()
     }
 
     /**
@@ -91,7 +91,7 @@ class Main : CliktCommand() {
         logger.info(STARTUP_MESSAGE + scriptArgument) // first logging call after configureLogging() call
 
         // get and render the BAST tree
-        val script = if (!commandMode()) {
+        val script: String = if (!commandMode()) {
             Files.readString(scriptPath).stripShebang()
         } else commandOption.ifEmpty {
             // read all stdin lines
@@ -100,17 +100,19 @@ class Main : CliktCommand() {
         val bastRoot: BastNode = _getBast(script.byteInputStream())
         val bash: String = bastRoot.render()
         if (!commandMode()) {
-            echo(bash, false)
+            logger.debug("Writing to STDOUT in regular (non-command) mode")
+            echo(SHEBANG_HEADER + bash, false)
         } else {
+            logger.debug("Executing compiled command mode script")
             val commandResults = bash.runCommand()
             check(commandResults.second == SCRIPT_SUCCESS) {
                 "Compile failed with return code ${commandResults.second} and text:\n${commandResults.first}"
             }
+            logger.trace("Writing to STDOUT in command mode")
             echo(commandResults.first)
         }
 
-        // Sometimes the Clikt framework hangs without an explicit exit
-        exitProcess(SCRIPT_SUCCESS)
+        endProgram()
     }
 
     private fun commandMode(): Boolean = scriptArgument.isEmpty()
@@ -161,5 +163,14 @@ class Main : CliktCommand() {
         val context: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
         context.getLogger("org.bashpile").level = logbackLevel
         logger.debug(VERBOSE_ENABLED_MESSAGE)
+    }
+
+    /**
+     * We need to explicitly exit to avoid some Clikt hangs with nested [String.runCommand] calls.
+     */
+    private fun endProgram() {
+        logger.trace("Exiting Bashpile")
+        // Clikt calls System.exit(0) when it catches this "error"
+        throw CliktError(null, null, SCRIPT_SUCCESS, false)
     }
 }

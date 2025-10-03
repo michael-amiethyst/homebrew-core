@@ -1,31 +1,21 @@
 package org.bashpile.core.antlr
 
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.expressions.FloatArithmeticBastNode
-import org.bashpile.core.bast.expressions.IntegerArithmeticBastNode
-import org.bashpile.core.bast.expressions.LooseShellStringBastNode
-import org.bashpile.core.bast.expressions.ParenthesisBastNode
-import org.bashpile.core.bast.expressions.ShellStringBastNode
-import org.bashpile.core.bast.statements.PrintBastNode
-import org.bashpile.core.bast.statements.ReassignmentBastNode
-import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.bast.types.BooleanLiteralBastNode
-import org.bashpile.core.bast.types.FloatLiteralBastNode
-import org.bashpile.core.bast.types.IntegerLiteralBastNode
-import org.bashpile.core.bast.types.StringLiteralBastNode
-import org.bashpile.core.bast.types.TypeEnum
-import org.bashpile.core.bast.types.VariableBastNode
+import org.bashpile.core.bast.expressions.*
+import org.bashpile.core.bast.statements.*
+import org.bashpile.core.bast.types.*
 import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode
 import org.bashpile.core.bast.types.leaf.LeafBastNode
 import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
+ * Holds minimal logic; most logic is in the BAST nodes.
  * Created by [org.bashpile.core.Main].
  * Is in two major sections - Statements and Expressions.
  * Code is arranged from complex at the top to simple at the bottom.
@@ -51,12 +41,18 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitProgram(ctx: BashpileParser.ProgramContext): BastNode {
-        val statementNodes = ShellLineBastNode(STRICT_HEADER).toList() + ctx.children.map { visit(it) }
+        val statementNodes = ShellLineBastNode(STRICT_HEADER).asList() + ctx.children.map { visit(it) }
         return InternalBastNode(statementNodes)
     }
 
     override fun visitShellLineStatement(ctx: BashpileParser.ShellLineStatementContext): BastNode {
         return ShellLineBastNode(ctx.children.map { visit(it) })
+    }
+
+    override fun visitForeachFileLineLoopStatement(ctx: BashpileParser.ForeachFileLineLoopStatementContext): BastNode {
+        val children = ctx.statements().map { visit(it) }
+        val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
+        return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
     }
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
@@ -88,20 +84,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
         require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
-        return VariableBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
+        return VariableReferenceBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
     }
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
-        require(ctx.children.size == 1) { "TypedId must have exactly one child" }
         val primaryTypeString = ctx.majorType().text
         val typeEnum = TypeEnum.valueOf(primaryTypeString.uppercase())
-        return VariableBastNode(ctx.Id().text, typeEnum)
+        return VariableReferenceBastNode(ctx.Id().text, typeEnum)
     }
 
     override fun visitParenthesisExpression(ctx: BashpileParser.ParenthesisExpressionContext): BastNode {
         check(ctx.childCount == 3)
         val child = visit(ctx.children[1])
-        return ParenthesisBastNode(child.toList(), child.majorType)
+        return ParenthesisBastNode(child.asList(), child.majorType())
     }
 
     override fun visitLiteral(ctx: BashpileParser.LiteralContext): BastNode {
@@ -135,17 +130,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val left: BastNode = visit(ctx.children[0])
         val middle = visit(ctx.children[1])
         val right = visit(ctx.children[2])
-        return if (left.areAllStrings() && right.areAllStrings()) {
+        val areAllStrings =
+            left.toList().all { it.coercesTo(TypeEnum.STRING) } && right.toList().all { it.coercesTo(TypeEnum.STRING) }
+        return if (areAllStrings) {
             require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)
-        } else if (left.majorType == TypeEnum.INTEGER && right.majorType == TypeEnum.INTEGER) {
+        } else if (left.majorType() == TypeEnum.INTEGER && right.majorType() == TypeEnum.INTEGER) {
             IntegerArithmeticBastNode(left, middle, right)
-        } else if (left.majorType.coercesTo(TypeEnum.FLOAT) && right.majorType.coercesTo(TypeEnum.FLOAT)) {
+        } else if (left.coercesTo(TypeEnum.FLOAT) && right.coercesTo(TypeEnum.FLOAT)) {
             FloatArithmeticBastNode(left, middle, right)
         } else {
             throw UnsupportedOperationException(
                 "Only calculations on all Strings or all numbers are supported, " +
-                        "but found ${left.majorType} and ${right.majorType}")
+                        "but found ${left.majorType()} and ${right.majorType()}")
         }
     }
 
@@ -155,7 +152,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val typecastTo = aastChildren[2].text
         val nextType = TypeEnum.valueOf(typecastTo.uppercase())
         val bastExpression = visit(aastChildren[0])
-        return InternalBastNode(bastExpression.toList(), nextType)
+        return InternalBastNode(bastExpression.asList(), nextType)
     }
 
     // Leaf nodes (parts of expressions)
@@ -183,11 +180,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
     }
 
+    /**
+     * Returns a LeafBastNode.  This is the catch-all when a more specific literal does not match.
+     * @see visitLiteral
+     * @see visitNumberExpression
+     */
     override fun visitTerminal(node: TerminalNode): BastNode {
-        return when (node.text) {
-            SubshellStartLeafBastNode.Companion.SUBSHELL_START -> SubshellStartLeafBastNode()
-            ClosingParenthesisLeafBastNode.Companion.CLOSING_PARENTHESIS -> ClosingParenthesisLeafBastNode()
-            else -> return LeafBastNode(node.text.replace("^newline$".toRegex(), "\n"))
+        return when (node.symbol.type) {
+            BashpileLexer.DollarOParen -> SubshellStartLeafBastNode()
+            BashpileLexer.CParen -> ClosingParenthesisLeafBastNode()
+            else -> LeafBastNode(
+                node.text.replace("^newline$".toRegex(), "\n"),
+                TypeEnum.STRING
+            )
         }
     }
 }

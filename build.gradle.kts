@@ -22,12 +22,14 @@ plugins {
 }
 
 repositories {
+    google()
     mavenCentral()
 }
 
 dependencies {
     // kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
     // clikt
     implementation("com.github.ajalt.clikt:clikt:$cliktVersion")

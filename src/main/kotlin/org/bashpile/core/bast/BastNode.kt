@@ -1,11 +1,10 @@
 package org.bashpile.core.bast
 
+import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.antlr.AstConvertingVisitor
-import org.bashpile.core.Main.Companion.bashpileState
-import org.bashpile.core.bast.expressions.ShellStringBastNode
-import org.bashpile.core.bast.types.*
+import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.types.leaf.LeafBastNode
+import org.bashpile.core.bast.types.VariableTypeInfo
 import java.util.function.Predicate
 
 
@@ -13,42 +12,53 @@ import java.util.function.Predicate
  * The base class of the BAST class hierarchy.
  * Converts this AST and children to the Bashpile text output via [render].
  * The root is created by the [AstConvertingVisitor].
- * Sometimes the type of a node isn't known at creation time, so the type is on the call stack at [org.bashpile.core.BashpileState].
  */
 abstract class BastNode(
     protected val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
-    /** The type at creation time see class KDoc for more info */
-    val majorType: TypeEnum = UNKNOWN
+    /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
+    private val majorType: TypeEnum = UNKNOWN
 ) {
-    companion object {
-        private var mermaidNodeIds = HashMap<String, Int>()
-        private val mermaidNodeIdsLock = Any()
-    }
 
     /** Should only be null for the root of the AST */
     var parent: BastNode? = null
         private set
 
     val children: List<BastNode>
+        // shallow copy
         get() = mutableChildren.toList()
+
+    private var mutable = false
 
     init {
         children.forEach { it.parent = this }
     }
 
-    fun coercesTo(type: TypeEnum): Boolean = majorType.coercesTo(type)
+    ///////////////////////
+    // type related methods
+    ///////////////////////
 
-    fun resolvedMajorType(): TypeEnum {
+    fun coercesTo(type: TypeEnum): Boolean = majorType().coercesTo(type)
+
+    fun majorType(): TypeEnum {
         // check call stack, fall back on node's type
-        return bashpileState.variableInfo(id)?.majorType ?: majorType
+        return callStack.variableInfo(id)?.majorType ?: majorType
     }
 
-    fun variableInfo(): VariableTypeInfo? {
-        return bashpileState.variableInfo(id)
+    fun variableInfo(): VariableTypeInfo {
+        check(id != null) { "Tried to get variable info for null variable ID" }
+        return callStack.requireOnStack(id)
     }
 
-    fun toList(): List<BastNode> = listOf(this)
+    // misc methods
+
+    /** Converts this tree to a list */
+    fun toList(): List<BastNode> {
+        return asList() + children.flatMap { it.toList() }
+    }
+
+    /** Converts this node to a list of size 1 */
+    fun asList(): List<BastNode> = listOf(this)
 
     /**
      * Should be just string manipulation to make final Bashpile text, no logic.
@@ -57,65 +67,19 @@ abstract class BastNode(
         return children.joinToString("") { it.render() }
     }
 
-    fun mermaidGraph(parentNodeName: String = ""): String {
-        synchronized(mermaidNodeIdsLock) {
-            if (parentNodeName.isEmpty()) {
-                // initial case
-                mermaidNodeIds.clear()
-                return "graph TD;" + mermaidGraph("root")
-            } else {
-                // terminating cose: no children
-                var mermaid = ""
-                children.forEach { child ->
-                    val nodeTypeName = child::class.simpleName!!.removeSuffix("BastNode")
-                    val nodeId = mermaidNodeIds.getOrDefault(nodeTypeName, Integer.valueOf(0))
-                    val nodeName = nodeTypeName + nodeId
-                    mermaidNodeIds[nodeTypeName] = nodeId + 1
-                    mermaid += "$parentNodeName --> $nodeName;${child.mermaidGraph(nodeName)}"
-                }
-                return mermaid
-            }
-
-        }
-    }
-
-    /**
-     * Are all the leaves of the AST string literals?
-     * Used to ensure that string concatenation is possible.
-     */
-    fun areAllStrings(): Boolean {
-        return if (children.isEmpty()) {
-            this is StringLiteralBastNode || this is ShellStringBastNode || this is LeafBastNode
-        } else {
-            children.all { it.areAllStrings() }
-        }
-    }
-
     fun deepCopy(): BastNode {
         return replaceChildren(this.children)
     }
 
-    fun linkChildren(parent: BastNode? = null): BastNode {
-        this.parent = parent
-        return replaceChildren(children.map { it.linkChildren(this) })
-    }
+    /** Returns all parents starting from the bottom of the tree */
+    fun parents(): List<BastNode> {
+        if (parent == null) return emptyList()
 
-    /** Depth-first recursive collection of parents (path from root to node) */
-    fun allParents(parentsList: List<BastNode> = listOf()): List<BastNode> {
-        return if (parent != null) {
-            parent!!.allParents(parentsList) + parent
-        } else {
-            emptyList()
-        }.filter { it != null }.map { it!! }
-    }
-
-    /** Mutates the children list of parent */
-    fun replaceWith(replacement: BastNode) {
-        val siblings = parent!!.mutableChildren
-        val nestedIndex = siblings.indexOf(this)
-        check (nestedIndex >= 0) { "Not found" }
-        replacement.parent = parent
-        siblings[nestedIndex] = replacement
+        val parents = mutableListOf(parent!!)
+        while (parents.last().parent != null) {
+            parents.add(parents.last().parent!!)
+        }
+        return parents.toList()
     }
 
     /**
@@ -127,14 +91,41 @@ abstract class BastNode(
         throw UnsupportedOperationException("Should be overridden in child class")
     }
 
-    /** Self and all transitory children -- all nodes in the tree starting with self as the root */
-    fun allNodes(childrenSet: MutableSet<BastNode> = mutableSetOf(this)): Set<BastNode> {
+    /** All nodes in this subtree */
+    fun all(): Set<BastNode> {
+        val childrenSet: MutableSet<BastNode> = mutableSetOf(this)
         childrenSet.addAll(children)
-        childrenSet.addAll(children.flatMap { it.allNodes() })
+        childrenSet.addAll(children.flatMap { it.all() })
         return childrenSet
     }
 
-    fun findInTree(condition: Predicate<BastNode>) : Boolean {
-        return condition.test(this) || children.filter { it.findInTree(condition) }.isNotEmpty()
+    /** Returns true if any node in this subtree matches [condition] */
+    fun any(condition: Predicate<BastNode>) : Boolean {
+        return condition.test(this) || children.filter { it.any(condition) }.isNotEmpty()
+    }
+
+    // mutation related methods
+
+    /** Makes this node mutable */
+    fun thaw(): BastNode {
+        mutable = true
+        return this
+    }
+
+    fun freeze(): BastNode {
+        mutable = false
+        return this
+    }
+
+    /** Mutates the children list of parent */
+    fun replaceWith(replacement: BastNode): BastNode {
+        check (mutable) { "Cannot use mutating call on frozen node, call thaw() first" }
+        check (parent != null) { "Cannot be called on root node" }
+
+        replacement.parent = parent
+
+        val myGeneration = parent!!.mutableChildren
+        myGeneration[myGeneration.indexOf(this)] = replacement
+        return parent!!
     }
 }

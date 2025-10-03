@@ -3,7 +3,7 @@ class Bashpile < Formula
   version "0.13.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.14.0"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.15.0"
   head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
@@ -17,7 +17,7 @@ class Bashpile < Formula
   # depends_on "shellcheck"
 
   # tooling dependencies for generated scripts
-  # depends_on "gnu-sed"
+  depends_on "gnu-sed"
   depends_on "bc"
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
 

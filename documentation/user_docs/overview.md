@@ -60,7 +60,7 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
 * `print("Any String here")`, [print statements](statements/print-statements.md)
 * `"string" + "concatination"` [calculation expressions](expressions/calculation-expressions.md)
   * Integer and Floating Point arithmatic supported
-* [Types!](types.md)
+* [Types!](features/types.md)
 * `varName: str = "variable"` [variable declaration statements](statements/variable-declaration-statements.md)
   * `SOME_CONSTANT: readonly string = "const"`
   * `SOME_CONSTANT: readonly exported str = "const"` exported is the same as Bash's `export`
@@ -68,5 +68,5 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
   * `one: string = "1"`
   * `(one as integer) + 1`
 * `varName = "reassign"` [reassignment statements](statements/reassignment-statements.md)
-* Automatic [strict mode](strict-mode.md) handling
+* Automatic [strict mode](features/strict-mode.md) handling
   * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax

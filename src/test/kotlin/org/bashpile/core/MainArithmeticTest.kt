@@ -1,9 +1,9 @@
 package org.bashpile.core
 
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.InputStream
 
 
@@ -14,11 +14,6 @@ import java.io.InputStream
 class MainArithmeticTest {
 
     val fixture = Main()
-
-    @BeforeEach
-    fun setUp() {
-        FinishedBastFactory.unnestedCount = 0
-    }
 
     @Test
     fun getBast_basicArithmatic_works() {
@@ -166,9 +161,17 @@ class MainArithmeticTest {
     }
 
     @Test
-    fun getBast_floatingPointArithmatic_shellStringAndParenthesis_works() {
+    fun getBast_floatingPointArithmatic_shellStringAndParenthesis_throws() {
+        // ShellString is a... STRING
         val bpScript: InputStream = """
             print(#(expr 2 - 1) - (30 * .5))""".trimIndent().byteInputStream()
+        assertThrows<UnsupportedOperationException> { fixture._getBast(bpScript).render() }
+    }
+
+    @Test
+    fun getBast_floatingPointArithmatic_shellStringAndParenthesis_withTypecast_works() {
+        val bpScript: InputStream = """
+            print(#(expr 2 - 1) as integer - (30 * .5))""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
         assertEquals(
             STRICT_HEADER + """
