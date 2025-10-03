@@ -1,9 +1,11 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.Main
+import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.types.TypeEnum.EMPTY
 import org.bashpile.core.bast.types.VariableReferenceBastNode
+import org.bashpile.core.runCommand
 
 /**
  * for(FirstName: string, LastName: string in 'src/test/resources/example.csv')
@@ -12,6 +14,10 @@ class ForeachFileLineLoopBashNode(
     children: List<BastNode> = listOf(),
     val doubleQuotedfilepath: String,
     val columns: List<VariableReferenceBastNode>) : BastNode(children.toMutableList()) {
+
+    companion object {
+        val sed: String = if ("which gsed".runCommand().second == SCRIPT_SUCCESS) "gsed" else "sed"
+    }
 
     init {
         require(!columns.map { it.id!! }.any { it.contains("\\s".toRegex())}) {
@@ -62,7 +68,7 @@ class ForeachFileLineLoopBashNode(
                 -ze '/\n$/!s/$/\n$/g'""".trimIndent()
 
         // need to have two gsed calls due to the -z option
-        return "gsed ${skipFirstLine}${convertWindowsLineEndings} | gsed $appendTrailingNewline"
+        return "$sed ${skipFirstLine}${convertWindowsLineEndings} | $sed $appendTrailingNewline"
     }
 
     /** .trimIndent fails with $childRenders so we need to munge whitespace manually */

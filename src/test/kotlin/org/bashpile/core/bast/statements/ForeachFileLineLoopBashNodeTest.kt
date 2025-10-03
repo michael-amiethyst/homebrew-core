@@ -1,5 +1,6 @@
 package org.bashpile.core.bast.statements
 
+import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
 import org.bashpile.core.bast.types.TypeEnum
 import org.bashpile.core.bast.types.TypeEnum.STRING
 import org.bashpile.core.bast.types.VariableReferenceBastNode
@@ -15,7 +16,7 @@ class ForeachFileLineLoopBashNodeTest {
             child.toList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
-            cat "file.csv" | gsed -e '1d' -e 's/\r//g' | gsed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
+            cat "file.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
                 printf "${'$'}{col1}"
             done
 
@@ -31,7 +32,7 @@ class ForeachFileLineLoopBashNodeTest {
             child.toList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
             """
-            cat "file.csv" | gsed -e '1d' -e 's/\r//g' | gsed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
+            cat "file.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
                 declare col1
                 col1="exampleValue"
             done
