@@ -15,7 +15,7 @@ class VariableDeclarationBastNode(
 ) : StatementBastNode(child, id, type) {
 
     override fun render(): String {
-        Main.Companion.callStack.addVariableInfo(id!!, majorType, subtype, readonly)
+        Main.Companion.callStack.addVariableInfo(id!!, majorType(), subtype, readonly)
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
@@ -28,6 +28,6 @@ class VariableDeclarationBastNode(
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): VariableDeclarationBastNode {
-        return VariableDeclarationBastNode(id!!, majorType, subtype, readonly, export, nextChildren[0].deepCopy())
+        return VariableDeclarationBastNode(id!!, majorType(), subtype, readonly, export, nextChildren[0].deepCopy())
     }
 }

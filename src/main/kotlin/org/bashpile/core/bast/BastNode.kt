@@ -18,7 +18,7 @@ abstract class BastNode(
     protected val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
     /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
-    val majorType: TypeEnum = UNKNOWN
+    private val majorType: TypeEnum = UNKNOWN
 ) {
 
     /** Should only be null for the root of the AST */
@@ -39,9 +39,9 @@ abstract class BastNode(
     // type related methods
     ///////////////////////
 
-    fun coercesTo(type: TypeEnum): Boolean = resolvedMajorType().coercesTo(type)
+    fun coercesTo(type: TypeEnum): Boolean = majorType().coercesTo(type)
 
-    fun resolvedMajorType(): TypeEnum {
+    fun majorType(): TypeEnum {
         // check call stack, fall back on node's type
         return callStack.variableInfo(id)?.majorType ?: majorType
     }

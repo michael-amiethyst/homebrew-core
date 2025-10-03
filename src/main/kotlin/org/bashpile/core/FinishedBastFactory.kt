@@ -118,7 +118,7 @@ class FinishedBastFactory {
 
         return if (inArithmetic && this is ArithmeticBastNode) {
             // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
-            InternalBastNode(flattenedChildren, majorType, " ")
+            InternalBastNode(flattenedChildren, majorType(), " ")
         } else {
             replaceChildren(flattenedChildren)
         }

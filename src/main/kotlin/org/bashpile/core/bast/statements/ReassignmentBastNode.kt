@@ -9,7 +9,7 @@ class ReassignmentBastNode(id: String, child: BastNode) : StatementBastNode(chil
         // guard
         val varInfo = variableInfo()
         check(!varInfo.readonly) { "Tried to reassign readonly variable: $id" }
-        val assignType = children[0].resolvedMajorType()
+        val assignType = children[0].majorType()
         check(varInfo.coercesTo(assignType)) {
             "Tried to reassign variable of type ${varInfo.majorType} to $assignType: $id"
         }

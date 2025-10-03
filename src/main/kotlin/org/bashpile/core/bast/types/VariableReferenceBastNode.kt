@@ -11,6 +11,6 @@ class VariableReferenceBastNode(id: String, majorType: TypeEnum) : BastNode(muta
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): VariableReferenceBastNode {
-        return VariableReferenceBastNode(id!!, majorType)
+        return VariableReferenceBastNode(id!!, majorType())
     }
 }

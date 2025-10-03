@@ -21,6 +21,6 @@ open class ShellStringBastNode(
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
-        return ShellStringBastNode(nextChildren.map { it.deepCopy() }, majorType)
+        return ShellStringBastNode(nextChildren.map { it.deepCopy() }, majorType())
     }
 }

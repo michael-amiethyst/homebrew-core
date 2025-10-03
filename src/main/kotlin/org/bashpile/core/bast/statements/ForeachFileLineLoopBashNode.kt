@@ -36,7 +36,7 @@ class ForeachFileLineLoopBashNode(
         Main.callStack.use { state ->
             state.pushStackframe()
             columns.forEach {
-                Main.callStack.addVariableInfo(it.id!!, it.majorType, EMPTY, readonly = true)
+                Main.callStack.addVariableInfo(it.id!!, it.majorType(), EMPTY, readonly = true)
             }
 
             val columnNamesJoined = columns.map { it.id }.joinToString(" ")
