@@ -4,14 +4,18 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
+import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
+import org.bashpile.core.bast.expressions.literals.BooleanLiteralBastNode
+import org.bashpile.core.bast.expressions.literals.FloatLiteralBastNode
+import org.bashpile.core.bast.expressions.literals.IntegerLiteralBastNode
+import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
 import org.bashpile.core.bast.statements.*
-import org.bashpile.core.bast.types.*
-import org.bashpile.core.bast.types.leaf.ClosingParenthesisLeafBastNode
-import org.bashpile.core.bast.types.leaf.LeafBastNode
-import org.bashpile.core.bast.types.leaf.SubshellStartLeafBastNode
+import org.bashpile.core.bast.expressions.literals.ClosingParenthesisTerminalBastNode
+import org.bashpile.core.bast.expressions.literals.TerminalBastNode
+import org.bashpile.core.bast.expressions.literals.SubshellStartTerminalBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
@@ -168,8 +172,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {
         val bastChildren = ctx.children.map { visit(it) }
         val isNestedSubshell = bastChildren.size == 3
-                && bastChildren[0] is SubshellStartLeafBastNode
-                && bastChildren[2] is ClosingParenthesisLeafBastNode
+                && bastChildren[0] is SubshellStartTerminalBastNode
+                && bastChildren[2] is ClosingParenthesisTerminalBastNode
         return if (bastChildren.size == 1) {
             bastChildren[0]
         } else if (isNestedSubshell) {
@@ -181,15 +185,15 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     /**
-     * Returns a LeafBastNode.  This is the catch-all when a more specific literal does not match.
+     * Returns a TerminalBastNode.  This is the catch-all when a more specific literal does not match.
      * @see visitLiteral
      * @see visitNumberExpression
      */
     override fun visitTerminal(node: TerminalNode): BastNode {
-        return when (node.symbol.type) {
-            BashpileLexer.DollarOParen -> SubshellStartLeafBastNode()
-            BashpileLexer.CParen -> ClosingParenthesisLeafBastNode()
-            else -> LeafBastNode(
+        return when (node.typeIndex()) {
+            BashpileLexer.DollarOParen -> SubshellStartTerminalBastNode()
+            BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
+            else -> TerminalBastNode(
                 node.text.replace("^newline$".toRegex(), "\n"),
                 TypeEnum.STRING
             )

@@ -1,8 +1,5 @@
 package org.bashpile.core
 
-import org.bashpile.core.bast.types.TypeEnum
-import org.bashpile.core.bast.types.VariableTypeInfo
-
 
 typealias Stackframe = MutableList<VariableTypeInfo>
 

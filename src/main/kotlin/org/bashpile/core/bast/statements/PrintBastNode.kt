@@ -1,9 +1,9 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.TypeEnum.FLOAT
-import org.bashpile.core.bast.types.TypeEnum.INTEGER
-import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
+import org.bashpile.core.TypeEnum.FLOAT
+import org.bashpile.core.TypeEnum.INTEGER
+import org.bashpile.core.TypeEnum.UNKNOWN
 
 /** This is a Print Statement node */
 class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
