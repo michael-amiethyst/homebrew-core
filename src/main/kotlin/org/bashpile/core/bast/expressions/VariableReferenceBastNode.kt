@@ -1,13 +1,13 @@
 package org.bashpile.core.bast.expressions
 
-import org.bashpile.core.Main
+import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 
 class VariableReferenceBastNode(id: String, majorType: TypeEnum) : BastNode(mutableListOf(), id, majorType) {
 
     override fun render(): String {
-        Main.Companion.callStack.requireOnStack(id!!)
+        callStack.requireOnStack(id!!)
         return "${'$'}{$id}"
     }
 
