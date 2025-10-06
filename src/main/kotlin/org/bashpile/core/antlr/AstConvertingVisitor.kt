@@ -190,8 +190,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
      * @see visitNumberExpression
      */
     override fun visitTerminal(node: TerminalNode): BastNode {
-        // TODO 0.16.0 - Make nodeType extension function
-        return when (node.symbol.type) {
+        return when (node.typeIndex()) {
             BashpileLexer.DollarOParen -> SubshellStartTerminalBastNode()
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
             else -> TerminalBastNode(
