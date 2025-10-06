@@ -71,9 +71,4 @@ class ForeachFileLineLoopBashNode(
         // need to have two gsed calls due to the -z option
         return "$sed ${skipFirstLine}${convertWindowsLineEndings} | $sed $appendTrailingNewline"
     }
-
-    /** .trimIndent fails with $childRenders so we need to munge whitespace manually */
-    private fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
-        it.removePrefix(trim)
-    }.joinToString("\n", postfix = "\n")
 }

@@ -20,7 +20,7 @@ class ConditionalBastNode(val condition: BastNode, val blockBodies: List<List<Ba
             $renderedIfBody
             fi
             
-            """.trimIndent()
+            """.trimScriptIndent("            ")
         } else { """
             if [ ${condition.render()} ]; then
             $renderedIfBody
@@ -28,7 +28,7 @@ class ConditionalBastNode(val condition: BastNode, val blockBodies: List<List<Ba
             $renderedElseBody
             fi
             
-            """.trimIndent()
+            """.trimScriptIndent("            ")
         }
     }
 }
