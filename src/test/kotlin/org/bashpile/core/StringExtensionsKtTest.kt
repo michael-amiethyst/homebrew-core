@@ -62,13 +62,12 @@ class StringExtensionsKtTest {
     fun runCommand_withIf_works() {
         val result = """
             $STRICT_HEADER
-            FILENAME=src/test/resources/data/example.csv
-            if [[ -e ${'$'}FILENAME ]]; then
-                printf "File Exists\n"
+            if [[ 1 -ge 0 ]]; then
+                printf "Math is mathing\n"
             fi
         """.trimIndent().runCommand()
         assertEquals("""
-            File Exists
+            Math is mathing
             
         """.trimIndent(), result.first)
         assertEquals(SCRIPT_SUCCESS, result.second)
