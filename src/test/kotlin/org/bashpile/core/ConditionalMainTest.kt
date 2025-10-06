@@ -20,5 +20,32 @@ class ConditionalMainTest {
             fi
             
         """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Math is mathing\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifElseStatement_works() {
+        val renderedBash = fixture._getBast("""
+            zero: integer = 0
+            if (1 < zero):
+                print("Math is not mathing\n")
+            else:
+                print("Math is mathing\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(STRICT_HEADER + """
+            declare zero
+            zero="0"
+            if [ 1 -lt "${'$'}{zero}" ]; then
+                printf "Math is not mathing\n"
+            else
+                printf "Math is mathing\n"
+            fi
+            
+        """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Math is mathing\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 }

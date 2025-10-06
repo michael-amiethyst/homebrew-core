@@ -61,9 +61,15 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {
         val condition = visit(ctx.expression())
-        check(ctx.indentedStatements().size == 1)
-        val body = ctx.indentedStatements(0).statement().map { visit(it) }
-        return ConditionalBastNode(condition, body)
+        val blockBodiesSize = ctx.indentedStatements().size
+        check(blockBodiesSize <= 2)
+        val ifBody = ctx.indentedStatements(0).statement().map { visit(it) }
+        val blockBodies = mutableListOf(ifBody)
+        if (blockBodiesSize == 2) {
+            val elseBody = ctx.indentedStatements().last().statement().map { visit(it) }
+            blockBodies += elseBody
+        }
+        return ConditionalBastNode(condition, blockBodies)
     }
 
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
