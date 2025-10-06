@@ -14,4 +14,5 @@
 * 0.13.1 - ReplaceChildren does deepcopy for all BastNodes, minor refactors
 * 0.14.0 - `-c` option to read string or from stdin
 * 0.15.0 - Foreach file-line loops, lexical scoping
-* 0.16.0 - if statements
+* 0.16.0 - Internal package refactoring
+* 0.17.0 - if statements
