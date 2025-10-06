@@ -34,7 +34,6 @@ Map      : 'map';
 Reference: 'reference';
 
 Function : 'function';
-Block    : 'block';
 Return   : 'return';
 Print    : 'print';
 BoolValues: 'true' | 'false';

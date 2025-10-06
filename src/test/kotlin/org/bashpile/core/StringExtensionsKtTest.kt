@@ -62,7 +62,7 @@ class StringExtensionsKtTest {
     fun runCommand_withIf_works() {
         val result = """
             $STRICT_HEADER
-            if [[ 1 -ge 0 ]]; then
+            if [ 1 -ge 0 ]; then
                 printf "Math is mathing\n"
             fi
         """.trimIndent().runCommand()

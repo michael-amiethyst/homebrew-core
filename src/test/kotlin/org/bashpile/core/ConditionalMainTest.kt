@@ -11,11 +11,11 @@ class ConditionalMainTest {
     @Test
     fun ifStatement_works() {
         val renderedBash = fixture._getBast("""
-            if(1 > 0):
+            if 1 > 0:
                 print("Math is mathing\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(STRICT_HEADER + """
-            if [[ 1 -gt 0 ]]; then
+            if [ 1 -gt 0 ]; then
                 printf "Math is mathing\n"
             fi
             

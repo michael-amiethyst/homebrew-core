@@ -59,6 +59,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
     }
 
+    override fun visitConditionalStatement(ctx: BashpileParser.ConditionalStatementContext): BastNode {
+        val condition = visit(ctx.expression())
+        check(ctx.indentedStatements().size == 1)
+        val body = ctx.indentedStatements(0).statement().map { visit(it) }
+        return ConditionalBastNode(condition, body)
+    }
+
     override fun visitVariableDeclarationStatement(ctx: BashpileParser.VariableDeclarationStatementContext): BastNode {
         val node = visit(ctx.expression())
         val readonly = ctx.modifiers().any { it.text == "readonly" }
@@ -148,6 +155,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
                 "Only calculations on all Strings or all numbers are supported, " +
                         "but found ${left.majorType()} and ${right.majorType()}")
         }
+    }
+
+    override fun visitBinaryPrimaryExpression(ctx: BashpileParser.BinaryPrimaryExpressionContext): BastNode {
+        return BinaryPrimaryBastNode(
+            visit(ctx.expression(0)), ctx.binaryPrimary().text, visit(ctx.expression(1)))
     }
 
     override fun visitTypecastExpression(ctx: BashpileParser.TypecastExpressionContext): BastNode {

@@ -8,13 +8,13 @@ statement
     : Import StringValues                       # importStatement
     | ShellLine Newline                         # shellLineStatement
     | While expression Colon indentedStatements # whileStatement
+    // TODO 0.17.0 -- remove OPanen and CParen
     | For OParen typedId (Comma typedId)* In StringValues CParen Colon indentedStatements
                                                 # foreachFileLineLoopStatement
     | Function Id paramaters (Arrow complexType)?
                                                 # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)?
                             Colon functionBlock # functionDeclarationStatement
-    | Block tags? Colon functionBlock           # anonymousBlockStatement
     | If expression Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
     | Switch expression Colon INDENT (Case expression Colon indentedStatements)+ DEDENT
