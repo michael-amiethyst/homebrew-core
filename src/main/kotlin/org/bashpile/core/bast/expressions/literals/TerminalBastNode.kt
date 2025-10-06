@@ -1,0 +1,17 @@
+package org.bashpile.core.bast.expressions.literals
+
+import org.bashpile.core.TypeEnum
+import org.bashpile.core.bast.BastNode
+
+/** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitTerminal] */
+open class TerminalBastNode(private val text: String, majorType: TypeEnum)
+    : BastNode(mutableListOf(), majorType = majorType)
+{
+    override fun render(): String {
+        return text
+    }
+
+    override fun replaceChildren(nextChildren: List<BastNode>): TerminalBastNode {
+        return TerminalBastNode(text, majorType())
+    }
+}

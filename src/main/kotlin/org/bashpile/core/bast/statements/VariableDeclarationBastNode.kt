@@ -2,7 +2,7 @@ package org.bashpile.core.bast.statements
 
 import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.types.TypeEnum
+import org.bashpile.core.TypeEnum
 
 /** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(

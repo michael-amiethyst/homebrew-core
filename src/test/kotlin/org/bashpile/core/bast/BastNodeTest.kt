@@ -1,6 +1,6 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.bast.types.StringLiteralBastNode
+import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test

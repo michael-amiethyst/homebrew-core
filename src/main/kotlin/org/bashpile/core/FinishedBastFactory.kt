@@ -6,14 +6,13 @@ import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.Subshell
 import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.bast.types.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.types.VariableReferenceBastNode
+import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 
 
 /**

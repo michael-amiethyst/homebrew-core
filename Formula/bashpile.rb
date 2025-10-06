@@ -3,7 +3,7 @@ class Bashpile < Formula
   version "0.13.0"
   homepage "https://github.com/michael-amiethyst/homebrew-core"
   license "MIT"
-  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.15.0"
+  url "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "main", tag: "0.16.0"
   head "https://github.com/michael-amiethyst/homebrew-core", using: :git, branch: "development"
 
   # foundational dependencies
@@ -33,7 +33,6 @@ class Bashpile < Formula
   def caveats
     <<~EOS
       Ensure the installed Bash is at least version 5 and is the default Bash.
-      (OSX/FreeBSD only) Ensure that gnu-getopt is installed and the default `getopt` as well. 
     EOS
   end
 end
