@@ -22,11 +22,11 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
         val formattedBodiesRenders = blockBodies.map { block ->
             block.joinToString("\n") { "    " + it.render() }.removeSuffix("\n")
         }
-        // TODO move bracket render into BinaryPrimaryBastNode
+        // TODO move $() render into ShellString.render
         val renderedConditions = conditions.map { condition ->
             if (condition is ShellStringBastNode) {
                 condition.renderRaw()
-            } else { "[ ${condition.render()} ]" }
+            } else { condition.render() }
         }
         val renderedIfBody = formattedBodiesRenders.first()
         return when (formattedBodiesRenders.size) {

@@ -31,6 +31,6 @@ class BinaryPrimaryBastNode(val left: BastNode, val operator: String, val right:
                 else -> throw IllegalStateException("Unknown operator: $operator")
             }
         }
-        return "$leftRender $translatedOperator $rightRender"
+        return "[ $leftRender $translatedOperator $rightRender ]"
     }
 }
