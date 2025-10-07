@@ -36,7 +36,7 @@ typedId     : Id Colon modifier* complexType;
 complexType : types (LessThan types MoreThan)?;
 modifier    : Exported | Readonly;
 argumentList: expression (Comma expression)*;
-elseIfClauses     : ElseIf OParen Not? expression CParen Colon indentedStatements;
+elseIfClauses     : Else If OParen Not? expression CParen Colon indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 assignmentOperator: Equals | PlusEquals;
 
