@@ -1,10 +1,9 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.expressions.ShellStringBastNode
 
 class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>)
-    : StatementBastNode(mutableListOf())
+    : StatementBastNode(conditions + blockBodies.flatMap { it })
 {
     init {
         // conditions may only be equal to or one less than blockBodies
@@ -22,12 +21,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
         val formattedBodiesRenders = blockBodies.map { block ->
             block.joinToString("\n") { "    " + it.render() }.removeSuffix("\n")
         }
-        // TODO move $() render into ShellString.render
-        val renderedConditions = conditions.map { condition ->
-            if (condition is ShellStringBastNode) {
-                condition.renderRaw()
-            } else { condition.render() }
-        }
+        val renderedConditions = conditions.map { it.render() }
         val renderedIfBody = formattedBodiesRenders.first()
         return when (formattedBodiesRenders.size) {
             1 -> { """
