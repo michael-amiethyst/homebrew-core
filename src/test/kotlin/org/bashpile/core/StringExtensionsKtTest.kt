@@ -1,5 +1,6 @@
 package org.bashpile.core
 
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -52,6 +53,21 @@ class StringExtensionsKtTest {
             Alice Smith alice.smith@email.com 555-1234
             Bob Johnson bob.j@email.com 555-5678
             Charlie Williams c.williams@email.com 555-9012
+            
+        """.trimIndent(), result.first)
+        assertEquals(SCRIPT_SUCCESS, result.second)
+    }
+
+    @Test
+    fun runCommand_withIf_works() {
+        val result = """
+            $STRICT_HEADER
+            if [ 1 -ge 0 ]; then
+                printf "Math is mathing\n"
+            fi
+        """.trimIndent().runCommand()
+        assertEquals("""
+            Math is mathing
             
         """.trimIndent(), result.first)
         assertEquals(SCRIPT_SUCCESS, result.second)

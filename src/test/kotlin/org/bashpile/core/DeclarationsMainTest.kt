@@ -10,7 +10,7 @@ import java.io.InputStream
 /**
  * Tests Declarations, Assignments and Typing
  */
-class MainDeclarationsTest {
+class DeclarationsMainTest {
 
     var fixture = Main()
 

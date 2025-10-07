@@ -11,7 +11,7 @@ import java.io.InputStream
  * Tests Clikt and [Main._getBast], does not test logging.
  * See SystemTest for logger framework tests.
  */
-class MainArithmeticTest {
+class ArithmeticMainTest {
 
     val fixture = Main()
 
@@ -48,6 +48,22 @@ class MainArithmeticTest {
     }
 
     @Test
+    fun getBast_basicArithmatic_division_works() {
+        val bpScript: InputStream = """
+            print(6 / 4)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+            printf "%s" "$((6 / 4))"
+            
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("1\n", results.first)
+    }
+
+    @Test
     fun getBast_basicArithmatic_withTypecast_works() {
         val bpScript: InputStream = """
                 one: string = "1"
@@ -64,6 +80,28 @@ class MainArithmeticTest {
         val results = render.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
         assertEquals("0\n", results.first)
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withTypecast_andFloatAssignToInt_works() {
+        val bpScript: InputStream = """
+                four: string = "4"
+                i: integer = 6 / four as integer
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+                declare four
+                four="4"
+                declare i
+                i="$((6 / ${'$'}{four}))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("1\n", results.first)
     }
 
     /** We don't double-check the user */
