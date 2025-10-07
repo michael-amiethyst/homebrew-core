@@ -1,5 +1,6 @@
 package org.bashpile.core.bast.statements
 
+import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
 
 class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>)
@@ -19,9 +20,12 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
 
     override fun render(): String {
         val formattedBodiesRenders = blockBodies.map { block ->
-            block.flatMap { statement ->
-                statement.render().lines().map { "    $it" }
-            }.joinToString("\n").removeSuffix("\n")
+            callStack.use { stack ->
+                stack.pushStackframe()
+                block.flatMap { statement ->
+                    statement.render().lines().map { "    $it" }
+                }.joinToString("\n").removeSuffix("\n")
+            }
         }
         val renderedConditions = conditions.map { it.render() }
         val renderedIfBody = formattedBodiesRenders.first()
