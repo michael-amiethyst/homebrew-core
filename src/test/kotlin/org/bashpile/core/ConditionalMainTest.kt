@@ -107,6 +107,41 @@ class ConditionalMainTest {
     }
 
     @Test
+    fun ifElseIfElseStatement_scopingWorks() {
+        val renderedBash = fixture._getBast("""
+            zero: integer = 0
+            if (1 < zero):
+                print("Math is not mathing\n")
+            else if (zero < 1):
+                math: string = "Math"
+                print(math + " is mathing! ")
+                print(math + " is mathing!\n")
+            else:
+                print("Zero is one???\n")
+            print(math)
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(STRICT_HEADER + """
+            declare zero
+            zero="0"
+            if [ 1 -lt "${'$'}{zero}" ]; then
+                printf "Math is not mathing\n"
+            elif [ "${'$'}{zero}" -lt 1 ]; then
+                declare math
+                math="Math"
+                printf "${'$'}{math} is mathing! "
+                printf "${'$'}{math} is mathing!\n"
+            else
+                printf "Zero is one???\n"
+            fi
+            printf "${'$'}{math}"
+            
+        """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Math is mathing! Math is mathing!\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
     fun ifElseIfElseStatement_withShellStringInElseIf_works() {
         val renderedBash = fixture._getBast("""
             zero: integer = 0
