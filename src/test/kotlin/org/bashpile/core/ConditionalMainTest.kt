@@ -53,18 +53,17 @@ class ConditionalMainTest {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO fix if statement with shell string (should be no []'s in render)
     @Test
     fun ifElseStatement_withFailedShellString_works() {
         val renderedBash = fixture._getBast("""
-            if (#(expr 1 > 0; exit $SCRIPT_ERROR__GENERIC)):
+            if (#((expr 1 \> 0; exit $SCRIPT_ERROR__GENERIC) > /dev/null)):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(STRICT_HEADER + """
-            if [ $(expr 1 > 0; exit $SCRIPT_ERROR__GENERIC) ]; then
+            if (expr 1 \> 0; exit $SCRIPT_ERROR__GENERIC) > /dev/null; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else

@@ -1,6 +1,7 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.expressions.ShellStringBastNode
 
 class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>)
     : StatementBastNode(mutableListOf())
@@ -21,11 +22,14 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
         val formattedBodiesRenders = blockBodies.map { block ->
             block.joinToString("\n") { "    " + it.render() }.removeSuffix("\n")
         }
-        val renderedIfCondition = conditions.first().render()
+        val ifCondition = conditions.first()
+        val renderedIfCondition = if (ifCondition is ShellStringBastNode) {
+            ifCondition.renderRaw()
+        } else { "[ ${ifCondition.render()} ]" }
         val renderedIfBody = formattedBodiesRenders.first()
         return when (formattedBodiesRenders.size) {
             1 -> { """
-                if [ $renderedIfCondition ]; then
+                if $renderedIfCondition; then
                 $renderedIfBody
                 fi
                 
@@ -34,7 +38,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
             2 -> {
                 val renderedElseBody = formattedBodiesRenders.last()
                 """
-                if [ $renderedIfCondition ]; then
+                if $renderedIfCondition; then
                 $renderedIfBody
                 else
                 $renderedElseBody
@@ -47,6 +51,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
                 val elseIfs: List<String> = formattedBodiesRenders.subList(1, formattedBodiesRenders.size - 1)
                 val renderedElseIfBlocks: String = elseIfs.mapIndexed { index, it ->
                     // offset by one to skip the initial if condition
+                    // TODO take brackets off of renderedElseIfCondition
                     val renderedElseIfCondition = conditions[index + 1].render()
                     """
                     elif [ $renderedElseIfCondition ]; then
@@ -55,7 +60,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
                 }.joinToString("\n")
                 val renderedElseBody = formattedBodiesRenders.last()
                 """
-                if [ $renderedIfCondition ]; then
+                if $renderedIfCondition; then
                 $renderedIfBody
                 $renderedElseIfBlocks
                 else

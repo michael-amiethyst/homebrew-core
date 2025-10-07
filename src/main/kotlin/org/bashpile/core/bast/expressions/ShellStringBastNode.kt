@@ -16,8 +16,11 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
     constructor(contents: String) : this(TerminalBastNode(contents, STRING).asList())
 
     override fun render(): String {
-        val childRenders = children.map { it.render() }.joinToString("")
-        return "$($childRenders)"
+        return "$(${renderRaw()})"
+    }
+
+    fun renderRaw(): String {
+        return children.map { it.render() }.joinToString("")
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
