@@ -22,14 +22,16 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
         val formattedBodiesRenders = blockBodies.map { block ->
             block.joinToString("\n") { "    " + it.render() }.removeSuffix("\n")
         }
-        val ifCondition = conditions.first()
-        val renderedIfCondition = if (ifCondition is ShellStringBastNode) {
-            ifCondition.renderRaw()
-        } else { "[ ${ifCondition.render()} ]" }
+        // TODO move bracket render into BinaryPrimaryBastNode
+        val renderedConditions = conditions.map { condition ->
+            if (condition is ShellStringBastNode) {
+                condition.renderRaw()
+            } else { "[ ${condition.render()} ]" }
+        }
         val renderedIfBody = formattedBodiesRenders.first()
         return when (formattedBodiesRenders.size) {
             1 -> { """
-                if $renderedIfCondition; then
+                if ${renderedConditions.first()}; then
                 $renderedIfBody
                 fi
                 
@@ -38,7 +40,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
             2 -> {
                 val renderedElseBody = formattedBodiesRenders.last()
                 """
-                if $renderedIfCondition; then
+                if ${renderedConditions.first()}; then
                 $renderedIfBody
                 else
                 $renderedElseBody
@@ -51,16 +53,15 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
                 val elseIfs: List<String> = formattedBodiesRenders.subList(1, formattedBodiesRenders.size - 1)
                 val renderedElseIfBlocks: String = elseIfs.mapIndexed { index, it ->
                     // offset by one to skip the initial if condition
-                    // TODO take brackets off of renderedElseIfCondition
-                    val renderedElseIfCondition = conditions[index + 1].render()
+                    val renderedElseIfCondition = renderedConditions[index + 1]
                     """
-                    elif [ $renderedElseIfCondition ]; then
+                    elif $renderedElseIfCondition; then
                     $it
                     """.trimScriptIndent("                    ")
                 }.joinToString("\n")
                 val renderedElseBody = formattedBodiesRenders.last()
                 """
-                if $renderedIfCondition; then
+                if ${renderedConditions.first()}; then
                 $renderedIfBody
                 $renderedElseIfBlocks
                 else
