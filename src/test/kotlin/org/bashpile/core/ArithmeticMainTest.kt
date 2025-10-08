@@ -134,6 +134,8 @@ class ArithmeticMainTest {
         assertEquals("0\n", results.first)
     }
 
+    // TODO write tests for unary operators like ++ and --
+
     @Test
     fun getBast_complexArithmatic_works() {
         val bpScript: InputStream = """

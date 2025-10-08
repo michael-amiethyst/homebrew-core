@@ -12,7 +12,7 @@ class UnaryPrimaryBastNode(private val operator: String, private val rightExpres
         } else { rightExpression.render() }
         val bashOperator = when (operator) {
             "isEmpty" -> "-z"
-            // Future operators can be supported here (isNotEmpty, exists, etc.)
+            "isNotEmpty" -> "-n"
             else -> throw IllegalStateException("Unknown unary operator: $operator")
         }
         return "[ $bashOperator $rightRendered ]"

@@ -53,6 +53,33 @@ class ConditionalMainTest {
     }
 
     @Test
+    fun ifStatement_isNotEmpty_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = "hello"
+            if (isNotEmpty name):
+                print("Not empty\n")
+            else:
+                print("Empty\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(STRICT_HEADER + """
+            declare name
+            name="hello"
+            if [ -n "${'$'}{name}" ]; then
+                printf "Not empty\n"
+            else
+                printf "Empty\n"
+            fi
+    
+        """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Not empty\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    // TODO write tests for exists, doesNotExist
+    // TODO write tests for fileExists, regularFileExists, directoryExists
+
+    @Test
     fun ifElseStatement_works() {
         val renderedBash = fixture._getBast("""
             zero: integer = 0

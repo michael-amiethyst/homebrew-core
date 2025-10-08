@@ -57,7 +57,6 @@ Import   : 'import';
 OParen  : '(';
 // closing parenthesis
 CParen  : ')';
-// unary minus (minus defined below)
 Increment: '++';
 Decrement: '--';
 Not     : 'not';
@@ -78,8 +77,6 @@ LessThan: '<';
 LessThanOrEquals: '<=';
 MoreThan: '>';
 MoreThanOrEquals: '>=';
-IsStrictlyEqual: '===';
-InNotStrictlyEqual: '!==';
 IsEqual : '==';
 IsNotEqual : '!=';
 And     : 'and';
