@@ -391,4 +391,29 @@ class ConditionalMainTest : MainTest() {
         assertEquals("Math is mathing!\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
+
+    @Test
+    fun ifElseStatement_withAndOr_floats_works() {
+        val renderedBash = fixture._getBast("""
+            if (1.0 < 2.0 and 2.0 <= 1.0 or #(bc <<< "2.0 < 3.0" > /dev/null)):
+                print("Math is mathing!\n")
+            else:
+                print("Command failed\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || bc <<< "2.0 < 3.0" > /dev/null; then
+                printf "Math is mathing!\n"
+            else
+                printf "Command failed\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Math is mathing!\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    // TODO write test for booleans
 }

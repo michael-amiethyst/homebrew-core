@@ -104,6 +104,8 @@ class ArithmeticMainTest : MainTest() {
         Assertions.assertEquals("1\n", results.first)
     }
 
+    // TODO make sure float division works
+
     /** We don't double-check the user */
     @Test
     fun getBast_basicArithmatic_withBadTypecast_works() {
