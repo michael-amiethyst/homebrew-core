@@ -29,6 +29,30 @@ class ConditionalMainTest {
     }
 
     @Test
+    fun ifStatement_isEmpty_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            if (isEmpty name):
+                print("Empty\n")
+            else:
+                print("Not empty\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(STRICT_HEADER + """
+            declare name
+            name=""
+            if [ -z "${'$'}{name}" ]; then
+                printf "Empty\n"
+            else
+                printf "Not empty\n"
+            fi
+            
+        """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Empty\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
     fun ifElseStatement_works() {
         val renderedBash = fixture._getBast("""
             zero: integer = 0
