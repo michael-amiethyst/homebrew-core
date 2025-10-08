@@ -11,9 +11,7 @@ import java.io.InputStream
  * Tests Clikt and [Main._getBast], does not test logging.
  * See SystemTest for logger framework tests.
  */
-class ArithmeticMainTest {
-
-    val fixture = Main()
+class ArithmeticMainTest : MainTest() {
 
     @Test
     fun getBast_basicArithmatic_works() {

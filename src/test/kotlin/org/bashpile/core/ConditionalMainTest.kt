@@ -5,9 +5,7 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ConditionalMainTest {
-
-    val fixture = Main()
+class ConditionalMainTest : MainTest() {
 
     @Test
     fun ifStatement_works() {

@@ -11,9 +11,7 @@ import java.io.InputStream
 /**
  * Tests Shell Strings and Shell Lines
  */
-class ShellStringMainTest {
-
-    val fixture = Main()
+class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_shellLine_printf_works() {

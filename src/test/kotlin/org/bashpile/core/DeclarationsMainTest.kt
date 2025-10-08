@@ -2,7 +2,6 @@ package org.bashpile.core
 
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
@@ -10,14 +9,7 @@ import java.io.InputStream
 /**
  * Tests Declarations, Assignments and Typing
  */
-class DeclarationsMainTest {
-
-    var fixture = Main()
-
-    @BeforeEach
-    fun setUp() {
-        fixture = Main()
-    }
+class DeclarationsMainTest : MainTest() {
 
     @Test
     fun getBast_declare_bool_works() {

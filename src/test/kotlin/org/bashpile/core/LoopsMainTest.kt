@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 
-class LoopsMainTest {
-
-    val fixture = Main()
+class LoopsMainTest : MainTest() {
 
     @Test
     fun foreach_fileLine_works() {
