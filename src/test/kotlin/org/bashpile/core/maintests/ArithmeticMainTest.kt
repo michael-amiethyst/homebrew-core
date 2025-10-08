@@ -1,14 +1,16 @@
-package org.bashpile.core
+package org.bashpile.core.maintests
 
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.bashpile.core.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.SCRIPT_SUCCESS
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.runCommand
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.InputStream
 
-
 /**
- * Tests Clikt and [Main._getBast], does not test logging.
+ * Tests Clikt and [org.bashpile.core.Main._getBast], does not test logging.
  * See SystemTest for logger framework tests.
  */
 class ArithmeticMainTest : MainTest() {
@@ -18,15 +20,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1 + 1)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "%s" "$((1 + 1))"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("2\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("2\n", results.first)
     }
 
     @Test
@@ -34,15 +36,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1 - 1)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "%s" "$((1 - 1))"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("0\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("0\n", results.first)
     }
 
     @Test
@@ -50,15 +52,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(6 / 4)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "%s" "$((6 / 4))"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("1\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("1\n", results.first)
     }
 
     @Test
@@ -67,8 +69,8 @@ class ArithmeticMainTest : MainTest() {
                 one: string = "1"
                 print(1 - one as integer)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
                 declare one
                 one="1"
                 printf "%s" "$((1 - ${'$'}{one}))"
@@ -76,8 +78,8 @@ class ArithmeticMainTest : MainTest() {
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("0\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("0\n", results.first)
     }
 
     @Test
@@ -87,8 +89,8 @@ class ArithmeticMainTest : MainTest() {
                 i: integer = 6 / four as integer
                 print(i)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
                 declare four
                 four="4"
                 declare i
@@ -98,8 +100,8 @@ class ArithmeticMainTest : MainTest() {
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("1\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("1\n", results.first)
     }
 
     /** We don't double-check the user */
@@ -110,7 +112,7 @@ class ArithmeticMainTest : MainTest() {
                 print(1 - one as integer)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
         val results = render.runCommand()
-        assertEquals(SCRIPT_ERROR__GENERIC, results.second)
+        Assertions.assertEquals(SCRIPT_ERROR__GENERIC, results.second)
     }
 
     @Test
@@ -119,8 +121,8 @@ class ArithmeticMainTest : MainTest() {
                 one: string = "1"
                 print(1 - (one as integer))""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
                 declare one
                 one="1"
                 printf "%s" "$((1 - (${'$'}{one})))"
@@ -128,8 +130,8 @@ class ArithmeticMainTest : MainTest() {
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("0\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("0\n", results.first)
     }
 
     // TODO write tests for unary operators like ++ and --
@@ -139,15 +141,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1 - (5 * 6))""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "%s" "$((1 - (5 * 6)))"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("-29\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("-29\n", results.first)
     }
 
     @Test
@@ -155,15 +157,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1.0 + .5)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "%s" "$(bc <<< "1.0 + 0.5")"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("1.5\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("1.5\n", results.first)
     }
 
     @Test
@@ -171,15 +173,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1.0 - (30 * .5))""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
                 printf "%s" "$(bc <<< "1.0 - (30 * 0.5)")"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("-14.0\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("-14.0\n", results.first)
     }
 
     @Test
@@ -187,15 +189,15 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1.0 - 30 * .5)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
                 printf "%s" "$(bc <<< "1.0 - 30 * 0.5")"
             
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("-14.0\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("-14.0\n", results.first)
     }
 
     @Test
@@ -211,8 +213,8 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(#(expr 2 - 1) as integer - (30 * .5))""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render()
-        assertEquals(
-            STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare __bp_var0
             __bp_var0="$(expr 2 - 1)"
             printf "%s" "$(bc <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
@@ -220,7 +222,7 @@ class ArithmeticMainTest : MainTest() {
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("-14.0\n", results.first)
+        Assertions.assertEquals(SCRIPT_SUCCESS, results.second)
+        Assertions.assertEquals("-14.0\n", results.first)
     }
 }

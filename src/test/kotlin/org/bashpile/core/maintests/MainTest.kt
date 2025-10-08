@@ -1,5 +1,6 @@
-package org.bashpile.core
+package org.bashpile.core.maintests
 
+import org.bashpile.core.Main
 import kotlin.test.BeforeTest
 
 open class MainTest {

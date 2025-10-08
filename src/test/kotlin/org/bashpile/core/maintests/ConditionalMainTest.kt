@@ -1,6 +1,9 @@
-package org.bashpile.core
+package org.bashpile.core.maintests
 
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
+import org.bashpile.core.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.SCRIPT_SUCCESS
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.runCommand
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,13 +17,15 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             if [ 1 -gt 0 ]; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Math is mathing! Math is mathing!\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -35,7 +40,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Not empty\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare name
             name=""
             if [ -z "${'$'}{name}" ]; then
@@ -44,7 +50,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Not empty\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Empty\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -59,7 +66,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Empty\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare name
             name="hello"
             if [ -n "${'$'}{name}" ]; then
@@ -68,7 +76,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Empty\n"
             fi
     
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Not empty\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -86,7 +95,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -97,7 +107,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Unknown\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("File exists\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -115,7 +126,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -126,7 +138,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Unknown\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("File does not exist\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -145,7 +158,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -156,7 +170,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Unknown\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("File does not exist\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -175,7 +190,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -186,7 +202,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Unknown\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("File exists\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -202,7 +219,8 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare zero
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
@@ -212,7 +230,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Math is mathing!\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Math is mathing! Math is mathing!\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -221,21 +240,23 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withFailedShellString_works() {
         val renderedBash = fixture._getBast("""
-            if (#((expr 1 \> 0; exit $SCRIPT_ERROR__GENERIC) > /dev/null)):
+            if (#((expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) > /dev/null)):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
-            if (expr 1 \> 0; exit $SCRIPT_ERROR__GENERIC) > /dev/null; then
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) > /dev/null; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Command failed\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -253,7 +274,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Zero is one???\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare zero
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
@@ -265,7 +287,8 @@ class ConditionalMainTest : MainTest() {
                 printf "Zero is one???\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Math is mathing! Math is mathing!\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
@@ -303,7 +326,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Zero is one???\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(STRICT_HEADER + """
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare zero
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
@@ -315,9 +339,35 @@ class ConditionalMainTest : MainTest() {
                 printf "Zero is one???\n"
             fi
             
-        """.trimIndent(), renderedBash)
+        """.trimIndent(), renderedBash
+        )
         val commandResult = renderedBash.runCommand()
         assertEquals("Math is mathing! Math is mathing!\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifElseStatement_withAnd_works() {
+        val renderedBash = fixture._getBast("""
+            if (1 < 2 and 2 <= 3):
+                print("Math is mathing! ")
+                print("Math is mathing!\n")
+            else:
+                print("Command failed\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            if [ 1 -lt 2 ] && [ 2 -le 3 ]; then
+                printf "Math is mathing! "
+                printf "Math is mathing!\n"
+            else
+                printf "Command failed\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Command failed\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 }
