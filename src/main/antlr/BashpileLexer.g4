@@ -85,6 +85,9 @@ And     : 'and';
 Or      : 'or';
 Equals  : '=';
 PlusEquals: '+=';
+BashUnaryOperator: '-a' | '-b' | '-c' | '-d' | '-e' | '-f' | '-g' | '-h' | '-k' | '-n' | '-o' | '-p'
+|  '-r' | '-s' | '-t' | '-u' | '-v' | '-w' | '-x' | '-z'
+| '-G' | '-L' | '-N' | '-O' | '-R' | '-S';
 
 // shell lines using Semantic Predicate
 ShellLine   : {isLinuxCommand(_input)}? (Id Equals (NumberValues | StringValues))* Id SHELL_LINE_WORD*;

@@ -36,7 +36,7 @@ typedId     : Id Colon modifier* complexType;
 complexType : types (LessThan types MoreThan)?;
 modifier    : Exported | Readonly;
 argumentList: expression (Comma expression)*;
-elseIfClauses     : Else If OParen Not? expression CParen Colon indentedStatements;
+elseIfClauses     : Else If OParen expression CParen Colon indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 assignmentOperator: Equals | PlusEquals;
 
@@ -53,7 +53,7 @@ expression
     | expression op=(Increment | Decrement)
                                         # unaryPostCrementExpression
     | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
-    | <assoc=right> unaryPrimary expression
+    | <assoc=right> Not? unaryPrimary expression
                                         # unaryPrimaryExpression
     | <assoc=right> expression As complexType # typecastExpression
     | shellString                       # shellStringExpression
@@ -87,7 +87,8 @@ shellStringContents: DollarOParen shellStringContents* CParen
                    | ShellStringEscapeSequence;
 
 // full list at https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html
-unaryPrimary: Not | Exists | DoesNotExist | IsEmpty | NotEmpty | FileExists | RegularFileExists | DirectoryExists;
+unaryPrimary: BashUnaryOperator | IsEmpty | NotEmpty
+| Exists | DoesNotExist | FileExists | RegularFileExists | DirectoryExists;
 
 // one line means logically equal precidence (e.g. LessThan in the same as MoreThanOrEquals)
 binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqual | IsNotEqual;

@@ -3,16 +3,15 @@ package org.bashpile.core.bast.expressions
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 
-class UnaryPrimaryBastNode(private val operator: String, private val rightExpression: BastNode)
-    : BastNode(mutableListOf(rightExpression), majorType = TypeEnum.BOOLEAN) {
-
-    companion object {
-        val BASH_UNARY_OPERATORS = listOf(
-            "-a", "-b", "-c", "-d", "-e", "-f", "-g", "-h", "-k", "-n", "-o", "-p", "-r", "-s", "-t", "-u", "-v", "-w", "-x", "-z",
-            "-G", "-L", "-N", "-O", "-R", "-S")
-    }
-
+class UnaryPrimaryBastNode(
+    private val inverted: Boolean, private val operator: String, private val rightExpression: BastNode)
+    : BastNode(mutableListOf(rightExpression), majorType = TypeEnum.BOOLEAN)
+{
     override fun render(): String {
+        check(!(inverted && operator == "isNotEmpty")) { "Use 'isEmpty' instead of 'not isNotEmpty'" }
+        check(!(inverted && operator == "doesNotExist")) { "Use 'exists' instead of 'not doesNotExist'" }
+
+        val not = if (inverted) "! " else ""
         val rightRendered = if (rightExpression is VariableReferenceBastNode) {
             "\"${rightExpression.render()}\""
         } else { rightExpression.render() }
@@ -23,16 +22,14 @@ class UnaryPrimaryBastNode(private val operator: String, private val rightExpres
             // file operators
             "exists" -> "-e"
             "doesNotExist" -> "! -e"
-            else -> {
-                // accept any Bash unary operator
-                check(BASH_UNARY_OPERATORS.contains(operator)) { "Unknown unary operator: $operator" }
-                operator
-            }
+            // for native Bash operators
+            else -> operator
         }
-        return "[ $bashOperator $rightRendered ]"
+
+        return "[ ${not}$bashOperator $rightRendered ]"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return UnaryPrimaryBastNode(operator, rightExpression.deepCopy())
+        return UnaryPrimaryBastNode(inverted, operator, rightExpression.deepCopy())
     }
 }

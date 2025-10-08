@@ -162,9 +162,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitUnaryPrimaryExpression(ctx: BashpileParser.UnaryPrimaryExpressionContext): BastNode {
+        val inverted = ctx.Not() != null
         val operator = ctx.unaryPrimary().text
         val right = visit(ctx.expression())
-        return UnaryPrimaryBastNode(operator, right)
+        return UnaryPrimaryBastNode(inverted, operator, right)
     }
 
     override fun visitBinaryPrimaryExpression(ctx: BashpileParser.BinaryPrimaryExpressionContext): BastNode {

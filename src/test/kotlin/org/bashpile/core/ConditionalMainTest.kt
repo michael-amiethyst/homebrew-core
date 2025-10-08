@@ -134,7 +134,65 @@ class ConditionalMainTest {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO write tests for regular bash unary operators like -f, -d, -r, -w, -x
+    /** Tests for a native '-e' */
+    @Test
+    fun ifStatement_bashExists_works() {
+        val filename = "src/test/resources/data/exampleNonExistentFilename.csv"
+        val renderedBash = fixture._getBast("""
+            filename: string = "$filename"
+            if (-e filename):
+                print("File exists\n")
+            else if (not -e filename):
+                print("File does not exist\n")
+            else:
+                print("Unknown\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(STRICT_HEADER + """
+            declare filename
+            filename="$filename"
+            if [ -e "${'$'}{filename}" ]; then
+                printf "File exists\n"
+            elif [ ! -e "${'$'}{filename}" ]; then
+                printf "File does not exist\n"
+            else
+                printf "Unknown\n"
+            fi
+            
+        """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("File does not exist\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    /** Tests for a native '-e' */
+    @Test
+    fun ifStatement_bashNotExists_works() {
+        val filename = "src/test/resources/data/example.csv"
+        val renderedBash = fixture._getBast("""
+            filename: string = "$filename"
+            if (-e filename):
+                print("File exists\n")
+            else if (not -e filename):
+                print("File does not exist\n")
+            else:
+                print("Unknown\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(STRICT_HEADER + """
+            declare filename
+            filename="$filename"
+            if [ -e "${'$'}{filename}" ]; then
+                printf "File exists\n"
+            elif [ ! -e "${'$'}{filename}" ]; then
+                printf "File does not exist\n"
+            else
+                printf "Unknown\n"
+            fi
+            
+        """.trimIndent(), renderedBash)
+        val commandResult = renderedBash.runCommand()
+        assertEquals("File exists\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
 
     // TODO write tests for fileExists, regularFileExists, directoryExists
 
