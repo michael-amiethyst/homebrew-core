@@ -11,7 +11,7 @@ class FloatArithmeticBastNode(children: List<BastNode> = listOf())
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString(" ")
-        return "$(bc <<< \"$childRenders\")"
+        return "$(bc -l <<< \"$childRenders\")"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): FloatArithmeticBastNode {
