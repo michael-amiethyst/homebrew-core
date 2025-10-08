@@ -34,12 +34,10 @@ Map      : 'map';
 Reference: 'reference';
 
 Function : 'function';
-Block    : 'block';
 Return   : 'return';
 Print    : 'print';
 BoolValues: 'true' | 'false';
 If       : 'if';
-ElseIf   : 'else-if';
 Else     : 'else';
 Switch   : 'switch';
 Case     : 'case';

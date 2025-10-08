@@ -70,3 +70,4 @@ Prerequisite: don't have the Homebrew version installed.  Run `brew uninstall ba
 * `varName = "reassign"` [reassignment statements](statements/reassignment-statements.md)
 * Automatic [strict mode](features/strict-mode.md) handling
   * Opt out (e.g. for a 3rd party script) with `##(command line)` syntax
+* [If-else if-else statements](statements/if-statements.md)

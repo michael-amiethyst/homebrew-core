@@ -128,4 +128,11 @@ abstract class BastNode(
         myGeneration[myGeneration.indexOf(this)] = replacement
         return parent!!
     }
+
+    // extension methods
+
+    /** .trimIndent fails with $childRenders so we need to munge whitespace manually */
+    protected fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
+        it.removePrefix(trim)
+    }.joinToString("\n", postfix = "\n")
 }

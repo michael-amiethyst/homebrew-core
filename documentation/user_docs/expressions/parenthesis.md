@@ -1,5 +1,5 @@
 # Parenthesis Expressions
 
-Used for precedence grouping, not as a Bash subshell
+Parentheses are used for precedence grouping for Bashpile, not as a Bash subshell.
 
-TODO
+Redundant ones are ignored and discarded

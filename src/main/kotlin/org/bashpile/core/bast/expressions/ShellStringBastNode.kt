@@ -5,6 +5,7 @@ import org.bashpile.core.Subshell
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
+import org.bashpile.core.bast.statements.ConditionalBastNode
 
 /**
  * A Shell String is the Bashpile equivalent of a Bash subshell (i.e., $() syntax).  It represents an expression.
@@ -17,7 +18,9 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
-        return "$($childRenders)"
+        return if (parent is ConditionalBastNode) {
+            childRenders
+        } else { "$($childRenders)" }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {

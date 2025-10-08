@@ -14,8 +14,7 @@ statement
                                                 # functionForwardDeclarationStatement
     | Function Id paramaters tags? (Arrow complexType)?
                             Colon functionBlock # functionDeclarationStatement
-    | Block tags? Colon functionBlock           # anonymousBlockStatement
-    | If expression Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
+    | If OParen expression CParen Colon indentedStatements (elseIfClauses)* (Else Colon indentedStatements)?
                                                 # conditionalStatement
     | Switch expression Colon INDENT (Case expression Colon indentedStatements)+ DEDENT
                                                 # switchStatement
@@ -37,7 +36,7 @@ typedId     : Id Colon modifier* complexType;
 complexType : types (LessThan types MoreThan)?;
 modifier    : Exported | Readonly;
 argumentList: expression (Comma expression)*;
-elseIfClauses     : ElseIf Not? expression Colon indentedStatements;
+elseIfClauses     : Else If OParen Not? expression CParen Colon indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 assignmentOperator: Equals | PlusEquals;
 

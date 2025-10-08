@@ -11,7 +11,7 @@ import java.io.InputStream
 /**
  * Tests Shell Strings and Shell Lines
  */
-class MainShellStringTest {
+class ShellStringMainTest {
 
     val fixture = Main()
 
