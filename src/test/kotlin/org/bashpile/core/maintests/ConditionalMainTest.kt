@@ -415,5 +415,33 @@ class ConditionalMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO write test for booleans
+    @Test
+    fun ifElseStatement_withBooleans_works() {
+        val renderedBash = fixture._getBast("""
+            a: boolean = true
+            if (a and false):
+                print("Both true\n")
+            else if (a or false):
+                print("At least one true\n")
+            else:
+                print("Neither true\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare a
+            a="true"
+            if ${'$'}{a} && false; then
+                printf "Both true\n"
+            elif ${'$'}{a} || false; then
+                printf "At least one true\n"
+            else
+                printf "Neither true\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("At least one true\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
 }
