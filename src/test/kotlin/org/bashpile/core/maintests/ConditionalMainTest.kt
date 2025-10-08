@@ -350,7 +350,6 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withAnd_works() {
         val renderedBash = fixture._getBast("""
             if (1 < 2 and 2 <= 3):
-                print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
@@ -358,7 +357,6 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             if [ 1 -lt 2 ] && [ 2 -le 3 ]; then
-                printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -367,7 +365,30 @@ class ConditionalMainTest : MainTest() {
         """.trimIndent(), renderedBash
         )
         val commandResult = renderedBash.runCommand()
-        assertEquals("Command failed\n", commandResult.first)
+        assertEquals("Math is mathing!\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifElseStatement_withAndOr_works() {
+        val renderedBash = fixture._getBast("""
+            if (1 < 2 and 2 <= 1 or #((expr 1 \> 0) > /dev/null)):
+                print("Math is mathing!\n")
+            else:
+                print("Command failed\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            if [ 1 -lt 2 ] && [ 2 -le 1 ] || (expr 1 \> 0) > /dev/null; then
+                printf "Math is mathing!\n"
+            else
+                printf "Command failed\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Math is mathing!\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 }

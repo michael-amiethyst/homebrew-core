@@ -173,6 +173,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             visit(ctx.expression(0)), ctx.binaryPrimary().text, visit(ctx.expression(1)))
     }
 
+    override fun visitCombiningExpression(ctx: BashpileParser.CombiningExpressionContext): BastNode {
+        check (ctx.expression().size == 2) { "Combining expression must have exactly 2 expressions" }
+        val expressions = ctx.expression().map { visit(it) }
+        return CombiningExpressionBastNode(
+            expressions[0], ctx.combiningOperator().text, expressions[1])
+    }
+
     override fun visitTypecastExpression(ctx: BashpileParser.TypecastExpressionContext): BastNode {
         val aastChildren = ctx.children
         require(aastChildren.size == 3)

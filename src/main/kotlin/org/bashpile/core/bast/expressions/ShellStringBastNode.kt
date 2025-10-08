@@ -18,7 +18,7 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
 
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
-        return if (parent is ConditionalBastNode) {
+        return if (parent is ConditionalBastNode || parent is CombiningExpressionBastNode) {
             childRenders
         } else { "$($childRenders)" }
     }
