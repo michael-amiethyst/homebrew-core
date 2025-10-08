@@ -22,6 +22,8 @@ class UnaryPrimaryBastNode(
             // file operators
             "exists" -> "-e"
             "doesNotExist" -> "! -e"
+            "regularFileExists" -> "-f"
+            "directoryExists" -> "-d"
             // for native Bash operators
             else -> operator
         }

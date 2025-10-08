@@ -66,12 +66,11 @@ Divide  : '/';
 Add     : '+';
 Minus   : '-';
 As      : 'as';
+// Bash -e
 Exists  : 'exists';
 DoesNotExist: 'doesNotExist';
 IsEmpty : 'isEmpty';
 NotEmpty: 'isNotEmpty';
-// Bash -e
-FileExists: 'fileExists';
 // Bash -f
 RegularFileExists: 'regularFileExists';
 DirectoryExists: 'directoryExists';

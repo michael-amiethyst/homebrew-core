@@ -88,7 +88,7 @@ shellStringContents: DollarOParen shellStringContents* CParen
 
 // full list at https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html
 unaryPrimary: BashUnaryOperator | IsEmpty | NotEmpty
-| Exists | DoesNotExist | FileExists | RegularFileExists | DirectoryExists;
+| Exists | DoesNotExist | RegularFileExists | DirectoryExists;
 
 // one line means logically equal precidence (e.g. LessThan in the same as MoreThanOrEquals)
 binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqual | IsNotEqual;

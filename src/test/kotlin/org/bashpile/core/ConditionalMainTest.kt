@@ -194,8 +194,6 @@ class ConditionalMainTest {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO write tests for fileExists, regularFileExists, directoryExists
-
     @Test
     fun ifElseStatement_works() {
         val renderedBash = fixture._getBast("""
