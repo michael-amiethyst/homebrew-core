@@ -90,8 +90,7 @@ shellStringContents: DollarOParen shellStringContents* CParen
 unaryPrimary: Not | Exists | DoesNotExist | IsEmpty | NotEmpty | FileExists | RegularFileExists | DirectoryExists;
 
 // one line means logically equal precidence (e.g. LessThan in the same as MoreThanOrEquals)
-binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals
-             | IsStrictlyEqual | InNotStrictlyEqual | IsEqual | IsNotEqual;
+binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqual | IsNotEqual;
 
 combiningOperator: And | Or;
 
