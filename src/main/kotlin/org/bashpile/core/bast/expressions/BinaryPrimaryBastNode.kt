@@ -24,10 +24,11 @@ class BinaryPrimaryBastNode(val left: BastNode, val operator: String, val right:
         } else {
             when(operator) {
                 ">" -> "-gt"
-                ">=" -> "-gte"
+                ">=" -> "-ge"
                 "<" -> "-lt"
-                "<=" -> "-lte"
+                "<=" -> "-le"
                 "=" -> "-eq"
+                "!=" -> "-ne"
                 else -> throw IllegalStateException("Unknown operator: $operator")
             }
         }
