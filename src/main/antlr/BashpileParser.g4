@@ -52,6 +52,8 @@ expression
     : listAccess                        # listAccessExpression
     | expression op=(Increment | Decrement)
                                         # unaryPostCrementExpression
+    | op=(Increment | Decrement) expression
+                                        # unaryPreCrementExpression
     | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
     | <assoc=right> Not? unaryPrimary expression
                                         # unaryPrimaryExpression

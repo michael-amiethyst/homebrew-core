@@ -5,7 +5,12 @@ import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.Literal
 
-class UnaryPostCrementArithmeticBastNode(private val expressionNode: BastNode, private val operator: String
+/** For Pre/Post increment/decrement operations.  E.g. ++2, i++, --i and i-- */
+class UnaryCrementArithmeticBastNode(
+    private val expressionNode: BastNode,
+    private val operator: String,
+    /** Is this a preincrement or predecrement? */
+    private val precrement: Boolean = false
 ) : ArithmeticBastNode(
     mutableListOf(expressionNode),
     majorType = expressionNode.majorType())
@@ -16,10 +21,11 @@ class UnaryPostCrementArithmeticBastNode(private val expressionNode: BastNode, p
         }
         check (expressionNode !is Literal) { "Literals cannot be incremented or decremented" }
         val childRender = expressionNode.render()
-        return "$((${childRender}$operator))"
+        val innerText = if (precrement) { "${operator}$childRender"} else { "${childRender}$operator" }
+        return "$(($innerText))"
     }
 
-    override fun replaceChildren(nextChildren: List<BastNode>): UnaryPostCrementArithmeticBastNode {
-        return UnaryPostCrementArithmeticBastNode(nextChildren[0].deepCopy(), operator)
+    override fun replaceChildren(nextChildren: List<BastNode>): UnaryCrementArithmeticBastNode {
+        return UnaryCrementArithmeticBastNode(nextChildren[0].deepCopy(), operator, precrement)
     }
 }
