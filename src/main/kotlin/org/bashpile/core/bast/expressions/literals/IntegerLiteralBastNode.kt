@@ -6,7 +6,7 @@ import java.math.BigInteger
 
 /** Represents an integer of any size */
 class IntegerLiteralBastNode(private val bigInt: BigInteger)
-    : BastNode(mutableListOf(), majorType = TypeEnum.INTEGER) {
+    : BastNode(mutableListOf(), majorType = TypeEnum.INTEGER), Literal {
 
     override fun render(): String {
         return bigInt.toString()

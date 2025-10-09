@@ -5,7 +5,7 @@ import org.bashpile.core.bast.BastNode
 
 /** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitTerminal] */
 open class TerminalBastNode(private val text: String, majorType: TypeEnum)
-    : BastNode(mutableListOf(), majorType = majorType)
+    : BastNode(mutableListOf(), majorType = majorType), Literal
 {
     override fun render(): String {
         return text

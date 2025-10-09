@@ -4,7 +4,8 @@ import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 
 /** May be true or false, not null */
-class BooleanLiteralBastNode(private val bool: Boolean) : BastNode(mutableListOf(), majorType = TypeEnum.BOOLEAN) {
+class BooleanLiteralBastNode(private val bool: Boolean)
+    : BastNode(mutableListOf(), majorType = TypeEnum.BOOLEAN), Literal {
     override fun render(): String {
         return bool.toString()
     }

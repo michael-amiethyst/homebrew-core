@@ -178,6 +178,27 @@ class ArithmeticMainTest : MainTest() {
     }
 
     @Test
+    fun getBast_basicArithmatic_withFloatPlusPlus_fails() {
+        assertThrows<IllegalStateException> {
+            val bpScript: InputStream = """
+                i: float = 0
+                print(i++)
+                print(i)""".trimIndent().byteInputStream()
+            fixture._getBast(bpScript).render()
+        }
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withLiteralIntegerPlusPlus_fails() {
+        assertThrows<IllegalStateException> {
+            val bpScript: InputStream = """
+                print(0++)
+                print(0)""".trimIndent().byteInputStream()
+            fixture._getBast(bpScript).render()
+        }
+    }
+
+    @Test
     fun getBast_basicArithmatic_withShellLine_works() {
         val bpScript: InputStream = """
                 i: integer = 0
@@ -198,7 +219,7 @@ class ArithmeticMainTest : MainTest() {
         assertEquals("10\n", results.first)
     }
 
-    // TODO write test for precrement operators, variables/literals, int/float
+    // TODO write test for precrement operators, variables/literals
 
     @Test
     fun getBast_complexArithmatic_works() {
