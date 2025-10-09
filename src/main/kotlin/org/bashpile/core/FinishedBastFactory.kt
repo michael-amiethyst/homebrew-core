@@ -115,6 +115,7 @@ class FinishedBastFactory {
             it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode)
         }
 
+        // TODO just change render of AritmeticBastNode instead of this method
         return if (inArithmetic && this is ArithmeticBastNode) {
             // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
             InternalBastNode(flattenedChildren, majorType(), " ")

@@ -73,7 +73,7 @@ class ArithmeticMainTest : MainTest() {
             STRICT_HEADER + """
                 declare one
                 one="1"
-                printf "%s" "$((1 - ${'$'}{one}))"
+                printf "%s" "$((1 - one))"
 
             """.trimIndent(), render
         )
@@ -94,7 +94,7 @@ class ArithmeticMainTest : MainTest() {
                 declare four
                 four="4"
                 declare i
-                i="$((6 / ${'$'}{four}))"
+                i="$((6 / four))"
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
@@ -122,8 +122,8 @@ class ArithmeticMainTest : MainTest() {
             """.trimIndent(), render
         )
         val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
         assertEquals("1.50000000000000000000\n", results.first)
+        assertEquals(SCRIPT_SUCCESS, results.second)
     }
 
     /** We don't double-check the user */
@@ -147,7 +147,7 @@ class ArithmeticMainTest : MainTest() {
             STRICT_HEADER + """
                 declare one
                 one="1"
-                printf "%s" "$((1 - (${'$'}{one})))"
+                printf "%s" "$((1 - (one)))"
 
             """.trimIndent(), render
         )
@@ -156,7 +156,28 @@ class ArithmeticMainTest : MainTest() {
         assertEquals("0\n", results.first)
     }
 
-    // TODO write tests for unary operators like ++ and --
+    @Test
+    fun getBast_basicArithmatic_withPlusPlus_works() {
+        val bpScript: InputStream = """
+                i: integer = 0
+                print(i++)
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+                declare i
+                i="0"
+                printf "%s" "$((i++))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("01\n", results.first)
+    }
+
+    // TODO write test for precrement operators, variables/literals, int/float
 
     @Test
     fun getBast_complexArithmatic_works() {

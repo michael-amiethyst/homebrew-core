@@ -4,6 +4,7 @@ import org.bashpile.core.bast.BastNode
 import org.bashpile.core.TypeEnum.FLOAT
 import org.bashpile.core.TypeEnum.INTEGER
 import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.bast.expressions.ArithmeticBastNode
 
 /** This is a Print Statement node */
 class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
@@ -15,7 +16,8 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
         val childRenders = children.map { it.render() }.joinToString("")
 
         val number = children.areNumbers()
-        return if (!number) {
+        val noArithmeticChildren = children.all { it !is ArithmeticBastNode }
+        return if (!number && noArithmeticChildren) {
             "printf \"$childRenders\"\n"
         } else {
             // treat as a String so floating point numbers work

@@ -8,6 +8,7 @@ import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
+import org.bashpile.core.bast.expressions.arithmetic.UnaryPostCrementArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.BooleanLiteralBastNode
 import org.bashpile.core.bast.expressions.literals.FloatLiteralBastNode
 import org.bashpile.core.bast.expressions.literals.IntegerLiteralBastNode
@@ -96,6 +97,12 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     ///////////////////////////////////
     // expressions
     ///////////////////////////////////
+
+    override fun visitUnaryPostCrementExpression(ctx: BashpileParser.UnaryPostCrementExpressionContext): BastNode {
+        val expressionNode = visit(ctx.expression())
+        val operator = ctx.op.text
+        return UnaryPostCrementArithmeticBastNode(expressionNode, operator)
+    }
 
     override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
         require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
