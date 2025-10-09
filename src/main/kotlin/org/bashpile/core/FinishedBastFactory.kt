@@ -61,6 +61,23 @@ class FinishedBastFactory {
         }
     }
 
+    /** Replaces nested arithmetic nodes with internal nodes */
+    private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
+        // it's needed to replace the nested ArithmeticBastNode (including floats with the Subshell interface)
+        // with a generic InternalBastNode.  This lets the unnesting logic work properly
+
+        val flattenedChildren = children.map {
+            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode)
+        }
+
+        return if (inArithmetic && this is ArithmeticBastNode) {
+            // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
+            InternalBastNode(flattenedChildren, majorType(), " ")
+        } else {
+            replaceChildren(flattenedChildren)
+        }
+    }
+
     /**
      * Returns a list of preambles to support unnesting.
      * @return An unnested version of the input tree.
@@ -107,20 +124,5 @@ class FinishedBastFactory {
             }
         }
         return replaceChildren(loosenedStatements)
-    }
-
-    /** Replaces nested arithmetic nodes with internal nodes */
-    private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
-        val flattenedChildren = children.map {
-            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode)
-        }
-
-        // TODO just change render of AritmeticBastNode instead of this method
-        return if (inArithmetic && this is ArithmeticBastNode) {
-            // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
-            InternalBastNode(flattenedChildren, majorType(), " ")
-        } else {
-            replaceChildren(flattenedChildren)
-        }
     }
 }
