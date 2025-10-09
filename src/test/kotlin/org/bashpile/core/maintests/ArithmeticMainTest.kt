@@ -177,6 +177,27 @@ class ArithmeticMainTest : MainTest() {
         assertEquals("01\n", results.first)
     }
 
+    @Test
+    fun getBast_basicArithmatic_withShellLine_works() {
+        val bpScript: InputStream = """
+                i: integer = 0
+                print(#(expr ${'$'}i) as integer + 1)
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render()
+        assertEquals(
+            STRICT_HEADER + """
+                declare i
+                i="0"
+                printf "%s" "$(($(expr ${'$'}i) + 1))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("10\n", results.first)
+    }
+
     // TODO write test for precrement operators, variables/literals, int/float
 
     @Test

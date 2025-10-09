@@ -9,15 +9,16 @@ class VariableReferenceBastNode(id: String, majorType: TypeEnum) : BastNode(muta
 
     override fun render(): String {
         callStack.requireOnStack(id!!)
-        // TODO if subshell before arithimeticBastNode it will bug out, create test to verify
-        val arithmeticNode = parents().find { it is ArithmeticBastNode }
-        return if (arithmeticNode == null || arithmeticNode is Subshell) { "${'$'}{$id}" } else {
-            // builtin, no '$' required
-            id
-        }
+        return if (isBashVariableReference()) { "${'$'}{$id}" } else { id }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): VariableReferenceBastNode {
         return VariableReferenceBastNode(id!!, majorType())
+    }
+
+    /** If not then we don't need a preceding '$' (e.g. we are in $(()) braces) */
+    private fun isBashVariableReference(): Boolean {
+        val arithmeticNode = parents().find { it is ArithmeticBastNode }
+        return arithmeticNode == null || arithmeticNode is Subshell
     }
 }
