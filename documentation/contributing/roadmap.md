@@ -1,7 +1,7 @@
 # Bashpile Compiler Plans
 
-1. Debug comments (mapping from Bashpile lines to generated Bash lines)
-2. Arguments references with argumentsBuiltinExpression
+1. Arguments references with argumentsBuiltinExpression
+2. Debug comments (mapping from Bashpile lines to generated Bash lines)
 3. switch / getopt
 4. C-style for loops
 5. lists
