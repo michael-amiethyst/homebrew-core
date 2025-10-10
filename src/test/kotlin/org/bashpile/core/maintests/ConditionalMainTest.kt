@@ -11,6 +11,22 @@ import kotlin.test.assertEquals
 class ConditionalMainTest : MainTest() {
 
     @Test
+    fun conditionals_works() {
+        val renderedBash = fixture._getBast("""
+            #(ls some_random_file_that_does_not_exist.txt) or true
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            (ls some_random_file_that_does_not_exist.txt) >/dev/null 2>&1 || true
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
     fun ifStatement_works() {
         val renderedBash = fixture._getBast("""
             if (1 > 0):
@@ -271,7 +287,7 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withFailedShellString_works() {
         val renderedBash = fixture._getBast("""
-            if (#((expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) > /dev/null)):
+            if (#(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC})):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
@@ -279,7 +295,7 @@ class ConditionalMainTest : MainTest() {
         """.trimIndent().byteInputStream()).render()
         assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
-            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) > /dev/null; then
+            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
@@ -351,7 +367,7 @@ class ConditionalMainTest : MainTest() {
             zero: integer = 0
             if (1 < zero):
                 print("Math is not mathing\n")
-            else if (#(expr "${'$'}{zero}" \< 1 > /dev/null)):
+            else if (#(expr "${'$'}{zero}" \< 1)):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:
@@ -363,7 +379,7 @@ class ConditionalMainTest : MainTest() {
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
                 printf "Math is not mathing\n"
-            elif expr "${'$'}{zero}" \< 1 > /dev/null; then
+            elif (expr "${'$'}{zero}" \< 1) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
             else
@@ -403,14 +419,14 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withAndOr_works() {
         val renderedBash = fixture._getBast("""
-            if (1 < 2 and 2 <= 1 or #((expr 1 \> 0) > /dev/null)):
+            if (1 < 2 and 2 <= 1 or #(expr 1 \> 0)):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
-            if [ 1 -lt 2 ] && [ 2 -le 1 ] || (expr 1 \> 0) > /dev/null; then
+            if [ 1 -lt 2 ] && [ 2 -le 1 ] || (expr 1 \> 0) >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -426,13 +442,13 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifElseStatement_withAndOr_literalFloats_works() {
         val renderedBash = fixture._getBast("""
-            if (1.0 < 2.0 and 2.0 <= 1.0 or #(bc <<< "2.0 < 3.0" > /dev/null)):
+            if (1.0 < 2.0 and 2.0 <= 1.0 or #(bc <<< "2.0 < 3.0")):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(AstConvertingVisitor.Companion.STRICT_HEADER + """
-            if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || bc <<< "2.0 < 3.0" > /dev/null; then
+            if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"
@@ -448,7 +464,7 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withAndOr_floatVariable_works() {
         val renderedBash = fixture._getBast("""
             one: float = 1.0
-            if (one < 2.0 and 2.0 <= one or #(bc <<< "2.0 < 3.0" > /dev/null)):
+            if (one < 2.0 and 2.0 <= one or #(bc <<< "2.0 < 3.0")):
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
@@ -456,7 +472,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare one
             one="1.0"
-            if bc -l <<< "${'$'}{one} < 2.0" > /dev/null && bc -l <<< "2.0 <= ${'$'}{one}" > /dev/null || bc <<< "2.0 < 3.0" > /dev/null; then
+            if bc -l <<< "${'$'}{one} < 2.0" > /dev/null && bc -l <<< "2.0 <= ${'$'}{one}" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
                 printf "Command failed\n"

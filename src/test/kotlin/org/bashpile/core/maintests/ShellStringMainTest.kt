@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.InputStream
+import kotlin.test.assertEquals
 
 /**
  * Tests Shell Strings and Shell Lines
@@ -23,6 +24,22 @@ class ShellStringMainTest : MainTest() {
             
             """.trimIndent(), fixture._getBast(script).render()
         )
+    }
+
+    @Test
+    fun getBast_shellLine_or_works() {
+        val renderedBash = fixture._getBast("""
+            ls some_random_file_that_does_not_exist.txt >/dev/null 2>&1 || true
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            ls some_random_file_that_does_not_exist.txt >/dev/null 2>&1 || true
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
     @Test

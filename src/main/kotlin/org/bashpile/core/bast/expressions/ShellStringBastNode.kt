@@ -19,11 +19,20 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
     override fun render(): String {
         val childRenders = children.map { it.render() }.joinToString("")
         return if (parent is ConditionalBastNode || parent is CombiningExpressionBastNode) {
-            childRenders
+            childRenders.ignoreOutput()
         } else { "$($childRenders)" }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
         return ShellStringBastNode(nextChildren.map { it.deepCopy() }, majorType())
+    }
+
+    private fun String.ignoreOutput(): String {
+        return if (parent is CombiningExpressionBastNode ||
+                parent is ConditionalBastNode || parent is BinaryPrimaryBastNode) {
+            "($this) >/dev/null 2>&1"
+        } else {
+            this
+        }
     }
 }
