@@ -1,15 +1,14 @@
-package org.bashpile.core
+package org.bashpile.core.maintests
 
-import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
-import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
-import org.junit.jupiter.api.Assertions.*
+import org.bashpile.core.SCRIPT_SUCCESS
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode
+import org.bashpile.core.runCommand
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-
-class LoopsMainTest {
-
-    val fixture = Main()
+class LoopsMainTest : MainTest() {
 
     @Test
     fun foreach_fileLine_works() {
@@ -18,21 +17,25 @@ class LoopsMainTest {
                 print(first + " " + last + " " + email + " " + phone + "\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
-        assertEquals(STRICT_HEADER + """
-            cat "src/test/resources/data/example.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            cat "src/test/resources/data/example.csv" | ${ForeachFileLineLoopBashNode.Companion.sed} -e '1d' -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
                 printf "${'$'}{first} ${'$'}{last} ${'$'}{email} ${'$'}{phone}\n"
             done
             
-            """.trimIndent(), renderedBash)
+            """.trimIndent(), renderedBash
+        )
 
         val bashResult = renderedBash.runCommand()
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
-        assertEquals("""
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        Assertions.assertEquals(
+            """
             Alice Smith alice.smith@email.com 555-1234
             Bob Johnson bob.j@email.com 555-5678
             Charlie Williams c.williams@email.com 555-9012
             
-        """.trimIndent(), bashResult.first)
+        """.trimIndent(), bashResult.first
+        )
     }
 
     @Test
@@ -51,12 +54,13 @@ class LoopsMainTest {
                     "\"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
-        assertEquals(STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | ${ForeachFileLineLoopBashNode.Companion.sed} -e '1d' -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -65,10 +69,12 @@ class LoopsMainTest {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-            """.trimIndent(), renderedBash)
+            """.trimIndent(), renderedBash
+        )
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -76,8 +82,9 @@ class LoopsMainTest {
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -95,12 +102,13 @@ class LoopsMainTest {
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
-        assertEquals(STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended.csv" | ${ForeachFileLineLoopBashNode.Companion.sed} -e '1d' -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -109,10 +117,12 @@ class LoopsMainTest {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-            """.trimIndent(), renderedBash)
+            """.trimIndent(), renderedBash
+        )
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -120,8 +130,9 @@ class LoopsMainTest {
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -139,12 +150,13 @@ class LoopsMainTest {
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
-        assertEquals(STRICT_HEADER + """
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x HOST
             HOST="HOST_NAME"
             declare -x TOKEN
             TOKEN="OAUTH_TOKEN"
-            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
+            cat "src/test/resources/data/example_extended_windows_line_endings.csv" | ${ForeachFileLineLoopBashNode.Companion.sed} -e '1d' -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r firstName middleName lastName email landline cell; do
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
@@ -153,10 +165,12 @@ class LoopsMainTest {
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
             
-            """.trimIndent(), renderedBash)
+            """.trimIndent(), renderedBash
+        )
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             Updating phone # 555-1235 with values: lastName Smith cell (555) 555-1235.
             { "cellShort": 555-1235, "lastName": "Smith" "cell": "(555) 555-1235", "regionId": "13" }
             Updating phone # 555-5679 with values: lastName Johnson cell (555) 555-5679.
@@ -164,8 +178,9 @@ class LoopsMainTest {
             Updating phone # 555-1701 with values: lastName Williams cell (555) 555-1701.
             { "cellShort": 555-1701, "lastName": "Williams" "cell": "(555) 555-1701", "regionId": "13" }
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -176,20 +191,24 @@ class LoopsMainTest {
                 print(line + "\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
-        assertEquals(STRICT_HEADER + """
-            cat "$filename" | $sed -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            cat "$filename" | ${ForeachFileLineLoopBashNode.Companion.sed} -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 printf "${'$'}{line}\n"
             done
             
-            """.trimIndent(), renderedBash)
+            """.trimIndent(), renderedBash
+        )
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             lorum
             ipsum
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -200,20 +219,24 @@ class LoopsMainTest {
                 print(line + "\n")
         """.trimIndent().byteInputStream()
         val renderedBash = fixture._getBast(script).render()
-        assertEquals(STRICT_HEADER + """
-            cat "$filename" | $sed -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+        Assertions.assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            cat "$filename" | ${ForeachFileLineLoopBashNode.Companion.sed} -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
                 printf "${'$'}{line}\n"
             done
             
-            """.trimIndent(), renderedBash)
+            """.trimIndent(), renderedBash
+        )
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             lorum
             ipsum
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -226,7 +249,7 @@ class LoopsMainTest {
             print(scoped + "\n")
         """.trimIndent().byteInputStream()
         val thrown: IllegalStateException? = assertThrows { fixture._getBast(script).render() }
-        assertNotNull(thrown)
+        Assertions.assertNotNull(thrown)
     }
 
     @Test
@@ -240,12 +263,14 @@ class LoopsMainTest {
         val renderedBash = fixture._getBast(script).render()
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             Hello Mars
             Hello Mars
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -259,12 +284,14 @@ class LoopsMainTest {
         val renderedBash = fixture._getBast(script).render()
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             lorum
             ipsum
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -281,7 +308,8 @@ class LoopsMainTest {
         val renderedBash = fixture._getBast(script).render()
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             row1
             lorum
             ipsum
@@ -289,8 +317,9 @@ class LoopsMainTest {
             lorum
             ipsum
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 
     @Test
@@ -307,7 +336,8 @@ class LoopsMainTest {
         val renderedBash = fixture._getBast(script).render()
 
         val bashResult = renderedBash.runCommand()
-        assertEquals("""
+        Assertions.assertEquals(
+            """
             row1
             lorum
             ipsum
@@ -315,7 +345,8 @@ class LoopsMainTest {
             lorum
             ipsum
 
-        """.trimIndent(), bashResult.first)
-        assertEquals(SCRIPT_SUCCESS, bashResult.second)
+        """.trimIndent(), bashResult.first
+        )
+        Assertions.assertEquals(SCRIPT_SUCCESS, bashResult.second)
     }
 }

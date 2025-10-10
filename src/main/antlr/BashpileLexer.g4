@@ -57,7 +57,6 @@ Import   : 'import';
 OParen  : '(';
 // closing parenthesis
 CParen  : ')';
-// unary minus (minus defined below)
 Increment: '++';
 Decrement: '--';
 Not     : 'not';
@@ -67,25 +66,27 @@ Divide  : '/';
 Add     : '+';
 Minus   : '-';
 As      : 'as';
+// Bash -e
 Exists  : 'exists';
 DoesNotExist: 'doesNotExist';
 IsEmpty : 'isEmpty';
 NotEmpty: 'isNotEmpty';
-FileExists: 'fileExists';
+// Bash -f
 RegularFileExists: 'regularFileExists';
 DirectoryExists: 'directoryExists';
 LessThan: '<';
 LessThanOrEquals: '<=';
 MoreThan: '>';
 MoreThanOrEquals: '>=';
-IsStrictlyEqual: '===';
-InNotStrictlyEqual: '!==';
 IsEqual : '==';
 IsNotEqual : '!=';
 And     : 'and';
 Or      : 'or';
 Equals  : '=';
 PlusEquals: '+=';
+BashUnaryOperator: '-a' | '-b' | '-c' | '-d' | '-e' | '-f' | '-g' | '-h' | '-k' | '-n' | '-o' | '-p'
+|  '-r' | '-s' | '-t' | '-u' | '-v' | '-w' | '-x' | '-z'
+| '-G' | '-L' | '-N' | '-O' | '-R' | '-S';
 
 // shell lines using Semantic Predicate
 ShellLine   : {isLinuxCommand(_input)}? (Id Equals (NumberValues | StringValues))* Id SHELL_LINE_WORD*;

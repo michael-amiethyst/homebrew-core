@@ -6,7 +6,7 @@ import java.math.BigDecimal
 
 /** Represents any float or double to an arbitrary precision */
 class FloatLiteralBastNode(private val float: BigDecimal)
-    : BastNode(mutableListOf(), majorType = TypeEnum.FLOAT) {
+    : BastNode(mutableListOf(), majorType = TypeEnum.FLOAT), Literal {
 
     override fun render(): String {
         return float.toString()

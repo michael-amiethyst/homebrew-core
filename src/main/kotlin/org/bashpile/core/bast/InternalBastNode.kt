@@ -11,7 +11,8 @@ import org.bashpile.core.TypeEnum.UNKNOWN
  */
 class InternalBastNode(
     children: List<BastNode> = listOf(), majorType: TypeEnum = UNKNOWN, val renderSeparator: String = "")
-    : BastNode(children.toMutableList(), majorType = majorType) {
+    : BastNode(children.toMutableList(), majorType = majorType)
+{
     /** Convenience constructor */
     constructor(vararg children: BastNode) : this(children.toList())
 

@@ -15,4 +15,5 @@
 * 0.14.0 - `-c` option to read string or from stdin
 * 0.15.0 - Foreach file-line loops, lexical scoping
 * 0.16.0 - Internal package refactoring
-* 0.17.0 - if statements
+* 0.17.0 - if-elseif-else statements, binary primaries (e.g. `1<2`)
+* 0.18.0 - unary primaries (e.g. `isEmpty ""`), combining operators (boolean logic)
