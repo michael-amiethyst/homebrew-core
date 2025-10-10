@@ -5,6 +5,8 @@ import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.TypeEnum
+import org.bashpile.core.TypeEnum.FLOAT
+import org.bashpile.core.TypeEnum.INTEGER
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
@@ -158,14 +160,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val left: BastNode = visit(ctx.children[0])
         val middle = visit(ctx.children[1])
         val right = visit(ctx.children[2])
-        val areAllStrings =
-            left.toList().all { it.coercesTo(TypeEnum.STRING) } && right.toList().all { it.coercesTo(TypeEnum.STRING) }
+        val areAllStrings = left.coercesTo(TypeEnum.STRING) && right.coercesTo(TypeEnum.STRING)
         return if (areAllStrings) {
             require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)
-        } else if (left.majorType() == TypeEnum.INTEGER && right.majorType() == TypeEnum.INTEGER) {
+        } else if (left.coercesTo(INTEGER) && right.coercesTo(INTEGER)) {
             IntegerArithmeticBastNode(left, middle, right)
-        } else if (left.coercesTo(TypeEnum.FLOAT) && right.coercesTo(TypeEnum.FLOAT)) {
+        } else if (left.coercesTo(FLOAT) && right.coercesTo(FLOAT)) {
             FloatArithmeticBastNode(left, middle, right)
         } else {
             throw UnsupportedOperationException(
@@ -182,8 +183,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitBinaryPrimaryExpression(ctx: BashpileParser.BinaryPrimaryExpressionContext): BastNode {
-        return BinaryPrimaryBastNode(
-            visit(ctx.expression(0)), ctx.binaryPrimary().text, visit(ctx.expression(1)))
+        val left = visit(ctx.expression(0))
+        val right = visit(ctx.expression(1))
+        return BinaryPrimaryBastNode(left, ctx.binaryPrimary().text, right)
     }
 
     override fun visitCombiningExpression(ctx: BashpileParser.CombiningExpressionContext): BastNode {

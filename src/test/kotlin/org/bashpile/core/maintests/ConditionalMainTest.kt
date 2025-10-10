@@ -513,4 +513,30 @@ class ConditionalMainTest : MainTest() {
         assertEquals("At least one true\n", commandResult.first)
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
+
+    @Test
+    fun ifElseStatement_withTypeCastSubtractionAndEquals_works() {
+        val renderedBash = fixture._getBast("""
+            a: integer = 1
+            if (#(expr 5 + 6) as integer - a == 10):
+                print("It tracks\n")
+            else:
+                print("Lame\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare a
+            a="1"
+            if [ $(($(expr 5 + 6) - a)) -eq 10 ]; then
+                printf "It tracks\n"
+            else
+                printf "Lame\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("It tracks\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
 }

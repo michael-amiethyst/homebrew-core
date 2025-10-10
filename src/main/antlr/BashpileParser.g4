@@ -49,30 +49,31 @@ returnPsudoStatement: Return expression? Newline;
 
 // in operator precedence order, modeled on Java precedence at https://introcs.cs.princeton.edu/java/11precedence/
 expression
+    // level 16
     : listAccess                        # listAccessExpression
-    | expression op=(Increment | Decrement)
-                                        # unaryPostCrementExpression
-    | op=(Increment | Decrement) expression
-                                        # unaryPreCrementExpression
-    | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
-    | <assoc=right> Not? unaryPrimary expression
-                                        # unaryPrimaryExpression
+    | OParen expression CParen          # parenthesisExpression
+    // level 15
+    | expression op=(Increment | Decrement) # unaryPostCrementExpression
+    // level 14
+    | <assoc=right> Minus? NumberValues          # numberExpression // unary minus
+    | <assoc=right> Not? unaryPrimary expression # unaryPrimaryExpression
+    | op=(Increment | Decrement) expression      # unaryPreCrementExpression
+    // level 13
     | <assoc=right> expression As complexType # typecastExpression
+    // level 12
+    // TODO break into */ and +- for proper precedence
+    | <assoc=right> expression op=(Multiply|Divide|Add|Minus) expression # calculationExpression
+    // level 9
+    | expression binaryPrimary expression # binaryPrimaryExpression
+    // level 4
+    | expression combiningOperator expression # combiningExpression
+    // other levels
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
-    // operator expressions
-    | OParen expression CParen          # parenthesisExpression
-    | <assoc=right> expression op=(Multiply|Divide|Add|Minus) expression
-                                        # calculationExpression
-    | expression binaryPrimary expression
-                                        # binaryPrimaryExpression
-    | expression combiningOperator expression
-                                        # combiningExpression
     | argumentsBuiltin                  # argumentsBuiltinExpression
     | ListOf (OParen CParen | OParen expression (Comma expression)* CParen)
                                         # listOfBuiltinExpression
-    // type expressions
     | literal                           # literalExpression
     | Id                                # idExpression
     ;

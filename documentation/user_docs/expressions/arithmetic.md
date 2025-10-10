@@ -1,11 +1,15 @@
 # Arithmetic Expressions
 
-Integer arithmetic uses Bash built-ins.
-Floating points use `bc` in a subshell.
+# Integers
+Integer arithmetic uses Bash built-ins.  See Bash documentation for `$(( ))` for details.
+
+Preincrement, postdecrement and all operators in between are supported.  
+For integer i you can write `++i`, `i++`, `--i` or `i--`.
+
+# Floats
+Floating point math uses `bc` in a subshell.
 
 Float assignments to an integer round down.
-
-++i, i++, --i, i-- are supported as well.
 
 Example:
 ```
