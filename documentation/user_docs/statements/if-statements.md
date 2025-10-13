@@ -33,6 +33,13 @@ else:
     ...
 ```
 
+## Shell String Operators
+
+```
+if ( #( someShellCommand ) ):
+    print("Command succeeded by returning 0, all STDOUT and STDERR output ignored")
+```
+
 ## File Operators
 
 exists, notExists, regularFileExists, directoryExists

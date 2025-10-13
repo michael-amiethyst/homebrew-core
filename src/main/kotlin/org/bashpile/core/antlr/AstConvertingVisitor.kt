@@ -149,6 +149,11 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
     }
 
+    override fun visitNotExpression(ctx: BashpileParser.NotExpressionContext): BastNode {
+        val bastNodeChildren = listOf(TerminalBastNode("! ", TypeEnum.STRING), visit(ctx.expression()))
+        return InternalBastNode(bastNodeChildren, TypeEnum.BOOLEAN)
+    }
+
     override fun visitMultipyDivideCalculationExpression(ctx: BashpileParser.MultipyDivideCalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         val bastNodes = ctx.children.map { visit(it) }
@@ -178,10 +183,9 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitUnaryPrimaryExpression(ctx: BashpileParser.UnaryPrimaryExpressionContext): BastNode {
-        val inverted = ctx.Not() != null
         val operator = ctx.unaryPrimary().text
         val right = visit(ctx.expression())
-        return UnaryPrimaryBastNode(inverted, operator, right)
+        return UnaryPrimaryBastNode(operator, right)
     }
 
     override fun visitBinaryPrimaryExpression(ctx: BashpileParser.BinaryPrimaryExpressionContext): BastNode {

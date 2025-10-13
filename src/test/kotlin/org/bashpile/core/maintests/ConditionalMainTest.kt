@@ -211,7 +211,7 @@ class ConditionalMainTest : MainTest() {
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
                 printf "File exists\n"
-            elif [ ! -e "${'$'}{filename}" ]; then
+            elif ! [ -e "${'$'}{filename}" ]; then
                 printf "File does not exist\n"
             else
                 printf "Unknown\n"
@@ -243,7 +243,39 @@ class ConditionalMainTest : MainTest() {
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
                 printf "File exists\n"
-            elif [ ! -e "${'$'}{filename}" ]; then
+            elif ! [ -e "${'$'}{filename}" ]; then
+                printf "File does not exist\n"
+            else
+                printf "Unknown\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("File exists\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    /** Tests for a native '-e' */
+    @Test
+    fun ifStatement_bashNotNotExists_works() {
+        val filename = "src/test/resources/data/example.csv"
+        val renderedBash = fixture._getBast("""
+            filename: string = "$filename"
+            if (not doesNotExist filename):
+                print("File exists\n")
+            else if (not -e filename):
+                print("File does not exist\n")
+            else:
+                print("Unknown\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare filename
+            filename="$filename"
+            if ! [ ! -e "${'$'}{filename}" ]; then
+                printf "File exists\n"
+            elif ! [ -e "${'$'}{filename}" ]; then
                 printf "File does not exist\n"
             else
                 printf "Unknown\n"

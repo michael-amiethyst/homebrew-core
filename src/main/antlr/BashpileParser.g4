@@ -56,7 +56,8 @@ expression
     | expression op=(Increment | Decrement) # unaryPostCrementExpression
     // level 14
     | <assoc=right> Minus? NumberValues          # numberExpression // unary minus
-    | <assoc=right> Not? unaryPrimary expression # unaryPrimaryExpression
+    | <assoc=right> Not expression               # notExpression
+    | <assoc=right> unaryPrimary expression      # unaryPrimaryExpression
     | op=(Increment | Decrement) expression      # unaryPreCrementExpression
     // level 13
     | <assoc=right> expression As complexType # typecastExpression
@@ -64,6 +65,8 @@ expression
     | <assoc=right> expression op=(Multiply|Divide) expression # multipyDivideCalculationExpression
     // level 11
     | <assoc=right> expression op=(Add|Minus) expression       # addSubtractCalculationExpression
+    // level 10
+    // TODO put unaryPrimaries here
     // level 9
     | expression binaryPrimary expression # binaryPrimaryExpression
     // level 4

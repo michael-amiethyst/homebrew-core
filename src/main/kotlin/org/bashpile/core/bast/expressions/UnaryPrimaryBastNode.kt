@@ -3,15 +3,10 @@ package org.bashpile.core.bast.expressions
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 
-class UnaryPrimaryBastNode(
-    private val inverted: Boolean, private val operator: String, private val rightExpression: BastNode)
+class UnaryPrimaryBastNode(private val operator: String, private val rightExpression: BastNode)
     : BastNode(mutableListOf(rightExpression), majorType = TypeEnum.BOOLEAN)
 {
     override fun render(): String {
-        check(!(inverted && operator == "isNotEmpty")) { "Use 'isEmpty' instead of 'not isNotEmpty'" }
-        check(!(inverted && operator == "doesNotExist")) { "Use 'exists' instead of 'not doesNotExist'" }
-
-        val not = if (inverted) "! " else ""
         val rightRendered = if (rightExpression is VariableReferenceBastNode) {
             "\"${rightExpression.render()}\""
         } else { rightExpression.render() }
@@ -28,10 +23,10 @@ class UnaryPrimaryBastNode(
             else -> operator
         }
 
-        return "[ ${not}$bashOperator $rightRendered ]"
+        return "[ $bashOperator $rightRendered ]"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
-        return UnaryPrimaryBastNode(inverted, operator, rightExpression.deepCopy())
+        return UnaryPrimaryBastNode(operator, rightExpression.deepCopy())
     }
 }
