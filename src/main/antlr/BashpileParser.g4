@@ -53,24 +53,32 @@ expression
     : listAccess                        # listAccessExpression
     | OParen expression CParen          # parenthesisExpression
     // level 15
-    | expression op=(Increment | Decrement) # unaryPostCrementExpression
+    | expression op=(Increment | Decrement)   # unaryPostCrementExpression
+
     // level 14
-    | <assoc=right> Minus? NumberValues          # numberExpression // unary minus
-    | <assoc=right> Not expression               # notExpression
-    | <assoc=right> unaryPrimary expression      # unaryPrimaryExpression
-    | op=(Increment | Decrement) expression      # unaryPreCrementExpression
+    | <assoc=right> Minus? NumberValues       # numberExpression // unary minus
+    | <assoc=right> Not expression            # notExpression
+    | op=(Increment | Decrement) expression   # unaryPreCrementExpression
+
     // level 13
     | <assoc=right> expression As complexType # typecastExpression
+
     // level 12
     | <assoc=right> expression op=(Multiply|Divide) expression # multipyDivideCalculationExpression
+
     // level 11
     | <assoc=right> expression op=(Add|Minus) expression       # addSubtractCalculationExpression
+
     // level 10
-    // TODO put unaryPrimaries here
+    // lower than typecast, higher than equality operators
+    | <assoc=right> unaryPrimary expression   # unaryPrimaryExpression
+
     // level 9
-    | expression binaryPrimary expression # binaryPrimaryExpression
+    | expression binaryPrimary expression     # binaryPrimaryExpression
+
     // level 4
     | expression combiningOperator expression # combiningExpression
+
     // other levels
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression

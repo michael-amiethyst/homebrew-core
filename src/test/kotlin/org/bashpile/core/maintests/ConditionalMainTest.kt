@@ -74,6 +74,35 @@ class ConditionalMainTest : MainTest() {
     }
 
     @Test
+    fun ifStatement_isEmptyPrecedence_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            if (isEmpty name + "notEmpty"):
+                print("Empty\n")
+            else:
+                print("Not empty\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare name
+            name=""
+            if [ -z "${'$'}{name}notEmpty" ]; then
+                printf "Empty\n"
+            else
+                printf "Not empty\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Not empty\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    // TODO make test with not
+    // TODO make test with binaryPrimary
+
+    @Test
     fun ifStatement_isNotEmpty_works() {
         val renderedBash = fixture._getBast("""
             name: string = "hello"

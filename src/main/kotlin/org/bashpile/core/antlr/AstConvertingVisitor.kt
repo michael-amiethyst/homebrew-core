@@ -170,7 +170,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val areAllStrings = left.coercesTo(TypeEnum.STRING) && right.coercesTo(TypeEnum.STRING)
         return if (areAllStrings) {
             require(middle.isAddition()) { "Only addition is supported on strings" }
-            InternalBastNode(left, right)
+            StringConcatenationBastNode(listOf(left, right))
         } else if (left.coercesTo(INTEGER) && right.coercesTo(INTEGER)) {
             IntegerArithmeticBastNode(left, middle, right)
         } else if (left.coercesTo(FLOAT) && right.coercesTo(FLOAT)) {
