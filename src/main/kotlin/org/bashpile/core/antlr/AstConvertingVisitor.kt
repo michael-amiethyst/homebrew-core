@@ -11,14 +11,8 @@ import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
 import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastNode
-import org.bashpile.core.bast.expressions.literals.BooleanLiteralBastNode
-import org.bashpile.core.bast.expressions.literals.FloatLiteralBastNode
-import org.bashpile.core.bast.expressions.literals.IntegerLiteralBastNode
-import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
+import org.bashpile.core.bast.expressions.literals.*
 import org.bashpile.core.bast.statements.*
-import org.bashpile.core.bast.expressions.literals.ClosingParenthesisTerminalBastNode
-import org.bashpile.core.bast.expressions.literals.TerminalBastNode
-import org.bashpile.core.bast.expressions.literals.SubshellStartTerminalBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
@@ -155,14 +149,23 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
     }
 
-    override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BastNode {
+    override fun visitMultipyDivideCalculationExpression(ctx: BashpileParser.MultipyDivideCalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
-        val left: BastNode = visit(ctx.children[0])
-        val middle = visit(ctx.children[1])
-        val right = visit(ctx.children[2])
+        val bastNodes = ctx.children.map { visit(it) }
+        return calculationExpressionInner(bastNodes[0], bastNodes[1], bastNodes[2])
+    }
+
+    override fun visitAddSubtractCalculationExpression(ctx: BashpileParser.AddSubtractCalculationExpressionContext): BastNode {
+        require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
+        val bastNodes = ctx.children.map { visit(it) }
+        return calculationExpressionInner(bastNodes[0], bastNodes[1], bastNodes[2])
+    }
+
+    private fun calculationExpressionInner(left: BastNode, middle: BastNode, right: BastNode): BastNode {
         val areAllStrings = left.coercesTo(TypeEnum.STRING) && right.coercesTo(TypeEnum.STRING)
         return if (areAllStrings) {
-            require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
+            // TODO LoD
+            require(middle.render() == "+") { "Only addition is supported on strings" }
             InternalBastNode(left, right)
         } else if (left.coercesTo(INTEGER) && right.coercesTo(INTEGER)) {
             IntegerArithmeticBastNode(left, middle, right)

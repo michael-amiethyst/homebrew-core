@@ -61,8 +61,9 @@ expression
     // level 13
     | <assoc=right> expression As complexType # typecastExpression
     // level 12
-    // TODO break into */ and +- for proper precedence
-    | <assoc=right> expression op=(Multiply|Divide|Add|Minus) expression # calculationExpression
+    | <assoc=right> expression op=(Multiply|Divide) expression # multipyDivideCalculationExpression
+    // level 11
+    | <assoc=right> expression op=(Add|Minus) expression       # addSubtractCalculationExpression
     // level 9
     | expression binaryPrimary expression # binaryPrimaryExpression
     // level 4
