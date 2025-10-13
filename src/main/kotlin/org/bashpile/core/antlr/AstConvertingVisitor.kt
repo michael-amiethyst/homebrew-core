@@ -152,20 +152,19 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitMultipyDivideCalculationExpression(ctx: BashpileParser.MultipyDivideCalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         val bastNodes = ctx.children.map { visit(it) }
-        return calculationExpressionInner(bastNodes[0], bastNodes[1], bastNodes[2])
+        return calculationExpressionInner(bastNodes[0], bastNodes[1] as TerminalBastNode, bastNodes[2])
     }
 
     override fun visitAddSubtractCalculationExpression(ctx: BashpileParser.AddSubtractCalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
         val bastNodes = ctx.children.map { visit(it) }
-        return calculationExpressionInner(bastNodes[0], bastNodes[1], bastNodes[2])
+        return calculationExpressionInner(bastNodes[0], bastNodes[1] as TerminalBastNode, bastNodes[2])
     }
 
-    private fun calculationExpressionInner(left: BastNode, middle: BastNode, right: BastNode): BastNode {
+    private fun calculationExpressionInner(left: BastNode, middle: TerminalBastNode, right: BastNode): BastNode {
         val areAllStrings = left.coercesTo(TypeEnum.STRING) && right.coercesTo(TypeEnum.STRING)
         return if (areAllStrings) {
-            // TODO LoD
-            require(middle.render() == "+") { "Only addition is supported on strings" }
+            require(middle.isAddition()) { "Only addition is supported on strings" }
             InternalBastNode(left, right)
         } else if (left.coercesTo(INTEGER) && right.coercesTo(INTEGER)) {
             IntegerArithmeticBastNode(left, middle, right)

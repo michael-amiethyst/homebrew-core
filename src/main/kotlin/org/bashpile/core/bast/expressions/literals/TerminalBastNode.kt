@@ -14,4 +14,9 @@ open class TerminalBastNode(private val text: String, majorType: TypeEnum)
     override fun replaceChildren(nextChildren: List<BastNode>): TerminalBastNode {
         return TerminalBastNode(text, majorType())
     }
+
+    fun isAddition(): Boolean {
+        // Should be the same symbol as for BashpileLexer.Add
+        return text == "+"
+    }
 }
