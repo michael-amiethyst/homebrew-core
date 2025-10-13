@@ -99,8 +99,85 @@ class ConditionalMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO make test with not
-    // TODO make test with binaryPrimary
+    @Test
+    fun ifStatement_isEmptyPrecedence_not_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            if (not isEmpty name + "value"):
+                print("!Empty\n")
+            else:
+                print("Empty\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare name
+            name=""
+            if ! [ -z "${'$'}{name}value" ]; then
+                printf "!Empty\n"
+            else
+                printf "Empty\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("!Empty\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifStatement_notEquals_withStringConcat_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            if ("value" == name + "value"):
+                print("Equal\n")
+            else:
+                print("Not Equal\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare name
+            name=""
+            if [ "value" == "${'$'}{name}value" ]; then
+                printf "Equal\n"
+            else
+                printf "Not Equal\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Equal\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifStatement_notEquals_withStringConcat_andParenthesis_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            if ("value" == (name + "value")):
+                print("Equal\n")
+            else:
+                print("Not Equal\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            declare name
+            name=""
+            if [ "value" == "${'$'}{name}value" ]; then
+                printf "Equal\n"
+            else
+                printf "Not Equal\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Equal\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    // TODO make test for combining expression
 
     @Test
     fun ifStatement_isNotEmpty_works() {

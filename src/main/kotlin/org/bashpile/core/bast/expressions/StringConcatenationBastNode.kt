@@ -10,7 +10,7 @@ class StringConcatenationBastNode(childern: List<BastNode>)
         val childRenders = children.map { it.render() }.map {
             it.removeSurrounding("\"").removeSurrounding("'")
         }.joinToString("")
-        return if (parent!! is UnaryPrimaryBastNode || parent!! is BinaryPrimaryBastNode) {
+        return if (parents().any { it is UnaryPrimaryBastNode || it is BinaryPrimaryBastNode } ) {
             """
                 "$childRenders"
             """.trimIndent()

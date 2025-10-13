@@ -1,15 +1,13 @@
 package org.bashpile.core.bast.expressions
 
-import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 
-class UnaryPrimaryBastNode(private val operator: String, private val rightExpression: BastNode)
-    : BastNode(mutableListOf(rightExpression), majorType = TypeEnum.BOOLEAN)
+/** See also [BinaryPrimaryBastNode] */
+class UnaryPrimaryBastNode(operator: String, private val rightExpression: BastNode)
+    : PrimaryBastNode(null, operator, rightExpression)
 {
     override fun render(): String {
-        val rightRendered = if (rightExpression is VariableReferenceBastNode) {
-            "\"${rightExpression.render()}\""
-        } else { rightExpression.render() }
+        val rightRendered = rightExpression.renderAndQuoteAsNeeded()
         val bashOperator = when (operator) {
             // string operators
             "isEmpty" -> "-z"

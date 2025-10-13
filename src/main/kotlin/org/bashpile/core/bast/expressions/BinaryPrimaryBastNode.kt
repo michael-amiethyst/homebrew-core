@@ -2,10 +2,10 @@ package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
 
-class BinaryPrimaryBastNode(val left: BastNode, val operator: String, val right: BastNode)
-    : BastNode(mutableListOf(left, right), majorType = TypeEnum.BOOLEAN)
+/** See also [UnaryPrimaryBastNode] */
+class BinaryPrimaryBastNode(val left: BastNode, operator: String, val right: BastNode)
+    : PrimaryBastNode(left, operator, right)
 {
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {
         return BinaryPrimaryBastNode(left, operator, right)
@@ -38,12 +38,5 @@ class BinaryPrimaryBastNode(val left: BastNode, val operator: String, val right:
             // floats
             "bc -l <<< \"${left.render()} $translatedOperator ${right.render()}\" > /dev/null"
         }
-    }
-
-    /** Render (and quote if needed) */
-    private fun BastNode.renderAndQuoteAsNeeded(): String {
-        return if (this is VariableReferenceBastNode || this is StringLiteralBastNode) {
-            "\"${this.render()}\""
-        } else { this.render() }
     }
 }
