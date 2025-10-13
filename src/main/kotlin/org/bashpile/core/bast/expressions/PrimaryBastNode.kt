@@ -12,9 +12,9 @@ abstract class PrimaryBastNode(left: BastNode?, protected val operator: String, 
 {
     /** Render (and quote if needed) */
     protected fun BastNode.renderAndQuoteAsNeeded(): String {
-        // TODO check if this is needed 'is CombiningExpressionBastNode'
-        return if (this is VariableReferenceBastNode || this is StringLiteralBastNode || this is UnaryPrimaryBastNode ||
-                this is BinaryPrimaryBastNode) {
+        return if (this is VariableReferenceBastNode || this is StringLiteralBastNode || this is ShellStringBastNode
+            || this is UnaryPrimaryBastNode || this is BinaryPrimaryBastNode)
+        {
             "\"${this.render()}\""
         } else { this.render() }
     }

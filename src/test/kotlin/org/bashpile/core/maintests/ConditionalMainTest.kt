@@ -2,7 +2,7 @@ package org.bashpile.core.maintests
 
 import org.bashpile.core.SCRIPT_ERROR__GENERIC
 import org.bashpile.core.SCRIPT_SUCCESS
-import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.runCommand
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
@@ -16,7 +16,7 @@ class ConditionalMainTest : MainTest() {
             #(ls some_random_file_that_does_not_exist.txt) or true
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             (ls some_random_file_that_does_not_exist.txt) >/dev/null 2>&1 || true
             
         """.trimIndent(), renderedBash
@@ -34,7 +34,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             if [ 1 -gt 0 ]; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
@@ -57,7 +57,7 @@ class ConditionalMainTest : MainTest() {
                 print("Not empty\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare name
             name=""
             if [ -z "${'$'}{name}" ]; then
@@ -83,7 +83,7 @@ class ConditionalMainTest : MainTest() {
                 print("Not empty\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare name
             name=""
             if [ -z "${'$'}{name}notEmpty" ]; then
@@ -109,7 +109,7 @@ class ConditionalMainTest : MainTest() {
                 print("Empty\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare name
             name=""
             if ! [ -z "${'$'}{name}value" ]; then
@@ -135,7 +135,7 @@ class ConditionalMainTest : MainTest() {
                 print("Not Equal\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare name
             name=""
             if [ "value" == "${'$'}{name}value" ]; then
@@ -161,7 +161,7 @@ class ConditionalMainTest : MainTest() {
                 print("Not Equal\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare name
             name=""
             if [ "value" == "${'$'}{name}value" ]; then
@@ -177,7 +177,63 @@ class ConditionalMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO make test for combining expression
+    @Test
+    fun ifStatement_notEquals_withStringConcat_andParenthesisAndCombining_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            input1: string = "value"
+            if ("value" == (name + "value") and input1 == "value"):
+                print("Equal\n")
+            else:
+                print("Not Equal\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            STRICT_HEADER + """
+            declare name
+            name=""
+            declare input1
+            input1="value"
+            if [ "value" == "${'$'}{name}value" ] && [ "${'$'}{input1}" == "value" ]; then
+                printf "Equal\n"
+            else
+                printf "Not Equal\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Equal\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifStatement_notEquals_withStringConcat_andParenthesisAndCombiningAndShellString_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            input1: string = "value"
+            if ("value" == (name + "value") and input1 == #(printf "value")):
+                print("Equal\n")
+            else:
+                print("Not Equal\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            STRICT_HEADER + """
+            declare name
+            name=""
+            declare input1
+            input1="value"
+            if [ "value" == "${'$'}{name}value" ] && [ "${'$'}{input1}" == "$(printf "value")" ]; then
+                printf "Equal\n"
+            else
+                printf "Not Equal\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Equal\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
 
     @Test
     fun ifStatement_isNotEmpty_works() {
@@ -189,7 +245,7 @@ class ConditionalMainTest : MainTest() {
                 print("Empty\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare name
             name="hello"
             if [ -n "${'$'}{name}" ]; then
@@ -218,7 +274,7 @@ class ConditionalMainTest : MainTest() {
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -249,7 +305,7 @@ class ConditionalMainTest : MainTest() {
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -280,7 +336,7 @@ class ConditionalMainTest : MainTest() {
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ "${'$'}{filename}" == "$filename" ]; then
@@ -312,7 +368,7 @@ class ConditionalMainTest : MainTest() {
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -344,7 +400,7 @@ class ConditionalMainTest : MainTest() {
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare filename
             filename="$filename"
             if [ -e "${'$'}{filename}" ]; then
@@ -376,7 +432,7 @@ class ConditionalMainTest : MainTest() {
                 print("Unknown\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare filename
             filename="$filename"
             if ! [ ! -e "${'$'}{filename}" ]; then
@@ -405,7 +461,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare zero
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
@@ -432,7 +488,7 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
                 printf "Math is mathing! "
                 printf "Math is mathing!\n"
@@ -460,7 +516,7 @@ class ConditionalMainTest : MainTest() {
                 print("Zero is one???\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare zero
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
@@ -512,7 +568,7 @@ class ConditionalMainTest : MainTest() {
                 print("Zero is one???\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare zero
             zero="0"
             if [ 1 -lt "${'$'}{zero}" ]; then
@@ -540,7 +596,7 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             if [ 1 -lt 2 ] && [ 2 -le 3 ]; then
                 printf "Math is mathing!\n"
             else
@@ -563,7 +619,7 @@ class ConditionalMainTest : MainTest() {
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             if [ 1 -lt 2 ] && [ 2 -le 1 ] || (expr 1 \> 0) >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
@@ -585,7 +641,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(
+            STRICT_HEADER + """
             if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
@@ -607,7 +664,8 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Command failed\n")
         """.trimIndent().byteInputStream()).render()
-        assertEquals(AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(
+            STRICT_HEADER + """
             declare one
             one="1.0"
             if bc -l <<< "${'$'}{one} < 2.0" > /dev/null && bc -l <<< "2.0 <= ${'$'}{one}" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
@@ -634,7 +692,7 @@ class ConditionalMainTest : MainTest() {
                 print("Neither true\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare a
             a="true"
             if ${'$'}{a} && false; then
@@ -662,7 +720,7 @@ class ConditionalMainTest : MainTest() {
                 print("Lame\n")
         """.trimIndent().byteInputStream()).render()
         assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+            STRICT_HEADER + """
             declare a
             a="1"
             if [ $(($(expr 5 + 6) - a)) -eq 10 ]; then
