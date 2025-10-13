@@ -3,6 +3,7 @@ package org.bashpile.core.antlr
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
+import org.bashpile.core.BashpileParser.ExpressionContext
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.FLOAT
@@ -96,13 +97,13 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitUnaryPostCrementExpression(ctx: BashpileParser.UnaryPostCrementExpressionContext): BastNode {
         val expressionNode = visit(ctx.expression())
-        val operator = ctx.op.text
+        val operator = ctx.operatorText()
         return UnaryCrementArithmeticBastNode(expressionNode, operator)
     }
 
     override fun visitUnaryPreCrementExpression(ctx: BashpileParser.UnaryPreCrementExpressionContext): BastNode {
         val expressionNode = visit(ctx.expression())
-        val operator = ctx.op.text
+        val operator = ctx.operatorText()
         return UnaryCrementArithmeticBastNode(expressionNode, operator, precrement = true)
     }
 
@@ -250,4 +251,56 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             )
         }
     }
+}
+
+private fun BashpileParser.UnaryPostCrementExpressionContext.operatorText(): String {
+    return op.text
+}
+
+private fun BashpileParser.UnaryPreCrementExpressionContext.operatorText(): String {
+    return op.text
+}
+/** Encapsulates Antlr API to preserve the Law of Demeter */
+private fun BashpileParser.ForeachFileLineLoopStatementContext.statements(): List<BashpileParser.StatementContext> {
+    return indentedStatements().statement()
+}
+
+/** Encapsulates Antlr API to preserve the Law of Demeter */
+private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
+    return argumentList().expression()
+}
+
+/** Encapsulates Antlr API to preserve the Law of Demeter */
+private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List<BashpileParser.ModifierContext> {
+    return typedId().modifier()
+}
+
+/** Encapsulates Antlr API to preserve the Law of Demeter */
+private fun BashpileParser.VariableDeclarationStatementContext.id(): TerminalNode {
+    return typedId().Id()
+}
+
+/**
+ * Gets the primary (first) type.  E.g., List.
+ * Encapsulates Antlr API to preserve the Law of Demeter
+ */
+private fun BashpileParser.VariableDeclarationStatementContext.majorType(): BashpileParser.TypesContext {
+    return typedId().majorType()
+}
+
+/**
+ * Gets the primary (first) type.  E.g., List.
+ * Encapsulates Antlr API to preserve the Law of Demeter
+ */
+private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesContext {
+    return complexType().types(0)
+}
+
+/**
+ * Gets the type index of this [TerminalNode].  Indexes are defined in [BashpileLexer].
+ * Encapsulates Antlr API to preserve the Law of Demeter
+ * @see BashpileLexer.DollarOParen as an example value to match against
+ */
+private fun TerminalNode.typeIndex(): Int {
+    return symbol.type
 }
