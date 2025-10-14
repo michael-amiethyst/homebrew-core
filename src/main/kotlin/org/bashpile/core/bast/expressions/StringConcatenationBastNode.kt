@@ -3,14 +3,15 @@ package org.bashpile.core.bast.expressions
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.BastNode
 
-class StringConcatenationBastNode(childern: List<BastNode>)
-    : BastNode(childern.toMutableList(), majorType = STRING)
+class StringConcatenationBastNode(children: List<BastNode>)
+    : BastNode(children.toMutableList(), majorType = STRING)
 {
     override fun render(): String {
         val childRenders = children.map { it.render() }.map {
             it.removeSurrounding("\"").removeSurrounding("'")
         }.joinToString("")
-        return if (parents().any { it is UnaryPrimaryBastNode || it is BinaryPrimaryBastNode } ) {
+        val quoteNeeded = parent!! !is StringConcatenationBastNode && parents().any { it is PrimaryBastNode }
+        return if (quoteNeeded) {
             """
                 "$childRenders"
             """.trimIndent()

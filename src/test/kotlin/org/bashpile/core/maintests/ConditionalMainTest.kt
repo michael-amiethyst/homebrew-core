@@ -236,6 +236,38 @@ class ConditionalMainTest : MainTest() {
     }
 
     @Test
+    fun ifStatement_notEquals_withDeepStringConcat_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            input1: string = "value"
+            if ("value" == ( name + ("val" + "ue") )):
+                print("Equal\n")
+            else:
+                print("Not Equal\n")
+        """.trimIndent().byteInputStream()).render()
+        assertEquals(
+            STRICT_HEADER + """
+            declare name
+            name=""
+            declare input1
+            input1="value"
+            if [ "value" == "${'$'}{name}value" ]; then
+                printf "Equal\n"
+            else
+                printf "Not Equal\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Equal\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    // TODO move renderAndQuoteAsNeeded to the .render() of the children
+    // TODO make RenderOptions and move logic to .renders with flags like `withQuotes`
+
+    @Test
     fun ifStatement_isNotEmpty_works() {
         val renderedBash = fixture._getBast("""
             name: string = "hello"
