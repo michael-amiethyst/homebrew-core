@@ -3,6 +3,7 @@ package org.bashpile.core.maintests
 import org.bashpile.core.SCRIPT_ERROR__GENERIC
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
+import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.runCommand
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
@@ -14,7 +15,7 @@ class ConditionalMainTest : MainTest() {
     fun conditionals_works() {
         val renderedBash = fixture._getBast("""
             #(ls some_random_file_that_does_not_exist.txt) or true
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             (ls some_random_file_that_does_not_exist.txt) >/dev/null 2>&1 || true
@@ -32,7 +33,7 @@ class ConditionalMainTest : MainTest() {
             if (1 > 0):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             if [ 1 -gt 0 ]; then
@@ -55,7 +56,7 @@ class ConditionalMainTest : MainTest() {
                 print("Empty\n")
             else:
                 print("Not empty\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -81,7 +82,7 @@ class ConditionalMainTest : MainTest() {
                 print("Empty\n")
             else:
                 print("Not empty\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -107,7 +108,7 @@ class ConditionalMainTest : MainTest() {
                 print("!Empty\n")
             else:
                 print("Empty\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -133,7 +134,7 @@ class ConditionalMainTest : MainTest() {
                 print("Equal\n")
             else:
                 print("Not Equal\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -159,7 +160,7 @@ class ConditionalMainTest : MainTest() {
                 print("Equal\n")
             else:
                 print("Not Equal\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -186,7 +187,7 @@ class ConditionalMainTest : MainTest() {
                 print("Equal\n")
             else:
                 print("Not Equal\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -215,7 +216,7 @@ class ConditionalMainTest : MainTest() {
                 print("Equal\n")
             else:
                 print("Not Equal\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -244,7 +245,7 @@ class ConditionalMainTest : MainTest() {
                 print("Equal\n")
             else:
                 print("Not Equal\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -264,7 +265,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO move renderAndQuoteAsNeeded to the .render() of the children
+    // TODO move renderAndQuoteAsNeeded to the .render(RenderOptions.UNQUOTED) of the children
     // TODO make RenderOptions and move logic to .renders with flags like `withQuotes`
 
     @Test
@@ -275,7 +276,7 @@ class ConditionalMainTest : MainTest() {
                 print("Not empty\n")
             else:
                 print("Empty\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare name
@@ -304,7 +305,7 @@ class ConditionalMainTest : MainTest() {
                 print("File does not exist\n")
             else:
                 print("Unknown\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare filename
@@ -335,7 +336,7 @@ class ConditionalMainTest : MainTest() {
                 print("File does not exist\n")
             else:
                 print("Unknown\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare filename
@@ -366,7 +367,7 @@ class ConditionalMainTest : MainTest() {
                 print("Fail\n")
             else:
                 print("Unknown\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare filename
@@ -398,7 +399,7 @@ class ConditionalMainTest : MainTest() {
                 print("File does not exist\n")
             else:
                 print("Unknown\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare filename
@@ -430,7 +431,7 @@ class ConditionalMainTest : MainTest() {
                 print("File does not exist\n")
             else:
                 print("Unknown\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare filename
@@ -462,7 +463,7 @@ class ConditionalMainTest : MainTest() {
                 print("File does not exist\n")
             else:
                 print("Unknown\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare filename
@@ -491,7 +492,7 @@ class ConditionalMainTest : MainTest() {
             else:
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare zero
@@ -518,7 +519,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
@@ -546,7 +547,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Zero is one???\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare zero
@@ -583,7 +584,7 @@ class ConditionalMainTest : MainTest() {
                     print("Zero is one???\n")
                 print(math)
                 """.trimIndent().byteInputStream()
-            ).render()
+            ).render(RenderOptions.UNQUOTED)
         }
     }
 
@@ -598,7 +599,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Zero is one???\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare zero
@@ -626,7 +627,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             if [ 1 -lt 2 ] && [ 2 -le 3 ]; then
@@ -649,7 +650,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             if [ 1 -lt 2 ] && [ 2 -le 1 ] || (expr 1 \> 0) >/dev/null 2>&1; then
@@ -672,7 +673,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             if bc -l <<< "1.0 < 2.0" > /dev/null && bc -l <<< "2.0 <= 1.0" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
@@ -695,7 +696,7 @@ class ConditionalMainTest : MainTest() {
                 print("Math is mathing!\n")
             else:
                 print("Command failed\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare one
@@ -722,7 +723,7 @@ class ConditionalMainTest : MainTest() {
                 print("At least one true\n")
             else:
                 print("Neither true\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare a
@@ -750,7 +751,7 @@ class ConditionalMainTest : MainTest() {
                 print("It tracks\n")
             else:
                 print("Lame\n")
-        """.trimIndent().byteInputStream()).render()
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare a

@@ -4,6 +4,7 @@ import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.Literal
+import org.bashpile.core.engine.RenderOptions
 
 /** For Pre/Post increment/decrement operations.  E.g. ++2, i++, --i and i-- */
 class UnaryCrementArithmeticBastNode(
@@ -15,12 +16,12 @@ class UnaryCrementArithmeticBastNode(
     mutableListOf(expressionNode),
     majorType = expressionNode.majorType())
 {
-    override fun render(): String {
+    override fun render(options: RenderOptions): String {
         check (expressionNode.coercesTo(TypeEnum.INTEGER)) {
             "Post-increment/decrement can only be applied to integers, not ${expressionNode.majorType()}"
         }
         check (expressionNode !is Literal) { "Literals cannot be incremented or decremented" }
-        val childRender = expressionNode.render()
+        val childRender = expressionNode.render(RenderOptions.UNQUOTED)
         val innerText = if (precrement) { "${operator}$childRender"} else { "${childRender}$operator" }
         return "$(($innerText))"
     }

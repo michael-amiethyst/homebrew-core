@@ -2,6 +2,7 @@ package org.bashpile.core.maintests
 
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.runCommand
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ class DeclarationsMainTest : MainTest() {
     @Test
     fun getBast_declare_bool_works() {
         val bashpileText: InputStream = "b: boolean = true".byteInputStream()
-        val bashScript = fixture._getBast(bashpileText).render()
+        val bashScript = fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare b
@@ -31,7 +32,7 @@ class DeclarationsMainTest : MainTest() {
     @Test
     fun getBast_declare_readonlyExported_string_works() {
         val bashpileText: InputStream = "b: readonly exported string = 'A_STRING'".byteInputStream()
-        val bashScript = fixture._getBast(bashpileText).render()
+        val bashScript = fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x b
@@ -50,7 +51,7 @@ class DeclarationsMainTest : MainTest() {
             b: readonly exported string = 'A_STRING'
             print(b)
         """.trimIndent().byteInputStream()
-        val bashScript = fixture._getBast(bashpileText).render()
+        val bashScript = fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x b
@@ -72,7 +73,7 @@ class DeclarationsMainTest : MainTest() {
             b="B_STRING"
             print(b)
         """.trimIndent().byteInputStream()
-        val bashScript = fixture._getBast(bashpileText).render()
+        val bashScript = fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x b
@@ -95,7 +96,7 @@ class DeclarationsMainTest : MainTest() {
             b="'B_STRING'"
             print(b)
         """.trimIndent().byteInputStream()
-        val bashScript = fixture._getBast(bashpileText).render()
+        val bashScript = fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x b
@@ -119,7 +120,7 @@ class DeclarationsMainTest : MainTest() {
             print(b)
         """.trimIndent().byteInputStream()
         Assertions.assertThrows(IllegalStateException::class.java) {
-            fixture._getBast(bashpileText).render()
+            fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         }
     }
 
@@ -132,7 +133,7 @@ class DeclarationsMainTest : MainTest() {
             print(b)
         """.trimIndent().byteInputStream()
         Assertions.assertThrows(IllegalStateException::class.java) {
-            fixture._getBast(bashpileText).render()
+            fixture._getBast(bashpileText).render(RenderOptions.UNQUOTED)
         }
     }
 }

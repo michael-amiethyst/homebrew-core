@@ -1,11 +1,12 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.engine.RenderOptions
 
 /** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class ReassignmentBastNode(id: String, child: BastNode) : StatementBastNode(child, id) {
 
-    override fun render(): String {
+    override fun render(options: RenderOptions): String {
         // guard
         val varInfo = variableInfo()
         check(!varInfo.readonly) { "Tried to reassign readonly variable: $id" }
@@ -15,7 +16,8 @@ class ReassignmentBastNode(id: String, child: BastNode) : StatementBastNode(chil
         }
 
         // body
-        val childRender = children[0].render()
+        // TODO render quoted
+        val childRender = children[0].render(RenderOptions.UNQUOTED)
         return """
             $id="$childRender"
 

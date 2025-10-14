@@ -1,13 +1,14 @@
 package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.engine.RenderOptions
 
 /** See also [BinaryPrimaryBastNode] */
 class UnaryPrimaryBastNode(operator: String, private val rightExpression: BastNode)
     : PrimaryBastNode(null, operator, rightExpression)
 {
-    override fun render(): String {
-        val rightRendered = rightExpression.renderAndQuoteAsNeeded()
+    override fun render(options: RenderOptions): String {
+        val rightRendered = rightExpression.render(RenderOptions.QUOTED)
         val bashOperator = when (operator) {
             // string operators
             "isEmpty" -> "-z"

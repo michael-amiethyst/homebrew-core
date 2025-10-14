@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.testing.test
 import org.bashpile.core.Main
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.engine.RenderOptions
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.InputStream
@@ -73,7 +74,7 @@ class BasicMainTest {
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture._getBast(script).render()
+            """.trimIndent(), fixture._getBast(script).render(RenderOptions.UNQUOTED)
         )
     }
 
@@ -84,7 +85,7 @@ class BasicMainTest {
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture._getBast(bpScript).render()
+            """.trimIndent(), fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         )
     }
 
@@ -96,7 +97,7 @@ class BasicMainTest {
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render()
+            """.trimIndent(), fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         )
     }
 
@@ -108,7 +109,7 @@ class BasicMainTest {
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render()
+            """.trimIndent(), fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         )
     }
 
@@ -120,7 +121,7 @@ class BasicMainTest {
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "Hello Bashpile!  It's awesome!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render()
+            """.trimIndent(), fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         )
     }
 
@@ -131,7 +132,7 @@ class BasicMainTest {
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             printf "%s" "1.0"
             
-            """.trimIndent(), fixture._getBast(bpScript).render()
+            """.trimIndent(), fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         )
     }
 
@@ -139,7 +140,7 @@ class BasicMainTest {
     fun getBast_printFloat_plusString_fails() {
         val bpScript: InputStream = "print(1.0 + \" apples please\")".byteInputStream()
         Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            fixture._getBast(bpScript).render()
+            fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         }
     }
 
@@ -147,7 +148,7 @@ class BasicMainTest {
     fun getBast_printString_plusBool_fails() {
         val bpScript: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
         Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            fixture._getBast(bpScript).render()
+            fixture._getBast(bpScript).render(RenderOptions.UNQUOTED)
         }
     }
 }

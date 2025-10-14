@@ -20,6 +20,8 @@ import org.apache.logging.log4j.LogManager
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.antlr.ThrowingErrorListener
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.engine.CallStack
+import org.bashpile.core.engine.RenderOptions
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
@@ -98,7 +100,7 @@ class Main : CliktCommand() {
             generateSequence(::readLine).joinToString("\n")
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        val bash: String = bastRoot.render()
+        val bash: String = bastRoot.render(RenderOptions.UNQUOTED)
         if (!commandMode()) {
             logger.debug("Writing to STDOUT in regular (non-command) mode")
             echo(SHEBANG_HEADER + bash, false)

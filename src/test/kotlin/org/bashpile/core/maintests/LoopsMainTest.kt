@@ -3,6 +3,7 @@ package org.bashpile.core.maintests
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode
+import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.runCommand
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ class LoopsMainTest : MainTest() {
             for(first: string, last: string, email: string, phone: string in "src/test/resources/data/example.csv"):
                 print(first + " " + last + " " + email + " " + phone + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             cat "src/test/resources/data/example.csv" | ${ForeachFileLineLoopBashNode.Companion.sed} -e '1d' -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r first last email phone; do
@@ -53,7 +54,7 @@ class LoopsMainTest : MainTest() {
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", " + \
                     "\"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x HOST
@@ -101,7 +102,7 @@ class LoopsMainTest : MainTest() {
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x HOST
@@ -149,7 +150,7 @@ class LoopsMainTest : MainTest() {
                 print("Updating phone # " + cellShort + " with values: lastName " + lastName + " cell " + cell + ".\n")
                 print("{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare -x HOST
@@ -190,7 +191,7 @@ class LoopsMainTest : MainTest() {
             for(line: string in "$filename"):
                 print(line + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             cat "$filename" | ${ForeachFileLineLoopBashNode.Companion.sed} -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
@@ -218,7 +219,7 @@ class LoopsMainTest : MainTest() {
             for(line: string in "$filename"):
                 print(line + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             cat "$filename" | ${ForeachFileLineLoopBashNode.Companion.sed} -e 's/\r//g' | ${ForeachFileLineLoopBashNode.Companion.sed} -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
@@ -248,7 +249,7 @@ class LoopsMainTest : MainTest() {
                 print(line + "\n")
             print(scoped + "\n")
         """.trimIndent().byteInputStream()
-        val thrown: IllegalStateException? = assertThrows { fixture._getBast(script).render() }
+        val thrown: IllegalStateException? = assertThrows { fixture._getBast(script).render(RenderOptions.UNQUOTED) }
         Assertions.assertNotNull(thrown)
     }
 
@@ -260,7 +261,7 @@ class LoopsMainTest : MainTest() {
             for(line: string in "$filename"):
                 print(outerScope + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
 
         val bashResult = renderedBash.runCommand()
         Assertions.assertEquals(
@@ -281,7 +282,7 @@ class LoopsMainTest : MainTest() {
             for(line: string in "$filename"):
                 print(line + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
 
         val bashResult = renderedBash.runCommand()
         Assertions.assertEquals(
@@ -305,7 +306,7 @@ class LoopsMainTest : MainTest() {
                 for(line2: string in "$innerFilename"):
                     print(line2 + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
 
         val bashResult = renderedBash.runCommand()
         Assertions.assertEquals(
@@ -333,7 +334,7 @@ class LoopsMainTest : MainTest() {
                 for(line: string in "$innerFilename"):
                     print(line + "\n")
         """.trimIndent().byteInputStream()
-        val renderedBash = fixture._getBast(script).render()
+        val renderedBash = fixture._getBast(script).render(RenderOptions.UNQUOTED)
 
         val bashResult = renderedBash.runCommand()
         Assertions.assertEquals(

@@ -5,6 +5,7 @@ import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
+import org.bashpile.core.engine.RenderOptions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -20,7 +21,7 @@ class ForeachFileLineLoopBashNodeTest {
                 printf "${'$'}{col1}"
             done
 
-        """.trimIndent(), fixture.render())
+        """.trimIndent(), fixture.render(RenderOptions.UNQUOTED))
     }
 
     /** Statement in block needs 2 Bash lines to render */
@@ -37,6 +38,6 @@ class ForeachFileLineLoopBashNodeTest {
                 col1="exampleValue"
             done
 
-        """.trimIndent(), fixture.render())
+        """.trimIndent(), fixture.render(RenderOptions.UNQUOTED))
     }
 }
