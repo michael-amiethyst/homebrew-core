@@ -12,9 +12,8 @@ abstract class PrimaryBastNode(left: BastNode?, protected val operator: String, 
 {
     /** Render (and quote if needed) */
     protected fun BastNode.renderAndQuoteAsNeeded(): String {
-        return if (this is VariableReferenceBastNode || this is StringLiteralBastNode || this is ShellStringBastNode
-            || this is UnaryPrimaryBastNode || this is BinaryPrimaryBastNode)
-        {
+        val isStringy = this is StringLiteralBastNode || this is ShellStringBastNode
+        return if (isStringy || this is VariableReferenceBastNode || this is PrimaryBastNode) {
             "\"${this.render()}\""
         } else { this.render() }
     }
