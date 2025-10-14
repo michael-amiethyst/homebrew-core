@@ -3,11 +3,9 @@ package org.bashpile.core.antlr
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
-import org.bashpile.core.BashpileParser.ExpressionContext
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.FLOAT
-import org.bashpile.core.TypeEnum.INTEGER
+import org.bashpile.core.TypeEnum.*
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
@@ -52,7 +50,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitForeachFileLineLoopStatement(ctx: BashpileParser.ForeachFileLineLoopStatementContext): BastNode {
-        val children = ctx.statements().map { visit(it) }
+        val antlrStatements = ctx.indentedStatements().statement()
+        val children = antlrStatements.map { visit(it) }
         val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
         return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
     }
@@ -72,8 +71,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val node = visit(ctx.expression())
         val readonly = ctx.modifiers().any { it.text == "readonly" }
         val export = ctx.modifiers().any { it.text == "exported" }
-        val id = ctx.id().text
-        val typeText = ctx.majorType().text
+        val id = ctx.typedId().Id().text
+        val typeText = ctx.typedId().majorType().text
         val type = TypeEnum.valueOf(typeText.uppercase())
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
@@ -83,7 +82,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
-        val nodes = ctx.expressions().map { visit(it) }
+        val antlrExpressions = ctx.argumentList().expression()
+        val nodes = antlrExpressions.map { visit(it) }
         return PrintBastNode(nodes)
     }
 
@@ -97,19 +97,18 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitUnaryPostCrementExpression(ctx: BashpileParser.UnaryPostCrementExpressionContext): BastNode {
         val expressionNode = visit(ctx.expression())
-        val operator = ctx.operatorText()
+        val operator = ctx.op.text
         return UnaryCrementArithmeticBastNode(expressionNode, operator)
     }
 
     override fun visitUnaryPreCrementExpression(ctx: BashpileParser.UnaryPreCrementExpressionContext): BastNode {
         val expressionNode = visit(ctx.expression())
-        val operator = ctx.operatorText()
+        val operator = ctx.op.text
         return UnaryCrementArithmeticBastNode(expressionNode, operator, precrement = true)
     }
 
-    override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
-        require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
-        return VariableReferenceBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
+    override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode {
+        return VariableReferenceBastNode(ctx.Id().text, UNKNOWN)
     }
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
@@ -151,8 +150,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitNotExpression(ctx: BashpileParser.NotExpressionContext): BastNode {
-        val bastNodeChildren = listOf(TerminalBastNode("! ", TypeEnum.STRING), visit(ctx.expression()))
-        return InternalBastNode(bastNodeChildren, TypeEnum.BOOLEAN)
+        val bastNodeChildren = listOf(TerminalBastNode("! ", STRING), visit(ctx.expression()))
+        return InternalBastNode(bastNodeChildren, BOOLEAN)
     }
 
     override fun visitMultipyDivideCalculationExpression(ctx: BashpileParser.MultipyDivideCalculationExpressionContext): BastNode {
@@ -168,7 +167,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     private fun calculationExpressionInner(left: BastNode, middle: TerminalBastNode, right: BastNode): BastNode {
-        val areAllStrings = left.coercesTo(TypeEnum.STRING) && right.coercesTo(TypeEnum.STRING)
+        val areAllStrings = left.coercesTo(STRING) && right.coercesTo(STRING)
         return if (areAllStrings) {
             require(middle.isAddition()) { "Only addition is supported on strings" }
             StringConcatenationBastNode(listOf(left, right))
@@ -247,60 +246,25 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
             else -> TerminalBastNode(
                 node.text.replace("^newline$".toRegex(), "\n"),
-                TypeEnum.STRING
+                STRING
             )
         }
     }
 }
 
-private fun BashpileParser.UnaryPostCrementExpressionContext.operatorText(): String {
-    return op.text
-}
-
-private fun BashpileParser.UnaryPreCrementExpressionContext.operatorText(): String {
-    return op.text
-}
-/** Encapsulates Antlr API to preserve the Law of Demeter */
-private fun BashpileParser.ForeachFileLineLoopStatementContext.statements(): List<BashpileParser.StatementContext> {
-    return indentedStatements().statement()
-}
-
-/** Encapsulates Antlr API to preserve the Law of Demeter */
-private fun BashpileParser.PrintStatementContext.expressions(): List<ExpressionContext> {
-    return argumentList().expression()
-}
-
-/** Encapsulates Antlr API to preserve the Law of Demeter */
 private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List<BashpileParser.ModifierContext> {
     return typedId().modifier()
 }
 
-/** Encapsulates Antlr API to preserve the Law of Demeter */
-private fun BashpileParser.VariableDeclarationStatementContext.id(): TerminalNode {
-    return typedId().Id()
-}
-
-/**
- * Gets the primary (first) type.  E.g., List.
- * Encapsulates Antlr API to preserve the Law of Demeter
- */
-private fun BashpileParser.VariableDeclarationStatementContext.majorType(): BashpileParser.TypesContext {
-    return typedId().majorType()
-}
-
-/**
- * Gets the primary (first) type.  E.g., List.
- * Encapsulates Antlr API to preserve the Law of Demeter
- */
 private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesContext {
     return complexType().types(0)
 }
 
 /**
  * Gets the type index of this [TerminalNode].  Indexes are defined in [BashpileLexer].
- * Encapsulates Antlr API to preserve the Law of Demeter
  * @see BashpileLexer.DollarOParen as an example value to match against
  */
 private fun TerminalNode.typeIndex(): Int {
     return symbol.type
 }
+
