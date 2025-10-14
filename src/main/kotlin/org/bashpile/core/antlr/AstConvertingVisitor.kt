@@ -18,6 +18,7 @@ import org.bashpile.core.bast.statements.*
  * Holds minimal logic; most logic is in the BAST nodes.
  * Created by [org.bashpile.core.Main].
  * Is in two major sections - Statements and Expressions.
+ * Law of Demeter relaxed to two calls deep (extension methods are just used once or twice)
  * Code is arranged from complex at the top to simple at the bottom.
  */
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
