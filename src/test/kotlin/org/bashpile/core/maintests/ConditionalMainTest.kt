@@ -265,7 +265,34 @@ class ConditionalMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO write BinaryPrimary like == with one side #(ls)
+    @Test
+    fun ifStatement_notEquals_withShellString_works() {
+        val renderedBash = fixture._getBast("""
+            name: string = ""
+            input1: string = "value"
+            if ("value" == #(ls)):
+                print("Equal\n")
+            else:
+                print("Not Equal\n")
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+            declare name
+            name=""
+            declare input1
+            input1="value"
+            if [ "value" == "$(ls)" ]; then
+                printf "Equal\n"
+            else
+                printf "Not Equal\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Not Equal\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
 
     @Test
     fun ifStatement_isNotEmpty_works() {
