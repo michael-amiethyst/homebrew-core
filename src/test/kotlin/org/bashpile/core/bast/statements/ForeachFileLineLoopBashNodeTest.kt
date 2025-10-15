@@ -6,8 +6,8 @@ import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
 import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
 import org.bashpile.core.engine.RenderOptions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ForeachFileLineLoopBashNodeTest {
     @Test

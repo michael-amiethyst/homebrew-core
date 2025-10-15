@@ -5,9 +5,9 @@ import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.runCommand
-import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ConditionalMainTest : MainTest() {
 
@@ -621,7 +621,7 @@ class ConditionalMainTest : MainTest() {
 
     @Test
     fun ifElseIfElseStatement_scopingWorks() {
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             fixture._getBast(
                 """
                 zero: integer = 0

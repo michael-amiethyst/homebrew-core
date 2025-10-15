@@ -10,9 +10,11 @@ import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 class FinishedBastFactoryTest {
@@ -21,7 +23,7 @@ class FinishedBastFactoryTest {
 
     lateinit var fixture: FinishedBastFactory
 
-    @BeforeEach
+    @BeforeTest
     fun setUp() {
         Main() // create for static state
         fixture = FinishedBastFactory()
