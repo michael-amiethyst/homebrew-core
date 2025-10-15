@@ -3,6 +3,7 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 
 /** If-elseif-else */
@@ -30,7 +31,7 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
                 }.joinToString("\n").removeSuffix("\n")
             }
         }
-        val renderedConditions = conditions.map { it.render(UNQUOTED) }
+        val renderedConditions = conditions.map { it.render(IGNORE_OUTPUT) }
         val renderedIfBody = formattedBodiesRenders.first()
         return when (formattedBodiesRenders.size) {
             1 -> { """

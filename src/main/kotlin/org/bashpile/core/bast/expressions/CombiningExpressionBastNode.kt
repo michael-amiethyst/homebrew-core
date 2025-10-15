@@ -13,7 +13,7 @@ class CombiningExpressionBastNode(private val left: BastNode, private val operat
             "or" -> "||"
             else -> throw IllegalArgumentException("Unknown combining operator: $operator")
         }
-        return "${left.render(RenderOptions.UNQUOTED)} $bashOperator ${right.render(RenderOptions.UNQUOTED)}"
+        return "${left.render(RenderOptions.IGNORE_OUTPUT)} $bashOperator ${right.render(RenderOptions.IGNORE_OUTPUT)}"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): BastNode {

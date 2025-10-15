@@ -18,8 +18,7 @@ class InternalBastNode(
     constructor(vararg children: BastNode) : this(children.toList())
 
     override fun render(options: RenderOptions): String {
-        // TODO pass options?
-        return children.joinToString(renderSeparator) { it.render(RenderOptions.UNQUOTED) }
+        return children.joinToString(renderSeparator) { it.render(options) }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): InternalBastNode {

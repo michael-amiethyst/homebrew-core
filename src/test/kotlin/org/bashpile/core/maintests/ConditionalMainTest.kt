@@ -265,8 +265,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(SCRIPT_SUCCESS, commandResult.second)
     }
 
-    // TODO move renderAndQuoteAsNeeded to the .render(RenderOptions.UNQUOTED) of the children
-    // TODO make RenderOptions and move logic to .renders with flags like `withQuotes`
+    // TODO write BinaryPrimary like == with one side #(ls)
 
     @Test
     fun ifStatement_isNotEmpty_works() {
@@ -515,6 +514,31 @@ class ConditionalMainTest : MainTest() {
     fun ifElseStatement_withFailedShellString_works() {
         val renderedBash = fixture._getBast("""
             if (#(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC})):
+                print("Math is mathing! ")
+                print("Math is mathing!\n")
+            else:
+                print("Command failed\n")
+        """.trimIndent().byteInputStream()).render(RenderOptions.UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+            if (expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}) >/dev/null 2>&1; then
+                printf "Math is mathing! "
+                printf "Math is mathing!\n"
+            else
+                printf "Command failed\n"
+            fi
+            
+        """.trimIndent(), renderedBash
+        )
+        val commandResult = renderedBash.runCommand()
+        assertEquals("Command failed\n", commandResult.first)
+        assertEquals(SCRIPT_SUCCESS, commandResult.second)
+    }
+
+    @Test
+    fun ifElseStatement_withFailedShellString_andParens_works() {
+        val renderedBash = fixture._getBast("""
+            if ((#(expr 1 \> 0; exit ${SCRIPT_ERROR__GENERIC}))):
                 print("Math is mathing! ")
                 print("Math is mathing!\n")
             else:

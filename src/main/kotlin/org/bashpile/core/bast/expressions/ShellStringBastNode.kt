@@ -5,7 +5,6 @@ import org.bashpile.core.Subshell
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
-import org.bashpile.core.bast.statements.ConditionalBastNode
 import org.bashpile.core.engine.RenderOptions
 
 /**
@@ -19,9 +18,8 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
 
     override fun render(options: RenderOptions): String {
         val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
-        // TODO move ignoreOutput into RenderOptions
-        val subshell = if (parent is ConditionalBastNode || parent is CombiningExpressionBastNode) {
-            childRenders.ignoreOutput()
+        val subshell = if (options.ignoreOutput) {
+            "($childRenders) >/dev/null 2>&1"
         } else { "$($childRenders)" }
         return if (options.quoted) { "\"$subshell\"" } else { subshell }
     }
@@ -30,12 +28,4 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
         return ShellStringBastNode(nextChildren.map { it.deepCopy() }, majorType())
     }
 
-    private fun String.ignoreOutput(): String {
-        return if (parent is CombiningExpressionBastNode ||
-                parent is ConditionalBastNode || parent is BinaryPrimaryBastNode) {
-            "($this) >/dev/null 2>&1"
-        } else {
-            this
-        }
-    }
 }
