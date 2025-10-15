@@ -20,11 +20,10 @@ class VariableDeclarationBastNode(
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
-        // TODO change render to quoted
-        val childRender = children[0].render(RenderOptions.UNQUOTED)
+        val childRender = children[0].render(RenderOptions.QUOTED)
         return """
             declare $flags$id
-            $id="$childRender"
+            $id=$childRender
 
         """.trimIndent()
     }

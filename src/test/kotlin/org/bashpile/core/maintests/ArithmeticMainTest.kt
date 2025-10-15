@@ -95,7 +95,7 @@ class ArithmeticMainTest : MainTest() {
                 declare four
                 four="4"
                 declare i
-                i="$((6 / four))"
+                i=$((6 / four))
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
@@ -167,7 +167,7 @@ class ArithmeticMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
                 declare i
-                i="0"
+                i=0
                 printf "%s" "$((i++))"
                 printf "%s" "${'$'}{i}"
 
@@ -188,7 +188,7 @@ class ArithmeticMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
                 declare i
-                i="0"
+                i=0
                 printf "%s" "$((++i))"
                 printf "%s" "${'$'}{i}"
 
@@ -230,7 +230,7 @@ class ArithmeticMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
                 declare i
-                i="0"
+                i=0
                 printf "%s" "$(($(expr ${'$'}i) + 1))"
                 printf "%s" "${'$'}{i}"
 

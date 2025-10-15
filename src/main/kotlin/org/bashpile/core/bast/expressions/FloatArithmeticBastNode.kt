@@ -11,8 +11,10 @@ class FloatArithmeticBastNode(children: List<BastNode> = listOf())
     constructor(vararg child: BastNode) : this(child.toList())
 
     override fun render(options: RenderOptions): String {
+        // output of `bc` may have spaces
         val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString(" ")
-        return "$(bc -l <<< \"$childRenders\")"
+        val bcSubshell = "$(bc -l <<< \"$childRenders\")"
+        return if (options.quoted) { "\"$bcSubshell\"" } else { bcSubshell }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): FloatArithmeticBastNode {

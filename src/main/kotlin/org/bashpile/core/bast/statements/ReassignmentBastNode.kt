@@ -16,10 +16,9 @@ class ReassignmentBastNode(id: String, child: BastNode) : StatementBastNode(chil
         }
 
         // body
-        // TODO render quoted
-        val childRender = children[0].render(RenderOptions.UNQUOTED)
+        val childRender = children[0].render(RenderOptions.QUOTED)
         return """
-            $id="$childRender"
+            $id=$childRender
 
         """.trimIndent()
     }

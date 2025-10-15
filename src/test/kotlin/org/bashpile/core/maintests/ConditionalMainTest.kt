@@ -496,7 +496,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
             declare zero
-            zero="0"
+            zero=0
             if [ 1 -lt "${'$'}{zero}" ]; then
                 printf "Math is not mathing\n"
             else
@@ -551,7 +551,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
             declare zero
-            zero="0"
+            zero=0
             if [ 1 -lt "${'$'}{zero}" ]; then
                 printf "Math is not mathing\n"
             elif [ "${'$'}{zero}" -lt 1 ]; then
@@ -603,7 +603,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
             declare zero
-            zero="0"
+            zero=0
             if [ 1 -lt "${'$'}{zero}" ]; then
                 printf "Math is not mathing\n"
             elif (expr "${'$'}{zero}" \< 1) >/dev/null 2>&1; then
@@ -700,7 +700,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
             declare one
-            one="1.0"
+            one=1.0
             if bc -l <<< "${'$'}{one} < 2.0" > /dev/null && bc -l <<< "2.0 <= ${'$'}{one}" > /dev/null || (bc <<< "2.0 < 3.0") >/dev/null 2>&1; then
                 printf "Math is mathing!\n"
             else
@@ -727,7 +727,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
             declare a
-            a="true"
+            a=true
             if ${'$'}{a} && false; then
                 printf "Both true\n"
             elif ${'$'}{a} || false; then
@@ -755,7 +755,7 @@ class ConditionalMainTest : MainTest() {
         assertEquals(
             STRICT_HEADER + """
             declare a
-            a="1"
+            a=1
             if [ $(($(expr 5 + 6) - a)) -eq 10 ]; then
                 printf "It tracks\n"
             else

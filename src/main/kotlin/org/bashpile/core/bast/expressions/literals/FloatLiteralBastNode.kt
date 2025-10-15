@@ -10,7 +10,10 @@ class FloatLiteralBastNode(private val float: BigDecimal)
     : BastNode(mutableListOf(), majorType = TypeEnum.FLOAT), Literal
 {
     override fun render(options: RenderOptions): String {
-        return float.toString()
+        val toString = float.toString()
+        val noWhitespace = "\\s".toRegex().find(toString) == null
+        check(noWhitespace)
+        return toString
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): FloatLiteralBastNode {

@@ -20,7 +20,7 @@ class DeclarationsMainTest : MainTest() {
         Assertions.assertEquals(
             AstConvertingVisitor.Companion.STRICT_HEADER + """
             declare b
-            b="true"
+            b=true
 
         """.trimIndent(), bashScript
         )

@@ -10,7 +10,10 @@ class IntegerLiteralBastNode(private val bigInt: BigInteger)
     : BastNode(mutableListOf(), majorType = TypeEnum.INTEGER), Literal
 {
     override fun render(options: RenderOptions): String {
-        return bigInt.toString()
+        val toString = bigInt.toString()
+        val noWhitespace = "\\s".toRegex().find(toString) == null
+        check (noWhitespace)
+        return toString
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): IntegerLiteralBastNode {

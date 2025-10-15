@@ -65,7 +65,7 @@ class LoopsMainTest : MainTest() {
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
-                regionId="13"
+                regionId=13
                 printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
@@ -113,7 +113,7 @@ class LoopsMainTest : MainTest() {
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
-                regionId="13"
+                regionId=13
                 printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
@@ -161,7 +161,7 @@ class LoopsMainTest : MainTest() {
                 declare -x cellShort
                 cellShort="$(printf "${'$'}cell" | cut -d " " -f 2)"
                 declare -x regionId
-                regionId="13"
+                regionId=13
                 printf "Updating phone # ${'$'}{cellShort} with values: lastName ${'$'}{lastName} cell ${'$'}{cell}.\n"
                 printf "{ \"cellShort\": ${'$'}cellShort, \"lastName\": \"${'$'}lastName\" \"cell\": \"${'$'}cell\", \"regionId\": \"${'$'}regionId\" }\n"
             done
