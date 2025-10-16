@@ -4,7 +4,7 @@ import org.bashpile.core.bast.BastNode
 import org.bashpile.core.TypeEnum.FLOAT
 import org.bashpile.core.TypeEnum.INTEGER
 import org.bashpile.core.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.expressions.ArithmeticBastNode
+import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
 import org.bashpile.core.engine.RenderOptions
 
 /** This is a Print Statement node */

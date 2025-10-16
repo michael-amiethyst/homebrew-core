@@ -6,7 +6,7 @@ import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.expressions.ArithmeticBastNode
+import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
