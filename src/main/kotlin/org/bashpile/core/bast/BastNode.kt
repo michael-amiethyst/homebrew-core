@@ -1,10 +1,11 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.Main.Companion.callStack
-import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.UNKNOWN
 import org.bashpile.core.VariableTypeInfo
+import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.engine.RenderOptions
 import java.util.function.Predicate
 
 
@@ -50,7 +51,9 @@ abstract class BastNode(
         return callStack.requireOnStack(id)
     }
 
+    ///////////////////////
     // misc methods
+    //////////////////////
 
     /** Converts this tree to a list */
     fun toList(): List<BastNode> {
@@ -63,8 +66,8 @@ abstract class BastNode(
     /**
      * Should be just string manipulation to make final Bashpile text, no logic.
      */
-    open fun render(): String {
-        return children.joinToString("") { it.render() }
+    open fun render(options: RenderOptions): String {
+        return children.joinToString("") { it.render(RenderOptions.UNQUOTED) }
     }
 
     fun deepCopy(): BastNode {

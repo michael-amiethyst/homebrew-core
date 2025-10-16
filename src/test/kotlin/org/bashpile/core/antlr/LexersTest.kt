@@ -2,13 +2,13 @@ package org.bashpile.core.antlr
 
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.runCommand
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
 import java.io.IOException
 import java.nio.file.Path
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-@Order(3)
 class LexersTest {
     private val bashDir = "src/test/resources/bashScripts"
 

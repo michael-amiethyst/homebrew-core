@@ -3,6 +3,7 @@ package org.bashpile.core.bast.statements
 import org.bashpile.core.Main
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.TypeEnum
+import org.bashpile.core.engine.RenderOptions
 
 /** Created by [org.bashpile.core.antlr.AstConvertingVisitor.visitVariableDeclarationStatement] */
 class VariableDeclarationBastNode(
@@ -12,17 +13,17 @@ class VariableDeclarationBastNode(
     val readonly: Boolean = false,
     val export: Boolean = false,
     child: BastNode
-) : StatementBastNode(child, id, type) {
-
-    override fun render(): String {
+) : StatementBastNode(child, id, type)
+{
+    override fun render(options: RenderOptions): String {
         Main.Companion.callStack.addVariableInfo(id!!, majorType(), subtype, readonly)
         var exportFlags = ""
         if (export) { exportFlags += "x" }
         val flags = if (exportFlags.isNotEmpty()) "-$exportFlags " else ""
-        val childRender = children[0].render()
+        val childRender = children[0].render(RenderOptions.QUOTED)
         return """
             declare $flags$id
-            $id="$childRender"
+            $id=$childRender
 
         """.trimIndent()
     }

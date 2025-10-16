@@ -5,6 +5,7 @@ import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.TypeEnum.EMPTY
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
+import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.runCommand
 
 /**
@@ -32,7 +33,7 @@ class ForeachFileLineLoopBashNode(
         return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, doubleQuotedFilepath, columns)
     }
 
-    override fun render(): String {
+    override fun render(options: RenderOptions): String {
         callStack.use { stack ->
             stack.pushStackframe()
 
@@ -42,7 +43,7 @@ class ForeachFileLineLoopBashNode(
 
             val columnNamesJoined = columns.map { it.id }.joinToString(" ")
             val childRenderList = children.map { child ->
-                child.render().lines().filter { it.isNotBlank() }.map {
+                child.render(RenderOptions.UNQUOTED).lines().filter { it.isNotBlank() }.map {
                     "    $it"
                 }.joinToString("\n", postfix = "\n")
             }

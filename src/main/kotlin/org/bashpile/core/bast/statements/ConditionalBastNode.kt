@@ -2,7 +2,11 @@ package org.bashpile.core.bast.statements
 
 import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.RenderOptions.Companion.IGNORE_OUTPUT
+import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 
+/** If-elseif-else */
 class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<List<BastNode>>)
     : StatementBastNode(conditions + blockBodies.flatMap { it })
 {
@@ -18,16 +22,16 @@ class ConditionalBastNode(val conditions: List<BastNode>, val blockBodies: List<
         })
     }
 
-    override fun render(): String {
+    override fun render(options: RenderOptions): String {
         val formattedBodiesRenders = blockBodies.map { block ->
             callStack.use { stack ->
                 stack.pushStackframe()
                 block.flatMap { statement ->
-                    statement.render().lines().map { "    $it" }
+                    statement.render(UNQUOTED).lines().map { "    $it" }
                 }.joinToString("\n").removeSuffix("\n")
             }
         }
-        val renderedConditions = conditions.map { it.render() }
+        val renderedConditions = conditions.map { it.render(IGNORE_OUTPUT) }
         val renderedIfBody = formattedBodiesRenders.first()
         return when (formattedBodiesRenders.size) {
             1 -> { """

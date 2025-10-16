@@ -1,19 +1,23 @@
-package org.bashpile.core
+package org.bashpile.core.maintests
 
 import com.github.ajalt.clikt.testing.test
+import org.bashpile.core.Main
 import org.bashpile.core.Main.Companion.SHEBANG_HEADER
+import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
+import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import java.io.InputStream
-import java.lang.UnsupportedOperationException
-
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 /**
  * Tests Clikt and [Main._getBast], does not test logging.
  * See SystemTest for logger framework related tests (e.g. for `-vv` option).
  */
-class MainTest {
+class BasicMainTest {
 
     val fixture = Main()
 
@@ -39,7 +43,8 @@ class MainTest {
         assertEquals(SHEBANG_HEADER + STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), output.stdout)
+            """.trimIndent(), output.stdout
+        )
     }
 
     @Test
@@ -50,7 +55,8 @@ class MainTest {
         assertEquals(SHEBANG_HEADER + STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), output.stdout)
+            """.trimIndent(), output.stdout
+        )
     }
 
     @Test
@@ -68,7 +74,8 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture._getBast(script).render())
+            """.trimIndent(), fixture._getBast(script).render(UNQUOTED)
+        )
     }
 
     @Test
@@ -77,7 +84,8 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "true"
             
-            """.trimIndent(), fixture._getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+        )
     }
 
     @Test
@@ -87,7 +95,8 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+        )
     }
 
     @Test
@@ -97,7 +106,8 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+        )
     }
 
     @Test
@@ -107,7 +117,8 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "Hello Bashpile!  It's awesome!"
             
-            """.trimIndent(), fixture._getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+        )
     }
 
     @Test
@@ -116,22 +127,23 @@ class MainTest {
         assertEquals(STRICT_HEADER + """
             printf "%s" "1.0"
             
-            """.trimIndent(), fixture._getBast(bpScript).render())
+            """.trimIndent(), fixture._getBast(bpScript).render(UNQUOTED)
+        )
     }
 
     @Test
     fun getBast_printFloat_plusString_fails() {
         val bpScript: InputStream = "print(1.0 + \" apples please\")".byteInputStream()
-        assertThrows(UnsupportedOperationException::class.java) {
-            fixture._getBast(bpScript).render()
+        assertFailsWith<UnsupportedOperationException> {
+            fixture._getBast(bpScript).render(UNQUOTED)
         }
     }
 
     @Test
     fun getBast_printString_plusBool_fails() {
         val bpScript: InputStream = "print(\"You can't handle the \" + true)".byteInputStream()
-        assertThrows(UnsupportedOperationException::class.java) {
-            fixture._getBast(bpScript).render()
+        assertFailsWith<UnsupportedOperationException> {
+            fixture._getBast(bpScript).render(UNQUOTED)
         }
     }
 }

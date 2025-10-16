@@ -5,23 +5,20 @@ import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
 import org.bashpile.core.TypeEnum
+import org.bashpile.core.TypeEnum.*
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
-import org.bashpile.core.bast.expressions.literals.BooleanLiteralBastNode
-import org.bashpile.core.bast.expressions.literals.FloatLiteralBastNode
-import org.bashpile.core.bast.expressions.literals.IntegerLiteralBastNode
-import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
+import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastNode
+import org.bashpile.core.bast.expressions.literals.*
 import org.bashpile.core.bast.statements.*
-import org.bashpile.core.bast.expressions.literals.ClosingParenthesisTerminalBastNode
-import org.bashpile.core.bast.expressions.literals.TerminalBastNode
-import org.bashpile.core.bast.expressions.literals.SubshellStartTerminalBastNode
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
  * Holds minimal logic; most logic is in the BAST nodes.
  * Created by [org.bashpile.core.Main].
  * Is in two major sections - Statements and Expressions.
+ * Law of Demeter relaxed to two calls deep (extension methods are just used once or twice)
  * Code is arranged from complex at the top to simple at the bottom.
  */
 class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
@@ -54,7 +51,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitForeachFileLineLoopStatement(ctx: BashpileParser.ForeachFileLineLoopStatementContext): BastNode {
-        val children = ctx.statements().map { visit(it) }
+        val antlrStatements = ctx.indentedStatements().statement()
+        val children = antlrStatements.map { visit(it) }
         val columns = ctx.typedId().map { visit(it) as VariableReferenceBastNode }
         return ForeachFileLineLoopBashNode(children, ctx.StringValues().text, columns)
     }
@@ -74,8 +72,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val node = visit(ctx.expression())
         val readonly = ctx.modifiers().any { it.text == "readonly" }
         val export = ctx.modifiers().any { it.text == "exported" }
-        val id = ctx.id().text
-        val typeText = ctx.majorType().text
+        val id = ctx.typedId().Id().text
+        val typeText = ctx.typedId().majorType().text
         val type = TypeEnum.valueOf(typeText.uppercase())
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
@@ -85,7 +83,8 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitPrintStatement(ctx: BashpileParser.PrintStatementContext): BastNode {
-        val nodes = ctx.expressions().map { visit(it) }
+        val antlrExpressions = ctx.argumentList().expression()
+        val nodes = antlrExpressions.map { visit(it) }
         return PrintBastNode(nodes)
     }
 
@@ -97,9 +96,20 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     // expressions
     ///////////////////////////////////
 
-    override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode? {
-        require(ctx.children.size == 1) { "IdExpression must have exactly one child" }
-        return VariableReferenceBastNode(ctx.Id().text, TypeEnum.UNKNOWN)
+    override fun visitUnaryPostCrementExpression(ctx: BashpileParser.UnaryPostCrementExpressionContext): BastNode {
+        val expressionNode = visit(ctx.expression())
+        val operator = ctx.op.text
+        return UnaryCrementArithmeticBastNode(expressionNode, operator)
+    }
+
+    override fun visitUnaryPreCrementExpression(ctx: BashpileParser.UnaryPreCrementExpressionContext): BastNode {
+        val expressionNode = visit(ctx.expression())
+        val operator = ctx.op.text
+        return UnaryCrementArithmeticBastNode(expressionNode, operator, precrement = true)
+    }
+
+    override fun visitIdExpression(ctx: BashpileParser.IdExpressionContext): BastNode {
+        return VariableReferenceBastNode(ctx.Id().text, UNKNOWN)
     }
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
@@ -140,19 +150,31 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
     }
 
-    override fun visitCalculationExpression(ctx: BashpileParser.CalculationExpressionContext): BastNode {
+    override fun visitNotExpression(ctx: BashpileParser.NotExpressionContext): BastNode {
+        val bastNodeChildren = listOf(TerminalBastNode("! ", STRING), visit(ctx.expression()))
+        return InternalBastNode(bastNodeChildren, BOOLEAN)
+    }
+
+    override fun visitMultipyDivideCalculationExpression(ctx: BashpileParser.MultipyDivideCalculationExpressionContext): BastNode {
         require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
-        val left: BastNode = visit(ctx.children[0])
-        val middle = visit(ctx.children[1])
-        val right = visit(ctx.children[2])
-        val areAllStrings =
-            left.toList().all { it.coercesTo(TypeEnum.STRING) } && right.toList().all { it.coercesTo(TypeEnum.STRING) }
+        val bastNodes = ctx.children.map { visit(it) }
+        return calculationExpressionInner(bastNodes[0], bastNodes[1] as TerminalBastNode, bastNodes[2])
+    }
+
+    override fun visitAddSubtractCalculationExpression(ctx: BashpileParser.AddSubtractCalculationExpressionContext): BastNode {
+        require(ctx.children.size == 3) { "Calculation expression must have 3 children" }
+        val bastNodes = ctx.children.map { visit(it) }
+        return calculationExpressionInner(bastNodes[0], bastNodes[1] as TerminalBastNode, bastNodes[2])
+    }
+
+    private fun calculationExpressionInner(left: BastNode, middle: TerminalBastNode, right: BastNode): BastNode {
+        val areAllStrings = left.coercesTo(STRING) && right.coercesTo(STRING)
         return if (areAllStrings) {
-            require(ctx.children[1].text == "+") { "Only addition is supported on strings" }
-            InternalBastNode(left, right)
-        } else if (left.majorType() == TypeEnum.INTEGER && right.majorType() == TypeEnum.INTEGER) {
+            require(middle.isAddition()) { "Only addition is supported on strings" }
+            StringConcatenationBastNode(listOf(left, right))
+        } else if (left.coercesTo(INTEGER) && right.coercesTo(INTEGER)) {
             IntegerArithmeticBastNode(left, middle, right)
-        } else if (left.coercesTo(TypeEnum.FLOAT) && right.coercesTo(TypeEnum.FLOAT)) {
+        } else if (left.coercesTo(FLOAT) && right.coercesTo(FLOAT)) {
             FloatArithmeticBastNode(left, middle, right)
         } else {
             throw UnsupportedOperationException(
@@ -161,9 +183,23 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         }
     }
 
+    override fun visitUnaryPrimaryExpression(ctx: BashpileParser.UnaryPrimaryExpressionContext): BastNode {
+        val operator = ctx.unaryPrimary().text
+        val right = visit(ctx.expression())
+        return UnaryPrimaryBastNode(operator, right)
+    }
+
     override fun visitBinaryPrimaryExpression(ctx: BashpileParser.BinaryPrimaryExpressionContext): BastNode {
-        return BinaryPrimaryBastNode(
-            visit(ctx.expression(0)), ctx.binaryPrimary().text, visit(ctx.expression(1)))
+        val left = visit(ctx.expression(0))
+        val right = visit(ctx.expression(1))
+        return BinaryPrimaryBastNode(left, ctx.binaryPrimary().text, right)
+    }
+
+    override fun visitCombiningExpression(ctx: BashpileParser.CombiningExpressionContext): BastNode {
+        check (ctx.expression().size == 2) { "Combining expression must have exactly 2 expressions" }
+        val expressions = ctx.expression().map { visit(it) }
+        return CombiningExpressionBastNode(
+            expressions[0], ctx.combiningOperator().text, expressions[1])
     }
 
     override fun visitTypecastExpression(ctx: BashpileParser.TypecastExpressionContext): BastNode {
@@ -211,8 +247,25 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
             BashpileLexer.CParen -> ClosingParenthesisTerminalBastNode()
             else -> TerminalBastNode(
                 node.text.replace("^newline$".toRegex(), "\n"),
-                TypeEnum.STRING
+                STRING
             )
         }
     }
 }
+
+private fun BashpileParser.VariableDeclarationStatementContext.modifiers(): List<BashpileParser.ModifierContext> {
+    return typedId().modifier()
+}
+
+private fun BashpileParser.TypedIdContext.majorType(): BashpileParser.TypesContext {
+    return complexType().types(0)
+}
+
+/**
+ * Gets the type index of this [TerminalNode].  Indexes are defined in [BashpileLexer].
+ * @see BashpileLexer.DollarOParen as an example value to match against
+ */
+private fun TerminalNode.typeIndex(): Int {
+    return symbol.type
+}
+

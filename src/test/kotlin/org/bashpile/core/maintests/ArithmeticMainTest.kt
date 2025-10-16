@@ -1,25 +1,26 @@
-package org.bashpile.core
+package org.bashpile.core.maintests
 
+import org.bashpile.core.SCRIPT_ERROR__GENERIC
+import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
+import org.bashpile.core.runCommand
 import java.io.InputStream
-
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 /**
- * Tests Clikt and [Main._getBast], does not test logging.
+ * Tests Clikt and [org.bashpile.core.Main._getBast], does not test logging.
  * See SystemTest for logger framework tests.
  */
-class ArithmeticMainTest {
-
-    val fixture = Main()
+class ArithmeticMainTest : MainTest() {
 
     @Test
     fun getBast_basicArithmatic_works() {
         val bpScript: InputStream = """
             print(1 + 1)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             printf "%s" "$((1 + 1))"
@@ -35,7 +36,7 @@ class ArithmeticMainTest {
     fun getBast_basicArithmatic_subtraction_works() {
         val bpScript: InputStream = """
             print(1 - 1)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             printf "%s" "$((1 - 1))"
@@ -51,7 +52,7 @@ class ArithmeticMainTest {
     fun getBast_basicArithmatic_division_works() {
         val bpScript: InputStream = """
             print(6 / 4)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             printf "%s" "$((6 / 4))"
@@ -68,12 +69,12 @@ class ArithmeticMainTest {
         val bpScript: InputStream = """
                 one: string = "1"
                 print(1 - one as integer)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
                 declare one
                 one="1"
-                printf "%s" "$((1 - ${'$'}{one}))"
+                printf "%s" "$((1 - one))"
 
             """.trimIndent(), render
         )
@@ -88,13 +89,13 @@ class ArithmeticMainTest {
                 four: string = "4"
                 i: integer = 6 / four as integer
                 print(i)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
                 declare four
                 four="4"
                 declare i
-                i="$((6 / ${'$'}{four}))"
+                i=$((6 / four))
                 printf "%s" "${'$'}{i}"
 
             """.trimIndent(), render
@@ -104,13 +105,35 @@ class ArithmeticMainTest {
         assertEquals("1\n", results.first)
     }
 
+    @Test
+    fun getBast_basicArithmatic_withTypecast_andFloats_work() {
+        val bpScript: InputStream = """
+                four: string = "4"
+                i: float = 6 / four as float
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+                declare four
+                four="4"
+                declare i
+                i="$(bc -l <<< "6 / ${'$'}{four}")"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals("1.50000000000000000000\n", results.first)
+        assertEquals(SCRIPT_SUCCESS, results.second)
+    }
+
     /** We don't double-check the user */
     @Test
     fun getBast_basicArithmatic_withBadTypecast_works() {
         val bpScript: InputStream = """
                 one: string = "one"
                 print(1 - one as integer)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         val results = render.runCommand()
         assertEquals(SCRIPT_ERROR__GENERIC, results.second)
     }
@@ -120,12 +143,12 @@ class ArithmeticMainTest {
         val bpScript: InputStream = """
                 one: string = "1"
                 print(1 - (one as integer))""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
                 declare one
                 one="1"
-                printf "%s" "$((1 - (${'$'}{one})))"
+                printf "%s" "$((1 - (one)))"
 
             """.trimIndent(), render
         )
@@ -135,10 +158,94 @@ class ArithmeticMainTest {
     }
 
     @Test
+    fun getBast_basicArithmatic_withPlusPlus_works() {
+        val bpScript: InputStream = """
+                i: integer = 0
+                print(i++)
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+                declare i
+                i=0
+                printf "%s" "$((i++))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("01\n", results.first)
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withPreIncrement_works() {
+        val bpScript: InputStream = """
+                i: integer = 0
+                print(++i)
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+                declare i
+                i=0
+                printf "%s" "$((++i))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("11\n", results.first)
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withFloatPlusPlus_fails() {
+        assertFailsWith<IllegalStateException> {
+            val bpScript: InputStream = """
+                i: float = 0
+                print(i++)
+                print(i)""".trimIndent().byteInputStream()
+            fixture._getBast(bpScript).render(UNQUOTED)
+        }
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withLiteralIntegerPlusPlus_fails() {
+        assertFailsWith<IllegalStateException> {
+            val bpScript: InputStream = """
+                print(0++)
+                print(0)""".trimIndent().byteInputStream()
+            fixture._getBast(bpScript).render(UNQUOTED)
+        }
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withShellLine_works() {
+        val bpScript: InputStream = """
+                i: integer = 0
+                print(#(expr ${'$'}i) as integer + 1)
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+                declare i
+                i=0
+                printf "%s" "$(($(expr ${'$'}i) + 1))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("10\n", results.first)
+    }
+
+    @Test
     fun getBast_complexArithmatic_works() {
         val bpScript: InputStream = """
             print(1 - (5 * 6))""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             printf "%s" "$((1 - (5 * 6)))"
@@ -154,10 +261,10 @@ class ArithmeticMainTest {
     fun getBast_basicFloatingPointArithmatic_works() {
         val bpScript: InputStream = """
             print(1.0 + .5)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
-            printf "%s" "$(bc <<< "1.0 + 0.5")"
+            printf "%s" "$(bc -l <<< "1.0 + 0.5")"
             
             """.trimIndent(), render
         )
@@ -170,10 +277,10 @@ class ArithmeticMainTest {
     fun getBast_floatingPointArithmatic_parenthesis_works() {
         val bpScript: InputStream = """
             print(1.0 - (30 * .5))""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
-                printf "%s" "$(bc <<< "1.0 - (30 * 0.5)")"
+                printf "%s" "$(bc -l <<< "1.0 - (30 * 0.5)")"
             
             """.trimIndent(), render
         )
@@ -186,10 +293,10 @@ class ArithmeticMainTest {
     fun getBast_floatingPointArithmatic_noParenthesis_works() {
         val bpScript: InputStream = """
             print(1.0 - 30 * .5)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
-                printf "%s" "$(bc <<< "1.0 - 30 * 0.5")"
+                printf "%s" "$(bc -l <<< "1.0 - 30 * 0.5")"
             
             """.trimIndent(), render
         )
@@ -203,19 +310,19 @@ class ArithmeticMainTest {
         // ShellString is a... STRING
         val bpScript: InputStream = """
             print(#(expr 2 - 1) - (30 * .5))""".trimIndent().byteInputStream()
-        assertThrows<UnsupportedOperationException> { fixture._getBast(bpScript).render() }
+        assertFailsWith<UnsupportedOperationException> { fixture._getBast(bpScript).render(UNQUOTED) }
     }
 
     @Test
     fun getBast_floatingPointArithmatic_shellStringAndParenthesis_withTypecast_works() {
         val bpScript: InputStream = """
             print(#(expr 2 - 1) as integer - (30 * .5))""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
         assertEquals(
             STRICT_HEADER + """
             declare __bp_var0
             __bp_var0="$(expr 2 - 1)"
-            printf "%s" "$(bc <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
+            printf "%s" "$(bc -l <<< "${'$'}{__bp_var0} - (30 * 0.5)")"
             
             """.trimIndent(), render
         )

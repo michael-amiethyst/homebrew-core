@@ -2,12 +2,13 @@ package org.bashpile.core.bast.expressions
 
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.TypeEnum
+import org.bashpile.core.engine.RenderOptions
 
 class ParenthesisBastNode(children: List<BastNode> = listOf(), majorType: TypeEnum = TypeEnum.UNKNOWN)
     : BastNode(children.toMutableList(), majorType = majorType) {
 
-    override fun render(): String {
-        val childRenders = children.map { it.render() }.joinToString(" ")
+    override fun render(options: RenderOptions): String {
+        val childRenders = children.map { it.render(options) }.joinToString(" ")
         return if (parents().any { it is ArithmeticBastNode }) {
             "($childRenders)"
         } else {

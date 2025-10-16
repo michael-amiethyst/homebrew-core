@@ -20,6 +20,8 @@ import org.apache.logging.log4j.LogManager
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.antlr.ThrowingErrorListener
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.engine.CallStack
+import org.bashpile.core.engine.RenderOptions
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.nio.file.Files
@@ -40,7 +42,7 @@ class Main : CliktCommand() {
         const val VERBOSE_ENABLED_MESSAGE = "Double verbose (DEBUG) logging enabled"
         /** As in source/sink -> generates a startup message given a script filename */
         const val STARTUP_MESSAGE = "Running Bashpile compiler with script: "
-        const val VERSION = "0.17.0"
+        const val VERSION = "0.18.0"
         const val SHEBANG_HEADER = "#!/usr/bin/env bash\n\n"
         /** Singleton per Main() instance */
         lateinit var callStack: CallStack
@@ -98,7 +100,7 @@ class Main : CliktCommand() {
             generateSequence(::readLine).joinToString("\n")
         }
         val bastRoot: BastNode = _getBast(script.byteInputStream())
-        val bash: String = bastRoot.render()
+        val bash: String = bastRoot.render(RenderOptions.UNQUOTED)
         if (!commandMode()) {
             logger.debug("Writing to STDOUT in regular (non-command) mode")
             echo(SHEBANG_HEADER + bash, false)
