@@ -4,6 +4,7 @@ import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
 
+/** Combines two boolean expressions with `and` or `or`, also takes literal booleans */
 class CombiningExpressionBastNode(private val left: BastNode, private val operator: String, private val right: BastNode)
     : BastNode(mutableListOf(left, right), majorType = TypeEnum.BOOLEAN)
 {

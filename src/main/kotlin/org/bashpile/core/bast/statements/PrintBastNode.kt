@@ -16,6 +16,7 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     override fun render(options: RenderOptions): String {
         val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
 
+        // TODO 0.19.0 write test with children in parenthesis, use RenderOptions.ARITHMETIC (or .isInArithmeticContext()) instead?
         val number = children.areNumbers()
         val noArithmeticChildren = children.all { it !is ArithmeticBastNode }
         return if (!number && noArithmeticChildren) {

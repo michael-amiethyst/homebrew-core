@@ -61,6 +61,7 @@ class FinishedBastFactory {
         }
     }
 
+    // TODO 0.19.0 - just have arithmetic nodes render normally in an arithmemetic context (use RenderOptions)
     /** Replaces nested arithmetic nodes with internal nodes */
     private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
         // it's needed to replace the nested ArithmeticBastNode (including floats with the Subshell interface)
