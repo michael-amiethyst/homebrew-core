@@ -1,12 +1,13 @@
 package org.bashpile.core.bast.statements
 
-import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
-import org.bashpile.core.bast.expressions.literals.TerminalBastNode
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
+import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
+import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
+import org.bashpile.core.engine.RenderOptions
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ForeachFileLineLoopBashNodeTest {
     @Test
@@ -20,14 +21,14 @@ class ForeachFileLineLoopBashNodeTest {
                 printf "${'$'}{col1}"
             done
 
-        """.trimIndent(), fixture.render())
+        """.trimIndent(), fixture.render(RenderOptions.UNQUOTED))
     }
 
     /** Statement in block needs 2 Bash lines to render */
     @Test
     fun render_withVariableDeclaration_works() {
         val child = VariableDeclarationBastNode(
-            "col1", STRING, TypeEnum.EMPTY, child = TerminalBastNode("exampleValue", STRING))
+            "col1", STRING, TypeEnum.EMPTY, child = StringLiteralBastNode("exampleValue"))
         val fixture = ForeachFileLineLoopBashNode(
             child.asList(),"\"file.csv\"", listOf(VariableReferenceBastNode("col1", STRING)))
         assertEquals(
@@ -37,6 +38,6 @@ class ForeachFileLineLoopBashNodeTest {
                 col1="exampleValue"
             done
 
-        """.trimIndent(), fixture.render())
+        """.trimIndent(), fixture.render(RenderOptions.UNQUOTED))
     }
 }

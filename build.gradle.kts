@@ -53,8 +53,6 @@ dependencies {
 
     // tests
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-
 }
 
 tasks.test {
@@ -141,6 +139,7 @@ sourceSets {
         compileClasspath += sourceSets.main.get().output
         compileClasspath += sourceSets.test.get().output
         runtimeClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.test.get().output
     }
 }
 

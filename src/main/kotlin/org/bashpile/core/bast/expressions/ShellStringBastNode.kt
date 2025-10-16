@@ -5,7 +5,7 @@ import org.bashpile.core.Subshell
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
-import org.bashpile.core.bast.statements.ConditionalBastNode
+import org.bashpile.core.engine.RenderOptions
 
 /**
  * A Shell String is the Bashpile equivalent of a Bash subshell (i.e., $() syntax).  It represents an expression.
@@ -16,14 +16,16 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
 {
     constructor(contents: String) : this(TerminalBastNode(contents, STRING).asList())
 
-    override fun render(): String {
-        val childRenders = children.map { it.render() }.joinToString("")
-        return if (parent is ConditionalBastNode) {
-            childRenders
+    override fun render(options: RenderOptions): String {
+        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val subshell = if (options.ignoreOutput) {
+            "($childRenders) >/dev/null 2>&1"
         } else { "$($childRenders)" }
+        return if (options.quoted) { "\"$subshell\"" } else { subshell }
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ShellStringBastNode {
         return ShellStringBastNode(nextChildren.map { it.deepCopy() }, majorType())
     }
+
 }

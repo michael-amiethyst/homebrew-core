@@ -36,7 +36,7 @@ typedId     : Id Colon modifier* complexType;
 complexType : types (LessThan types MoreThan)?;
 modifier    : Exported | Readonly;
 argumentList: expression (Comma expression)*;
-elseIfClauses     : Else If OParen Not? expression CParen Colon indentedStatements;
+elseIfClauses     : Else If OParen expression CParen Colon indentedStatements;
 indentedStatements: INDENT statement+ DEDENT;
 assignmentOperator: Equals | PlusEquals;
 
@@ -49,28 +49,43 @@ returnPsudoStatement: Return expression? Newline;
 
 // in operator precedence order, modeled on Java precedence at https://introcs.cs.princeton.edu/java/11precedence/
 expression
+    // level 16
     : listAccess                        # listAccessExpression
-    | expression op=(Increment | Decrement)
-                                        # unaryPostCrementExpression
-    | <assoc=right> Minus? NumberValues # numberExpression // covers the unary '-' as well
-    | <assoc=right> unaryPrimary expression
-                                        # unaryPrimaryExpression
+    | OParen expression CParen          # parenthesisExpression
+    // level 15
+    | expression op=(Increment | Decrement)   # unaryPostCrementExpression
+
+    // level 14
+    | <assoc=right> Minus? NumberValues       # numberExpression // unary minus
+    | <assoc=right> Not expression            # notExpression
+    | op=(Increment | Decrement) expression   # unaryPreCrementExpression
+
+    // level 13
     | <assoc=right> expression As complexType # typecastExpression
+
+    // level 12
+    | <assoc=right> expression op=(Multiply|Divide) expression # multipyDivideCalculationExpression
+
+    // level 11
+    | <assoc=right> expression op=(Add|Minus) expression       # addSubtractCalculationExpression
+
+    // level 10
+    // lower than typecast, higher than equality operators
+    | <assoc=right> unaryPrimary expression   # unaryPrimaryExpression
+
+    // level 9
+    | expression binaryPrimary expression     # binaryPrimaryExpression
+
+    // level 4
+    | expression combiningOperator expression # combiningExpression
+
+    // other levels
     | shellString                       # shellStringExpression
     | looseShellString                  # looseShellStringExpression
     | Id OParen argumentList? CParen    # functionCallExpression
-    // operator expressions
-    | OParen expression CParen          # parenthesisExpression
-    | <assoc=right> expression op=(Multiply|Divide|Add|Minus) expression
-                                        # calculationExpression
-    | expression binaryPrimary expression
-                                        # binaryPrimaryExpression
-    | expression combiningOperator expression
-                                        # combiningExpression
     | argumentsBuiltin                  # argumentsBuiltinExpression
     | ListOf (OParen CParen | OParen expression (Comma expression)* CParen)
                                         # listOfBuiltinExpression
-    // type expressions
     | literal                           # literalExpression
     | Id                                # idExpression
     ;
@@ -87,11 +102,11 @@ shellStringContents: DollarOParen shellStringContents* CParen
                    | ShellStringEscapeSequence;
 
 // full list at https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html
-unaryPrimary: Not | Exists | DoesNotExist | IsEmpty | NotEmpty | FileExists | RegularFileExists | DirectoryExists;
+unaryPrimary: BashUnaryOperator | IsEmpty | NotEmpty
+| Exists | DoesNotExist | RegularFileExists | DirectoryExists;
 
 // one line means logically equal precidence (e.g. LessThan in the same as MoreThanOrEquals)
-binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals
-             | IsStrictlyEqual | InNotStrictlyEqual | IsEqual | IsNotEqual;
+binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqual | IsNotEqual;
 
 combiningOperator: And | Or;
 

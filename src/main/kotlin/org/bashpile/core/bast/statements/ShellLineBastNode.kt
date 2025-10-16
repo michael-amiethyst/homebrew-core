@@ -5,14 +5,15 @@ import org.bashpile.core.bast.BastNode
 import org.bashpile.core.Subshell
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
+import org.bashpile.core.engine.RenderOptions
 
 /** Represents a line of Bash, has no loose mode like [org.bashpile.core.bast.expressions.ShellStringBastNode] */
-class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children), Subshell {
-
+class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children), Subshell
+{
     constructor(contents: String) : this(TerminalBastNode(contents, TypeEnum.UNKNOWN).asList())
 
-    override fun render(): String {
-        val childRenders = children.map { it.render() }.joinToString("")
+    override fun render(options: RenderOptions): String {
+        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
         return childRenders.appendIfMissing("\n")
     }
 
