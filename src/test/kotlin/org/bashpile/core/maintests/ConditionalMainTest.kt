@@ -154,7 +154,7 @@ class ConditionalMainTest : MainTest() {
                 print("Equal\n")
             else:
                 print("Not Equal\n")
-        """.trimIndent().byteInputStream()).render(UNQUOTED)
+            """.trimIndent().byteInputStream()).render(UNQUOTED)
         assertEquals(STRICT_HEADER + """
             declare name
             name=""
