@@ -1,7 +1,7 @@
 package org.bashpile.core.maintests
 
 import org.bashpile.core.SCRIPT_SUCCESS
-import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
 import org.bashpile.core.runCommand
 import java.io.InputStream
@@ -18,12 +18,11 @@ class DeclarationsMainTest : MainTest() {
     fun getBast_declare_bool_works() {
         val bashpileText: InputStream = "b: boolean = true".byteInputStream()
         val bashScript = fixture._getBast(bashpileText).render(UNQUOTED)
-        assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(STRICT_HEADER + """
             declare b
             b=true
 
-        """.trimIndent(), bashScript
+            """.trimIndent(), bashScript
         )
 
         val results = bashScript.runCommand()
@@ -34,12 +33,11 @@ class DeclarationsMainTest : MainTest() {
     fun getBast_declare_readonlyExported_string_works() {
         val bashpileText: InputStream = "b: readonly exported string = 'A_STRING'".byteInputStream()
         val bashScript = fixture._getBast(bashpileText).render(UNQUOTED)
-        assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
 
-        """.trimIndent(), bashScript
+            """.trimIndent(), bashScript
         )
 
         val results = bashScript.runCommand()
@@ -53,13 +51,12 @@ class DeclarationsMainTest : MainTest() {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture._getBast(bashpileText).render(UNQUOTED)
-        assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
             printf "${'$'}{b}"
         
-        """.trimIndent(), bashScript
+            """.trimIndent(), bashScript
         )
 
         val results = bashScript.runCommand()
@@ -75,14 +72,13 @@ class DeclarationsMainTest : MainTest() {
             print(b)
         """.trimIndent().byteInputStream()
         val bashScript = fixture._getBast(bashpileText).render(UNQUOTED)
-        assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
             b="B_STRING"
             printf "${'$'}{b}"
         
-        """.trimIndent(), bashScript
+            """.trimIndent(), bashScript
         )
 
         val results = bashScript.runCommand()
@@ -96,16 +92,15 @@ class DeclarationsMainTest : MainTest() {
             b: exported string = 'A_STRING'
             b="'B_STRING'"
             print(b)
-        """.trimIndent().byteInputStream()
+            """.trimIndent().byteInputStream()
         val bashScript = fixture._getBast(bashpileText).render(UNQUOTED)
-        assertEquals(
-            AstConvertingVisitor.Companion.STRICT_HEADER + """
+        assertEquals(STRICT_HEADER + """
             declare -x b
             b="A_STRING"
             b="'B_STRING'"
             printf "${'$'}{b}"
 
-        """.trimIndent(), bashScript
+            """.trimIndent(), bashScript
         )
 
         val results = bashScript.runCommand()
@@ -119,7 +114,7 @@ class DeclarationsMainTest : MainTest() {
             b: readonly exported string = 'A_STRING'
             b = "B_STRING"
             print(b)
-        """.trimIndent().byteInputStream()
+            """.trimIndent().byteInputStream()
         assertFailsWith<IllegalStateException> {
             fixture._getBast(bashpileText).render(UNQUOTED)
         }
@@ -132,7 +127,7 @@ class DeclarationsMainTest : MainTest() {
             i: integer = 0
             b = i
             print(b)
-        """.trimIndent().byteInputStream()
+            """.trimIndent().byteInputStream()
         assertFailsWith<IllegalStateException> {
             fixture._getBast(bashpileText).render(UNQUOTED)
         }

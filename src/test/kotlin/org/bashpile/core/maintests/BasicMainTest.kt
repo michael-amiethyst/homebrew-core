@@ -2,6 +2,7 @@ package org.bashpile.core.maintests
 
 import com.github.ajalt.clikt.testing.test
 import org.bashpile.core.Main
+import org.bashpile.core.Main.Companion.SHEBANG_HEADER
 import org.bashpile.core.SCRIPT_SUCCESS
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.STRICT_HEADER
 import org.bashpile.core.engine.RenderOptions.Companion.UNQUOTED
@@ -13,7 +14,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 /**
- * Tests Clikt and [org.bashpile.core.Main._getBast], does not test logging.
+ * Tests Clikt and [Main._getBast], does not test logging.
  * See SystemTest for logger framework related tests (e.g. for `-vv` option).
  */
 class BasicMainTest {
@@ -40,7 +41,7 @@ class BasicMainTest {
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
         assertEquals(
-            Main.Companion.SHEBANG_HEADER + STRICT_HEADER + """
+            SHEBANG_HEADER + STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), output.stdout
@@ -53,7 +54,7 @@ class BasicMainTest {
         assertEquals(SCRIPT_SUCCESS, output.statusCode)
         assertTrue(output.stderr.isEmpty())
         assertEquals(
-            Main.Companion.SHEBANG_HEADER + STRICT_HEADER + """
+            SHEBANG_HEADER + STRICT_HEADER + """
             printf "Hello Bashpile!"
             
             """.trimIndent(), output.stdout
