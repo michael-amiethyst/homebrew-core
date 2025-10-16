@@ -18,6 +18,7 @@ class VariableReferenceBastNode(id: String, majorType: TypeEnum) : BastNode(muta
         return VariableReferenceBastNode(id!!, majorType())
     }
 
+    // TODO reimplement with RenderOptions.isArithmetic
     /** If not then we don't need a preceding '$' (e.g. we are in $(()) braces) */
     private fun isBashVariableReference(): Boolean {
         val arithmeticNode = parents().find { it is ArithmeticBastNode }
