@@ -2,7 +2,6 @@ package org.bashpile.core.bast.expressions.arithmetic
 
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.bast.expressions.ArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.Literal
 import org.bashpile.core.engine.RenderOptions
 

@@ -4,6 +4,7 @@ import org.bashpile.core.Main.Companion.callStack
 import org.bashpile.core.Subshell
 import org.bashpile.core.TypeEnum
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
 import org.bashpile.core.engine.RenderOptions
 
 class VariableReferenceBastNode(id: String, majorType: TypeEnum) : BastNode(mutableListOf(), id, majorType) {

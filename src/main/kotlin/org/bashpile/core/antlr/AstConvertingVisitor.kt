@@ -9,6 +9,8 @@ import org.bashpile.core.TypeEnum.*
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
+import org.bashpile.core.bast.expressions.arithmetic.FloatArithmeticBastNode
+import org.bashpile.core.bast.expressions.arithmetic.IntegerArithmeticBastNode
 import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.*
 import org.bashpile.core.bast.statements.*
