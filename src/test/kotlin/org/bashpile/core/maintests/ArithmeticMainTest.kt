@@ -221,7 +221,7 @@ class ArithmeticMainTest : MainTest() {
     }
 
     @Test
-    fun getBast_basicArithmatic_withShellLine_works() {
+    fun getBast_basicArithmatic_withShellString_works() {
         val bpScript: InputStream = """
                 i: integer = 0
                 print(#(expr ${'$'}i) as integer + 1)
@@ -239,6 +239,27 @@ class ArithmeticMainTest : MainTest() {
         val results = render.runCommand()
         assertEquals(SCRIPT_SUCCESS, results.second)
         assertEquals("10\n", results.first)
+    }
+
+    @Test
+    fun getBast_basicArithmatic_withParenthesis_works() {
+        val bpScript: InputStream = """
+                i: integer = 0
+                print((i++))
+                print(i)""".trimIndent().byteInputStream()
+        val render = fixture._getBast(bpScript).render(UNQUOTED)
+        assertEquals(
+            STRICT_HEADER + """
+                declare i
+                i=0
+                printf "%s" "$((i++))"
+                printf "%s" "${'$'}{i}"
+
+            """.trimIndent(), render
+        )
+        val results = render.runCommand()
+        assertEquals(SCRIPT_SUCCESS, results.second)
+        assertEquals("01\n", results.first)
     }
 
     @Test

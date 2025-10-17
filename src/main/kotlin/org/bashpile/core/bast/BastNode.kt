@@ -5,6 +5,7 @@ import org.bashpile.core.engine.TypeEnum
 import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.engine.VariableTypeInfo
 import org.bashpile.core.antlr.AstConvertingVisitor
+import org.bashpile.core.engine.HolderNode
 import org.bashpile.core.engine.RenderOptions
 import java.util.function.Predicate
 
@@ -95,11 +96,22 @@ abstract class BastNode(
     }
 
     /** All nodes in this subtree */
-    fun all(): Set<BastNode> {
+    fun allDescendants(): Set<BastNode> {
         val childrenSet: MutableSet<BastNode> = mutableSetOf(this)
         childrenSet.addAll(children)
-        childrenSet.addAll(children.flatMap { it.all() })
+        childrenSet.addAll(children.flatMap { it.allDescendants() })
         return childrenSet
+    }
+
+    /**
+     * Like getting [children] but flattens any [HolderNode]s. It ignores [HolderNode]s in favor of their children.
+     */
+    fun immediateImportantDescendants(): List<BastNode> {
+        var ret = mutableChildren
+        while (ret.any { it is HolderNode }) {
+            ret = ret.flatMap { it.mutableChildren }.toMutableList()
+        }
+        return ret
     }
 
     /** Returns true if any node in this subtree matches [condition] */

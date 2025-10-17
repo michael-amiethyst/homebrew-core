@@ -1,10 +1,10 @@
 package org.bashpile.core.bast.expressions.arithmetic
 
-import org.bashpile.core.engine.TypeEnum.INTEGER
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.literals.Literal
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.RenderOptions.Companion.INTEGER_ARITHMETIC
+import org.bashpile.core.engine.TypeEnum.INTEGER
 
 /** For Pre/Post increment/decrement operations.  E.g. ++2, i++, --i and i-- */
 class UnaryCrementArithmeticBastNode(
@@ -14,7 +14,7 @@ class UnaryCrementArithmeticBastNode(
     private val precrement: Boolean = false
 ) : ArithmeticBastNode(
     mutableListOf(expressionNode),
-    majorType = expressionNode.majorType())
+    majorType = INTEGER)
 {
     override fun render(options: RenderOptions): String {
         check (expressionNode.coercesTo(INTEGER)) {
