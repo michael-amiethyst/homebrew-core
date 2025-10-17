@@ -1,15 +1,17 @@
 package org.bashpile.core.bast.expressions.arithmetic
 
-import org.bashpile.core.TypeEnum
+import org.bashpile.core.TypeEnum.INTEGER
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.RenderOptions.Companion.INTEGER_ARITHMETIC
 
 class IntegerArithmeticBastNode(children: List<BastNode> = listOf())
-    : ArithmeticBastNode(children, majorType = TypeEnum.INTEGER) {
+    : ArithmeticBastNode(children, majorType = INTEGER)
+{
     constructor(vararg child: BastNode) : this(child.toList())
 
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.Companion.UNQUOTED) }.joinToString(" ")
+        val childRenders = children.map { it.render(INTEGER_ARITHMETIC) }.joinToString(" ")
         return "$(($childRenders))"
     }
 
