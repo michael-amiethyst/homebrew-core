@@ -17,7 +17,7 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
     constructor(contents: String) : this(TerminalBastNode(contents, STRING).asList())
 
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val childRenders = children.map { it.render(options) }.joinToString("")
         val subshell = if (options.ignoreOutput) {
             "($childRenders) >/dev/null 2>&1"
         } else { "$($childRenders)" }
