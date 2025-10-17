@@ -1,6 +1,6 @@
 package org.bashpile.core.bast.expressions.arithmetic
 
-import org.bashpile.core.TypeEnum.INTEGER
+import org.bashpile.core.engine.TypeEnum.INTEGER
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.expressions.literals.Literal
 import org.bashpile.core.engine.RenderOptions

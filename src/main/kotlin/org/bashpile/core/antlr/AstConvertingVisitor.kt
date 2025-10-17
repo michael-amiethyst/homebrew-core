@@ -4,8 +4,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
-import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.*
+import org.bashpile.core.engine.TypeEnum.*
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
@@ -76,7 +75,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val export = ctx.modifiers().any { it.text == "exported" }
         val id = ctx.typedId().Id().text
         val typeText = ctx.typedId().majorType().text
-        val type = TypeEnum.valueOf(typeText.uppercase())
+        val type = valueOf(typeText.uppercase())
         return VariableDeclarationBastNode(id, type, readonly = readonly, export = export, child = node)
     }
 
@@ -116,7 +115,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitTypedId(ctx: BashpileParser.TypedIdContext): BastNode {
         val primaryTypeString = ctx.majorType().text
-        val typeEnum = TypeEnum.valueOf(primaryTypeString.uppercase())
+        val typeEnum = valueOf(primaryTypeString.uppercase())
         return VariableReferenceBastNode(ctx.Id().text, typeEnum)
     }
 
@@ -208,7 +207,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val aastChildren = ctx.children
         require(aastChildren.size == 3)
         val typecastTo = aastChildren[2].text
-        val nextType = TypeEnum.valueOf(typecastTo.uppercase())
+        val nextType = valueOf(typecastTo.uppercase())
         val bastExpression = visit(aastChildren[0])
         return InternalBastNode(bastExpression.asList(), nextType)
     }

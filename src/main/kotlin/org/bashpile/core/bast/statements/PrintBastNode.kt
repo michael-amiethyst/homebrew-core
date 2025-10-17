@@ -1,9 +1,9 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.TypeEnum.FLOAT
-import org.bashpile.core.TypeEnum.INTEGER
-import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.TypeEnum.FLOAT
+import org.bashpile.core.engine.TypeEnum.INTEGER
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
 import org.bashpile.core.engine.RenderOptions
 

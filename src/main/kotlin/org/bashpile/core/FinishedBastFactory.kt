@@ -11,8 +11,9 @@ import org.bashpile.core.bast.expressions.LooseShellStringBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
+import org.bashpile.core.engine.Subshell
 
 
 /**

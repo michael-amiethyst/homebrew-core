@@ -1,7 +1,7 @@
 package org.bashpile.core.bast
 
-import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.TypeEnum
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.engine.RenderOptions
 
 
