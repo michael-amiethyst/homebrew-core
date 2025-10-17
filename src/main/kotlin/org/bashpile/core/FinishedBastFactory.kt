@@ -90,7 +90,7 @@ class FinishedBastFactory {
         var unnestedCount = 0
         val unnestedChildren = children.flatMap { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
-            val nestedSubshells = statementNode.all().filter {
+            val nestedSubshells = statementNode.allDescendants().filter {
                 it is Subshell
             }.filter { subshells ->
                 subshells.parents().any { it is Subshell }

@@ -1,11 +1,8 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
-import org.bashpile.core.engine.TypeEnum.FLOAT
-import org.bashpile.core.engine.TypeEnum.INTEGER
-import org.bashpile.core.engine.TypeEnum.UNKNOWN
-import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
 import org.bashpile.core.engine.RenderOptions
+import org.bashpile.core.engine.TypeEnum.*
 
 /** This is a Print Statement node */
 class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children) {
@@ -16,10 +13,8 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
     override fun render(options: RenderOptions): String {
         val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
 
-        // TODO 0.19.0 write test with children in parenthesis, use RenderOptions.ARITHMETIC (or .isInArithmeticContext()) instead?
-        val number = children.areNumbers()
-        val noArithmeticChildren = children.all { it !is ArithmeticBastNode }
-        return if (!number && noArithmeticChildren) {
+        val notNumeric = !immediateImportantDescendants().areNumbers()
+        return if (notNumeric) {
             "printf \"$childRenders\"\n"
         } else {
             // treat as a String so floating point numbers work
