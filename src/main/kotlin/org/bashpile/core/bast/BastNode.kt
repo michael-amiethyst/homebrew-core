@@ -1,9 +1,9 @@
 package org.bashpile.core.bast
 
 import org.bashpile.core.Main.Companion.callStack
-import org.bashpile.core.TypeEnum
-import org.bashpile.core.TypeEnum.UNKNOWN
-import org.bashpile.core.VariableTypeInfo
+import org.bashpile.core.engine.TypeEnum
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.VariableTypeInfo
 import org.bashpile.core.antlr.AstConvertingVisitor
 import org.bashpile.core.engine.RenderOptions
 import java.util.function.Predicate

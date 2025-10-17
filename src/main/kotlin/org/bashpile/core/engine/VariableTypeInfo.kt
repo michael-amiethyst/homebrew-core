@@ -1,6 +1,4 @@
-package org.bashpile.core
-
-import org.bashpile.core.engine.CallStack
+package org.bashpile.core.engine
 
 /** All the relevant data for a variable for [CallStack] */
 data class VariableTypeInfo(val id: String, val majorType: TypeEnum, val minorType: TypeEnum, val readonly: Boolean) {

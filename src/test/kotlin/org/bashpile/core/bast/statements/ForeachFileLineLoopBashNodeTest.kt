@@ -1,7 +1,7 @@
 package org.bashpile.core.bast.statements
 
-import org.bashpile.core.TypeEnum.EMPTY
-import org.bashpile.core.TypeEnum.STRING
+import org.bashpile.core.engine.TypeEnum.EMPTY
+import org.bashpile.core.engine.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.bast.expressions.literals.StringLiteralBastNode
 import org.bashpile.core.bast.statements.ForeachFileLineLoopBashNode.Companion.sed
