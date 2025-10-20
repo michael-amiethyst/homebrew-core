@@ -9,7 +9,6 @@ class UnaryPrimaryBastNode(operator: String, private val rightExpression: BastNo
 {
     override fun render(options: RenderOptions): String {
         val rightRendered = rightExpression.render(RenderOptions.QUOTED)
-        // TODO factor out bashOperator mapping into superclass
         val bashOperator = when (operator) {
             // string operators
             "isEmpty" -> "-z"

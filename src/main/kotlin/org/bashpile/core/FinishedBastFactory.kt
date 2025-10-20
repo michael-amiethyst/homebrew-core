@@ -27,12 +27,8 @@ class FinishedBastFactory {
     fun transform(root: BastNode): BastNode {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
-        // flatten
-        val flattenedBast = root.flattenArithmetic()
-        logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
-
         // unnest
-        val unnestedBast = flattenedBast.unnestSubshells()
+        val unnestedBast = root.unnestSubshells()
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
 
         // loosen
@@ -62,36 +58,19 @@ class FinishedBastFactory {
         }
     }
 
-    // TODO 0.19.0 - just have arithmetic nodes render normally in an arithmemetic context (use RenderOptions)
-    /** Replaces nested arithmetic nodes with internal nodes */
-    private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
-        // it's needed to replace the nested ArithmeticBastNode (including floats with the Subshell interface)
-        // with a generic InternalBastNode.  This lets the unnesting logic work properly
-
-        val flattenedChildren = children.map {
-            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode)
-        }
-
-        return if (inArithmetic && this is ArithmeticBastNode) {
-            // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
-            InternalBastNode(flattenedChildren, majorType(), " ")
-        } else {
-            replaceChildren(flattenedChildren)
-        }
-    }
-
     /**
      * Returns a list of preambles to support unnesting.
      * @return An unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
+    // TODO move unnesting into render time?  (Render a Statement[], String pair again?)
     @VisibleForTesting
     internal fun BastNode.unnestSubshells(): BastNode {
         var unnestedCount = 0
         val unnestedChildren = children.flatMap { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
             val nestedSubshells = statementNode.allDescendants().filter {
-                it is Subshell
+                it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
             }.filter { subshells ->
                 subshells.parents().any { it is Subshell }
             }
