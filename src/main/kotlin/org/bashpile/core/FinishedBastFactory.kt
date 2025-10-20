@@ -60,14 +60,17 @@ class FinishedBastFactory {
 
     /**
      * Returns a list of preambles to support unnesting.
+     * Not implemented in BastNode.render() because of complexity and testability.
+     *
      * @return An unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
-    // TODO move unnesting into render time?  (Render a Statement[], String pair again?)
     @VisibleForTesting
     internal fun BastNode.unnestSubshells(): BastNode {
         var unnestedCount = 0
-        val unnestedChildren = children.flatMap { statementNode ->
+        // TODO make a thawed copy of `this` instead of mutating it in place.  Then return a frozen copy.
+        // this will let us delete .thaw() and .freeze()
+        val unnestedStatements = children.flatMap { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
             val nestedSubshells = statementNode.allDescendants().filter {
                 it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
@@ -87,7 +90,7 @@ class FinishedBastFactory {
             }
             variableDeclarationBastNodes + statementNode
         }
-        return replaceChildren(unnestedChildren)
+        return replaceChildren(unnestedStatements)
     }
 
     /** @return A loosened version of the input tree */
