@@ -16,7 +16,7 @@ import java.util.function.Predicate
  * The root is created by the [AstConvertingVisitor].
  */
 abstract class BastNode(
-    protected val mutableChildren: MutableList<BastNode>,
+    private val mutableChildren: MutableList<BastNode>,
     val id: String? = null,
     /** The type at creation time (e.g. for literals).  See [callStack] for variable types. */
     private val majorType: TypeEnum = UNKNOWN
@@ -29,8 +29,6 @@ abstract class BastNode(
     val children: List<BastNode>
         // shallow copy
         get() = mutableChildren.toList()
-
-    private var mutable = false
 
     init {
         children.forEach { it.parent = this }
@@ -119,22 +117,8 @@ abstract class BastNode(
         return condition.test(this) || children.filter { it.any(condition) }.isNotEmpty()
     }
 
-    // mutation related methods
-
-    /** Makes this node mutable */
-    fun thaw(): BastNode {
-        mutable = true
-        return this
-    }
-
-    fun freeze(): BastNode {
-        mutable = false
-        return this
-    }
-
     /** Mutates the children list of parent */
-    fun replaceWith(replacement: BastNode): BastNode {
-        check (mutable) { "Cannot use mutating call on frozen node, call thaw() first" }
+    fun mutatingReplaceWith(replacement: BastNode): BastNode {
         check (parent != null) { "Cannot be called on root node" }
 
         replacement.parent = parent
@@ -144,7 +128,9 @@ abstract class BastNode(
         return parent!!
     }
 
+    ///////////////////////
     // extension methods
+    //////////////////////
 
     /** .trimIndent fails with $childRenders so we need to munge whitespace manually */
     protected fun String.trimScriptIndent(trim: String) = this.lines().filter { it.isNotBlank() }.map {
