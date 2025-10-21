@@ -68,8 +68,6 @@ class FinishedBastFactory {
     @VisibleForTesting
     internal fun BastNode.unnestSubshells(): BastNode {
         var unnestedCount = 0
-        // TODO make a thawed copy of `this` instead of mutating it in place.  Then return a frozen copy.
-        // this will let us delete .thaw() and .freeze()
         val unnestedStatements = children.flatMap { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
             val nestedSubshells = statementNode.allDescendants().filter {
@@ -79,9 +77,7 @@ class FinishedBastFactory {
             }
             val variableDeclarationBastNodes = nestedSubshells.map { nestedSubshell ->
                 val id = "__bp_var${unnestedCount++}"
-                nestedSubshell.thaw()
-                    .replaceWith(VariableReferenceBastNode(id, UNKNOWN))
-                    .freeze()
+                nestedSubshell.mutatingReplaceWith(VariableReferenceBastNode(id, UNKNOWN))
                 VariableDeclarationBastNode(
                     id,
                     UNKNOWN,
