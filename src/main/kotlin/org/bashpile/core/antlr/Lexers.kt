@@ -34,7 +34,9 @@ class Lexers {
 
         private val WINDOWS_FILE_PATTERN: Pattern = Pattern.compile("^([A-Za-z]):\\\\([a-zA-Z_.][a-zA-Z0-9_\\-.]*)+")
 
-        private val FILE_PATTERN: Pattern = Pattern.compile("^(?:/?[a-zA-Z_.-][a-zA-Z0-9_.\\\\-]*)+")
+        private val POXIX_FILE_PATTERN: Pattern = Pattern.compile("^(?:/?[a-zA-Z_.-][a-zA-Z0-9_.\\\\-]*)+")
+
+        private val OSX_FILE_PATTERN: Pattern = Pattern.compile("^(?:/?[a-zA-Z0-9_.-][a-zA-Z0-9_.@\\\\-]*)+")
 
         /** A regex for a Bash assignment  */
         private val ASSIGN_PATTERN: Pattern =
@@ -120,7 +122,8 @@ class Lexers {
                 return COMMAND_TO_VALIDITY_CACHE[command]!!
             }
 
-            val isWindows = System.getProperty("os.name").lowercase(Locale.getDefault()).startsWith("windows")
+            val osName = System.getProperty("os.name").lowercase(Locale.getDefault())
+            val isWindows = osName.startsWith("windows")
             if (isWindows) {
                 // change paths like C:\filename to /mnt/c/filename for WSL
                 command = FilenameUtils.separatorsToUnix(command)
@@ -133,8 +136,11 @@ class Lexers {
             }
 
             try {
+                val filePattern = if (!osName.contains("mac")) {
+                    POXIX_FILE_PATTERN
+                } else { OSX_FILE_PATTERN }
                 // may need a 'and not find with createsStatementRegex' when we add file path recognition to shell lines
-                if (COMMAND_PATTERN.matcher(command).matches() || FILE_PATTERN.matcher(command).matches()) {
+                if (COMMAND_PATTERN.matcher(command).matches() || filePattern.matcher(command).matches()) {
                     LOG.trace("Running external 'type' command on {}", command)
                     val results = "type -t $command".runCommand()
 
@@ -144,7 +150,7 @@ class Lexers {
                             && COMMAND_TYPES.contains(typeResults) && !BASHPILE_KEYWORDS.contains(command)
                     COMMAND_TO_VALIDITY_CACHE[command] = ret
                     return ret
-                } else if (FILE_PATTERN.matcher(command).matches() && !BASHPILE_KEYWORDS.contains(command)) {
+                } else if (filePattern.matcher(command).matches() && !BASHPILE_KEYWORDS.contains(command)) {
                     val path = Path.of(command)
                     val valid = Files.exists(path) && Files.isRegularFile(path) && Files.isExecutable(path)
                     COMMAND_TO_VALIDITY_CACHE[command] = valid

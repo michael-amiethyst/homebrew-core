@@ -13,6 +13,8 @@ const val SCRIPT_ERROR__GENERIC = 1
 
 private val executors = Executors.newFixedThreadPool(8)
 
+private var profileLocation = "${'$'}HOME/.profile"
+
 /** Strip initial logging line */
 fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
 
@@ -23,7 +25,7 @@ fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
     try {
         val callable: Callable<Process> = Callable {
             val cwd = System.getProperty("user.dir")
-            val proc2 = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
+            val proc2 = ProcessBuilder(listOf("bash", "-c", ". $profileLocation; $this"))
                 .directory(workingDir ?: File(cwd))
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true)
@@ -43,7 +45,22 @@ fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
         val filteredText = lines
             .filter { !it.contains("Using java version") }
             .joinToString("\n") + "\n"
-        return Pair(filteredText, proc.exitValue())
+
+        // check for bad profileLocation and cache good location
+        val noFile = "No such file or directory"
+        return if (!filteredText.contains(noFile)) {
+            Pair(filteredText, proc.exitValue())
+        } else if (filteredText.contains(".profile: $noFile")) {
+            profileLocation = "${'$'}HOME/.bash_profile"
+            runCommand(workingDir)
+        } else if (filteredText.contains(".bash_profile: $noFile")) {
+            profileLocation = "${'$'}HOME/.bashrc"
+            runCommand(workingDir)
+        } else {
+            throw IllegalStateException(
+                "Could not find valid profile.  Checked ~/.profile, ~/.bash_profile, ~/.bashrc.  \n" +
+                        "Command results: $filteredText")
+        }
     } catch(e: IOException) {
         return Pair(e.stackTraceToString(), proc?.exitValue() ?: -1)
     }
