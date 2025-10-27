@@ -11,8 +11,8 @@ class Bashpile < Formula
   depends_on "gradle@8" => :build
   depends_on "bc"
   depends_on "gnu-sed"
-  depends_on "openjdk"
-  depends_on "bash"
+  depends_on "openjdk@21"
+  depends_on "bash@5"
 
   # tooling dependencies for generated scripts
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
