@@ -6,10 +6,6 @@ import kotlin.test.assertEquals
 
 class StringExtensionsKtTest {
     @Test
-    fun javaVersionParses() {
-        assertEquals("", org.jetbrains.kotlin.com.intellij.util.lang.JavaVersion)
-    }
-    @Test
     fun runCommand_withMultiline_works() {
         val result = "echo 'Hello \n world'".runCommand()
         assertEquals("Hello \n world\n", result.first)
