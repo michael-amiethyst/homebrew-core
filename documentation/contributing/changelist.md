@@ -18,3 +18,4 @@
 * 0.17.0 - if-elseif-else statements, binary primaries (e.g. `1<2`)
 * 0.18.0 - unary primaries (e.g. `isEmpty ""`), combining operators (boolean logic)
 * 0.18.1 - fixes for OSX filename, Makefile and smarter lookup of Bash startup scripts
+* 0.18.2 - Updates for Homebrew formula
