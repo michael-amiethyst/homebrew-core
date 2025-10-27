@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-printf '#!/usr/bin/env -S java -jar' > build/bashpile
+printf '#!/usr/bin/env -S java -jar\n' > build/bashpile
 cat build/libs/bashpile-all.jar >> build/bashpile
 chmod +x build/bashpile
