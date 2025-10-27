@@ -14,7 +14,7 @@ version = properties["version.bashpile"] as String
 plugins {
     antlr
     // kotlin version in plugins must be literal
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.1.21"
     id("com.gradleup.shadow") version "9.0.0-beta15"
     id("org.graalvm.buildtools.native") version "0.10.6"
     id("org.gradlex.jvm-dependency-conflict-detection") version "2.2"
