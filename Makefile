@@ -8,4 +8,4 @@ install:
 
 # used by Homebrew Formula
 jar:
-	./gradlew clean build --debug --stacktrace -x test -x integrationTest -x nativeCompile
+	./gradlew clean build --info --stacktrace -x test -x integrationTest -x nativeCompile
