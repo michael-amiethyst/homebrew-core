@@ -18,13 +18,33 @@ fun String.stripFirstLine(): String = this.lines().drop(1).joinToString("\n")
 
 fun String.appendIfMissing(suffix: String): String = Strings.CS.appendIfMissing(this, suffix)
 
+/**
+ * Returns stdout/stderr and the exit code.
+ */
 fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
+    val cwd = File(System.getProperty("user.dir"))
+    val profileFilenames = listOf(".profile", ".bash_profile", ".bashrc")
+    var stdoutText = ""
+    for (profileFilename in profileFilenames) {
+        val commandResult = runCommandImpl(workingDir ?: cwd, profileFilename)
+        stdoutText = commandResult.first
+        val noFile = "No such file or directory"
+        if (!stdoutText.contains("$profileFilename: $noFile")) {
+            return commandResult
+        } // else try next profileFilename
+    }
+
+    throw IllegalStateException(
+        "Could not find valid profile.  Checked ~/.profile, ~/.bash_profile, ~/.bashrc.  \n" +
+                "Command results: $stdoutText")
+}
+
+private fun String.runCommandImpl(workingDir: File, profileFilename: String): Pair<String, Int> {
     var proc: Process? = null
     try {
         val callable: Callable<Process> = Callable {
-            val cwd = System.getProperty("user.dir")
-            val proc2 = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/.profile; $this"))
-                .directory(workingDir ?: File(cwd))
+            val proc2 = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/$profileFilename; $this"))
+                .directory(workingDir)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true)
                 .start()
@@ -44,6 +64,7 @@ fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
             .filter { !it.contains("Using java version") }
             .joinToString("\n") + "\n"
         return Pair(filteredText, proc.exitValue())
+
     } catch(e: IOException) {
         return Pair(e.stackTraceToString(), proc?.exitValue() ?: -1)
     }

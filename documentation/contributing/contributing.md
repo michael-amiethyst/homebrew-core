@@ -2,8 +2,6 @@
 
 ## Quick Start
 ### Setup env
-Any script setup (e.g., for SDKMAN) should be reachable from .profile 
-(e.g., have it source .bashrc or .bash_profile if needed).
 
 Ensure your IDE can display Mermaid syntax.
 
