@@ -12,7 +12,7 @@ class Bashpile < Formula
   depends_on "bc"
   depends_on "gnu-sed"
   depends_on "openjdk@21"
-  depends_on "bash@5"
+  depends_on "bash"
 
   # tooling dependencies for generated scripts
   # depends_on "gnu-getopt" # needed for OSX and FreeBSD, kept as generic dependency for consistency
