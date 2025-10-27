@@ -18,18 +18,14 @@ class ArithmeticMainTest : MainTest() {
 
     @Test
     fun getBast_basicArithmatic_works() {
-        val bpScript: InputStream = """
-            print(1 + 1)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+        val render = """
+            print(1 + 1)""".trimIndent().createRender()
+        assertRendersEqual("""
             printf "%s" "$((1 + 1))"
             
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("2\n", results.first)
+        render.assertRenderProduces("2\n")
     }
 
     @Test
