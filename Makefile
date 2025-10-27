@@ -8,6 +8,5 @@ install:
 
 # used by Homebrew Formula
 jar:
-    export JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
-	./gradlew clean build --info --stacktrace -x test -x integrationTest -x nativeCompile
+    JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home" ./gradlew clean build --info --stacktrace -x test -x integrationTest -x nativeCompile
 
