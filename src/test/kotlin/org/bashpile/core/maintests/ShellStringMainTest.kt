@@ -16,6 +16,8 @@ import kotlin.test.assertTrue
  */
 class ShellStringMainTest : MainTest() {
 
+    override val testName = "ShellStringTest"
+
     @Test
     fun getBast_shellLine_printf_works() {
         val script: InputStream = "printf \"true\"".byteInputStream()

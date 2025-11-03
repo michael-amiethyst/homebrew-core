@@ -11,6 +11,8 @@ import kotlin.test.assertFailsWith
 
 class ConditionalMainTest : MainTest() {
 
+    override val testName = "ConditionalTest"
+
     @Test
     fun conditionals_works() {
         val renderedBash = fixture._getBast("""

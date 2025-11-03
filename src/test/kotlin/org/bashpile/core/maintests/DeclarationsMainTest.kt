@@ -14,6 +14,8 @@ import kotlin.test.assertFailsWith
  */
 class DeclarationsMainTest : MainTest() {
 
+    override val testName = "DeclarationsTest"
+
     @Test
     fun getBast_declare_bool_works() {
         val bashpileText: InputStream = "b: boolean = true".byteInputStream()

@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 // TODO 0.19.0 - run shellcheck on them in a GHA
-open class MainTest {
+abstract class MainTest {
 
     companion object {
         const val DIRECTORY_PREFIX = "build/shellcheck"
@@ -21,6 +21,8 @@ open class MainTest {
     }
 
     protected lateinit var fixture: Main
+
+    abstract val testName: String
 
 
     @BeforeTest
@@ -38,7 +40,7 @@ open class MainTest {
         assertTrue { renderedBash.startsWith(STRICT_HEADER) }
         assertEquals(STRICT_HEADER + expectedBash, renderedBash)
 
-        val filename = Paths.get("$DIRECTORY_PREFIX/script${filenameCounter++}.bpc")
+        val filename = Paths.get("$DIRECTORY_PREFIX/$testName${filenameCounter++}.bpc")
         Files.writeString(filename, renderedBash,
             StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING)
