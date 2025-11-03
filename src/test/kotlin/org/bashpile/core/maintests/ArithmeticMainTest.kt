@@ -30,9 +30,8 @@ class ArithmeticMainTest : MainTest() {
 
     @Test
     fun getBast_basicArithmatic_subtraction_works() {
-        val bpScript: InputStream = """
-            print(1 - 1)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
+        val render = """
+            print(1 - 1)""".trimIndent().createRender()
         assertRenderEquals("""
             printf "%s" "$((1 - 1))"
             
@@ -43,48 +42,38 @@ class ArithmeticMainTest : MainTest() {
 
     @Test
     fun getBast_basicArithmatic_division_works() {
-        val bpScript: InputStream = """
-            print(6 / 4)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+        val render = """
+            print(6 / 4)""".trimIndent().createRender()
+        assertRenderEquals("""
             printf "%s" "$((6 / 4))"
             
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("1\n", results.first)
+        render.assertRenderProduces("1\n")
     }
 
     @Test
     fun getBast_basicArithmatic_withTypecast_works() {
-        val bpScript: InputStream = """
+        val render = """
                 one: string = "1"
-                print(1 - one as integer)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+                print(1 - one as integer)""".trimIndent().createRender()
+        assertRenderEquals("""
                 declare one
                 one="1"
                 printf "%s" "$((1 - one))"
 
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("0\n", results.first)
+        render.assertRenderProduces("0\n")
     }
 
     @Test
     fun getBast_basicArithmatic_withTypecast_andFloatAssignToInt_works() {
-        val bpScript: InputStream = """
+        val render = """
                 four: string = "4"
                 i: integer = 6 / four as integer
-                print(i)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+                print(i)""".trimIndent().createRender()
+        assertRenderEquals("""
                 declare four
                 four="4"
                 declare i
@@ -93,20 +82,16 @@ class ArithmeticMainTest : MainTest() {
 
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("1\n", results.first)
+        render.assertRenderProduces("1\n")
     }
 
     @Test
     fun getBast_basicArithmatic_withTypecast_andFloats_work() {
-        val bpScript: InputStream = """
+        val render = """
                 four: string = "4"
                 i: float = 6 / four as float
-                print(i)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+                print(i)""".trimIndent().createRender()
+        assertRenderEquals("""
                 declare four
                 four="4"
                 declare i
@@ -115,50 +100,40 @@ class ArithmeticMainTest : MainTest() {
 
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals("1.50000000000000000000\n", results.first)
-        assertEquals(SCRIPT_SUCCESS, results.second)
+        render.assertRenderProduces("1.50000000000000000000\n")
     }
 
     /** We don't double-check the user */
     @Test
     fun getBast_basicArithmatic_withBadTypecast_works() {
-        val bpScript: InputStream = """
+        val render = """
                 one: string = "one"
-                print(1 - one as integer)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        val results = render.runCommand()
-        assertEquals(SCRIPT_ERROR__GENERIC, results.second)
+                print(1 - one as integer)""".trimIndent().createRender()
+        render.assertRenderProduces(null, SCRIPT_ERROR__GENERIC)
     }
 
     @Test
     fun getBast_basicArithmatic_withTypecastAndParenthesis_works() {
-        val bpScript: InputStream = """
+        val render = """
                 one: string = "1"
-                print(1 - (one as integer))""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+                print(1 - (one as integer))""".trimIndent().createRender()
+        assertRenderEquals("""
                 declare one
                 one="1"
                 printf "%s" "$((1 - (one)))"
 
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("0\n", results.first)
+        render.assertRenderProduces("0\n")
     }
 
     @Test
     fun getBast_basicArithmatic_withPlusPlus_works() {
-        val bpScript: InputStream = """
+        val render = """
                 i: integer = 0
                 print(i++)
-                print(i)""".trimIndent().byteInputStream()
-        val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+                print(i)""".trimIndent().createRender()
+        assertRenderEquals("""
                 declare i
                 i=0
                 printf "%s" "$((i++))"
@@ -166,9 +141,7 @@ class ArithmeticMainTest : MainTest() {
 
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("01\n", results.first)
+        render.assertRenderProduces("01\n")
     }
 
     @Test

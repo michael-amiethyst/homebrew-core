@@ -44,9 +44,9 @@ open class MainTest {
             StandardOpenOption.TRUNCATE_EXISTING)
     }
 
-    protected fun String.assertRenderProduces(expectedStdout: String, expectedExitCode: Int = 0) {
+    protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0) {
         val results = runCommand()
-        assertEquals(expectedStdout, results.first)
+        if (expectedStdout != null) { assertEquals(expectedStdout, results.first) }
         assertEquals(expectedExitCode, results.second)
     }
 }
