@@ -20,7 +20,7 @@ class ArithmeticMainTest : MainTest() {
     fun getBast_basicArithmatic_works() {
         val render = """
             print(1 + 1)""".trimIndent().createRender()
-        assertRendersEqual("""
+        assertRenderEquals("""
             printf "%s" "$((1 + 1))"
             
             """.trimIndent(), render
@@ -33,16 +33,13 @@ class ArithmeticMainTest : MainTest() {
         val bpScript: InputStream = """
             print(1 - 1)""".trimIndent().byteInputStream()
         val render = fixture._getBast(bpScript).render(UNQUOTED)
-        assertEquals(
-            STRICT_HEADER + """
+        assertRenderEquals("""
             printf "%s" "$((1 - 1))"
             
             """.trimIndent(), render
         )
-        val results = render.runCommand()
-        assertEquals(SCRIPT_SUCCESS, results.second)
-        assertEquals("0\n", results.first)
-    }
+        render.assertRenderProduces("0\n")
+    } // TODO convert rest of file to new APIs
 
     @Test
     fun getBast_basicArithmatic_division_works() {

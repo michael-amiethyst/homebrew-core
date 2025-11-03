@@ -16,11 +16,12 @@ open class MainTest {
 
     companion object {
         const val DIRECTORY_PREFIX = "build/shellcheck"
+        // framework makes a separate MainTest instance per test, so this needs to be here
+        private var filenameCounter = 0
     }
 
     protected lateinit var fixture: Main
 
-    private var filenameCounter = 0
 
     @BeforeTest
     fun init() {
@@ -33,7 +34,7 @@ open class MainTest {
         return fixture._getBast(scriptStream).render(UNQUOTED)
     }
 
-    protected fun assertRendersEqual(expectedBash: String, renderedBash: String) {
+    protected fun assertRenderEquals(expectedBash: String, renderedBash: String) {
         assertTrue { renderedBash.startsWith(STRICT_HEADER) }
         assertEquals(STRICT_HEADER + expectedBash, renderedBash)
 
