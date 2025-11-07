@@ -36,7 +36,7 @@ abstract class MainTest {
         return fixture._getBast(scriptStream).render(UNQUOTED)
     }
 
-    protected fun assertRenderEquals(expectedBash: String, renderedBash: String) {
+    protected fun assertRenderEquals(expectedBash: String, renderedBash: String): String {
         assertTrue { renderedBash.startsWith(STRICT_HEADER) }
         assertEquals(STRICT_HEADER + expectedBash, renderedBash)
 
@@ -44,6 +44,7 @@ abstract class MainTest {
         Files.writeString(filename, renderedBash,
             StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING)
+        return renderedBash
     }
 
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0) {
