@@ -7,7 +7,7 @@ import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.ShellStringBastNode
 import org.bashpile.core.bast.statements.PrintBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
-import org.bashpile.core.TypeEnum.STRING
+import org.bashpile.core.engine.TypeEnum.STRING
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
 import kotlin.test.BeforeTest

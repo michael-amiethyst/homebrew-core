@@ -11,6 +11,8 @@ import kotlin.test.assertFailsWith
 
 class LoopsMainTest : MainTest() {
 
+    override val testName = "LoopsTest"
+
     @Test
     fun foreach_fileLine_works() {
         val script = """
