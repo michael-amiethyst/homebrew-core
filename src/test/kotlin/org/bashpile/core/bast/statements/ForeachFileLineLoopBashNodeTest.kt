@@ -18,7 +18,7 @@ class ForeachFileLineLoopBashNodeTest {
         assertEquals(
             """
             cat "file.csv" | $sed -e '1d' -e 's/\r//g' | $sed -ze '/\n$/!s/$/\n$/g' | while IFS=',' read -r col1; do
-                printf "${'$'}{col1}"
+                printf "%s" "${'$'}{col1}"
             done
 
         """.trimIndent(), fixture.render(UNQUOTED))

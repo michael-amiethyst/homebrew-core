@@ -1,6 +1,7 @@
 package org.bashpile.core.bast.statements
 
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.bast.expressions.VariableReferenceBastNode
 import org.bashpile.core.engine.RenderOptions
 import org.bashpile.core.engine.TypeEnum.*
 
@@ -11,20 +12,21 @@ class PrintBastNode(children: List<BastNode> = listOf()) : StatementBastNode(chi
 
     /** Combines all children into a single string as a pre-computation for Bash */
     override fun render(options: RenderOptions): String {
-        val childRenders = children.map { it.render(RenderOptions.UNQUOTED) }.joinToString("")
+        val printfArguments = mutableListOf<String>()
+        val childRenders = children.map {
+            val render = it.render(RenderOptions.UNQUOTED)
+            val notNumeric = !immediateImportantDescendants().areNumbers()
+            if (it !is VariableReferenceBastNode && notNumeric) {
+                render
+            } else {
+                printfArguments.add(render)
+                // print numbers as strings to avoid a bug with negative numbers
+                "%s"
+            }
+        }.joinToString("")
 
-        val notNumeric = !immediateImportantDescendants().areNumbers()
-        return if (notNumeric) {
-            "printf \"$childRenders\"\n"
-        } else {
-            // treat as a String so floating point numbers work
-            // we do the formatting on the Kotlin layer (we're not using %f for that reason)
-            // we need the %s so Bash doesn't interpret negative numbers as options to the program
-            """
-                printf "%s" "$childRenders"
-                
-            """.trimIndent()
-        }
+        val renderedArguments = printfArguments.joinToString("") { " \"$it\"" }
+        return "printf \"$childRenders\"$renderedArguments\n"
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): PrintBastNode {

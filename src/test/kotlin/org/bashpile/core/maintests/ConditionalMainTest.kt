@@ -222,15 +222,12 @@ class ConditionalMainTest : MainTest() {
     @Test
     fun ifStatement_notEquals_withShellString_works() {
         val renderedBash = """
-            input1: string = "value"
             if ("value" == #(ls)):
                 print("Equal\n")
             else:
                 print("Not Equal\n")
             """.trimIndent().createRender()
         assertRenderEquals("""
-            declare input1
-            input1="value"
             if [ "value" == "$(ls)" ]; then
                 printf "Equal\n"
             else
