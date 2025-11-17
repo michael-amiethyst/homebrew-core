@@ -7,6 +7,7 @@ import org.bashpile.core.runCommand
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.util.function.Predicate
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -50,6 +51,12 @@ abstract class MainTest {
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0) {
         val results = runCommand()
         if (expectedStdout != null) { assertEquals(expectedStdout, results.first) }
+        assertEquals(expectedExitCode, results.second)
+    }
+
+    protected fun String.assertRenderProduces(test: Predicate<String>, expectedExitCode: Int = 0) {
+        val results = runCommand()
+        assertTrue(test.test(results.first))
         assertEquals(expectedExitCode, results.second)
     }
 }
