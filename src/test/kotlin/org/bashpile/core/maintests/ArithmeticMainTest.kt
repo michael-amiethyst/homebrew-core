@@ -34,7 +34,7 @@ class ArithmeticMainTest : MainTest() {
             """.trimIndent(), render
         )
         render.assertRenderProduces("0\n")
-    } // TODO convert rest of file to new APIs
+    }
 
     @Test
     fun getBast_basicArithmatic_division_works() {
