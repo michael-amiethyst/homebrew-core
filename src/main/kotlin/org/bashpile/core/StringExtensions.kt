@@ -21,12 +21,12 @@ fun String.appendIfMissing(suffix: String): String = Strings.CS.appendIfMissing(
 /**
  * Returns stdout/stderr and the exit code.
  */
-fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
+fun String.runCommand(workingDir: File? = null, arguments: String? = null): Pair<String, Int> {
     val cwd = File(System.getProperty("user.dir"))
     val profileFilenames = listOf(".profile", ".bash_profile", ".bashrc")
     var stdoutText = ""
     for (profileFilename in profileFilenames) {
-        val commandResult = runCommandImpl(workingDir ?: cwd, profileFilename)
+        val commandResult = runCommandImpl(workingDir ?: cwd, profileFilename, arguments)
         stdoutText = commandResult.first
         val noFile = "No such file or directory"
         if (!stdoutText.contains("$profileFilename: $noFile")) {
@@ -39,11 +39,11 @@ fun String.runCommand(workingDir: File? = null): Pair<String, Int> {
                 "Command results: $stdoutText")
 }
 
-private fun String.runCommandImpl(workingDir: File, profileFilename: String): Pair<String, Int> {
+private fun String.runCommandImpl(workingDir: File, profileFilename: String, arguments: String?): Pair<String, Int> {
     var proc: Process? = null
     try {
         val callable: Callable<Process> = Callable {
-            val proc2 = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/$profileFilename; $this"))
+            val proc2 = ProcessBuilder(listOf("bash", "-c", ". ${'$'}HOME/$profileFilename; $this $arguments"))
                 .directory(workingDir)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true)

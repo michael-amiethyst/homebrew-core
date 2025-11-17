@@ -48,8 +48,8 @@ abstract class MainTest {
         return renderedBash
     }
 
-    protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0) {
-        val results = runCommand()
+    protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
+        val results = this.runCommand(arguments = arguments.joinToString { " " })
         if (expectedStdout != null) { assertEquals(expectedStdout, results.first) }
         assertEquals(expectedExitCode, results.second)
     }
