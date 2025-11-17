@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.bashpile.core.BashpileLexer
 import org.bashpile.core.BashpileParser
 import org.bashpile.core.BashpileParserBaseVisitor
-import org.bashpile.core.engine.TypeEnum.*
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.*
@@ -13,6 +12,7 @@ import org.bashpile.core.bast.expressions.arithmetic.IntegerArithmeticBastNode
 import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.*
 import org.bashpile.core.bast.statements.*
+import org.bashpile.core.engine.TypeEnum.*
 
 /**
  * Converts Antlr AST (AAST) to Bashpile AST (BAST).
@@ -211,6 +211,14 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         val bastExpression = visit(aastChildren[0])
         return InternalBastNode(bastExpression.asList(), nextType)
     }
+
+    override fun visitArgumentsBuiltinExpression(ctx: BashpileParser.ArgumentsBuiltinExpressionContext): BastNode {
+        // if the script has 'arguments[5]' then textInBrackets would be '5'
+        val textInBrackets = ctx.children[0].getChild(2).text
+        return TerminalBastNode("$$textInBrackets", STRING)
+    }
+
+    // TODO fix issue of unwinded statement in foreach loop
 
     // Leaf nodes (parts of expressions)
 

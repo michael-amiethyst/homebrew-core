@@ -49,7 +49,7 @@ abstract class MainTest {
     }
 
     protected fun String.assertRenderProduces(expectedStdout: String?, expectedExitCode: Int = 0, arguments: List<String> = listOf()) {
-        val results = this.runCommand(arguments = arguments.joinToString { " " })
+        val results = runCommand(arguments = arguments)
         if (expectedStdout != null) { assertEquals(expectedStdout, results.first) }
         assertEquals(expectedExitCode, results.second)
     }

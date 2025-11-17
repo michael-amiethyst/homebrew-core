@@ -8,7 +8,9 @@ class ArgumentsMainTest : MainTest() {
     @Test
     fun argumentReferenceWorks() {
         val script = "print(arguments[1])".createRender()
-        assertRenderEquals("printf \"$1\"", script)
-            .assertRenderProduces("first", arguments = listOf("first"))
+        assertRenderEquals("printf \"$1\"\n", script)
+            .assertRenderProduces("first\n", arguments = listOf("first"))
     }
+
+    // TODO arguments - write test for arguments[all]
 }
