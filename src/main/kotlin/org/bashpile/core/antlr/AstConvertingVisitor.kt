@@ -215,7 +215,7 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     override fun visitArgumentsBuiltinExpression(ctx: BashpileParser.ArgumentsBuiltinExpressionContext): BastNode {
         // if the script has 'arguments[5]' then textInBrackets would be '5'
         val textInBrackets = ctx.children[0].getChild(2).text
-        return TerminalBastNode("$$textInBrackets", STRING)
+        return ArgumentsBastNode(textInBrackets)
     }
 
     // TODO fix issue of unwinded statement in foreach loop

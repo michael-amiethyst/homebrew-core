@@ -12,5 +12,19 @@ class ArgumentsMainTest : MainTest() {
             .assertRenderProduces("first\n", arguments = listOf("first"))
     }
 
-    // TODO arguments - write test for arguments[all]
+    @Test
+    fun argumentAllWorks() {
+        // TODO change ##() syntax to #l() and create #v() for strings
+        val script = """
+            ##(IFS=\" \")
+            print(arguments[all])
+            
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            IFS=" "
+            printf "$@"
+            
+            """.trimIndent(), script
+        ).assertRenderProduces("first second third\n", arguments = listOf("first", "second", "third"))
+    }
 }

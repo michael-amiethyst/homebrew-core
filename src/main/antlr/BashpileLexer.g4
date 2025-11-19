@@ -139,8 +139,6 @@ DollarOParen     : '$(' -> pushMode(SHELL_STRING);
 
 /** See https://github.com/sepp2k/antlr4-string-interpolation-examples/blob/master/with-duplication/StringLexer.g4 */
 mode SHELL_STRING;
-ShellStringDoubleHashOParen : '##(' -> type(DoubleHashOParen), pushMode(SHELL_STRING);
-ShellStringHashOParen    : '#(' -> type(HashOParen), pushMode(SHELL_STRING);
 ShellStringDollarOParen  : '$(' -> type(DollarOParen), pushMode(SHELL_STRING);
 ShellStringOParen        : '(' -> type(OParen), pushMode(SHELL_STRING);
 ShellStringText          : (~[\\\f()#$]
