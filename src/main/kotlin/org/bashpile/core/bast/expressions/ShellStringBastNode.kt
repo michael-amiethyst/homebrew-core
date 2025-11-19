@@ -20,7 +20,7 @@ open class ShellStringBastNode(children: List<BastNode> = listOf(), majorType: T
         val childRenders = children.map { it.render(options) }.joinToString("")
         val subshell = if (options.ignoreOutput) {
             "($childRenders) >/dev/null 2>&1"
-        // TODO add branch for verbatim shell strings
+        // TODO 0.21.0 -- add branch for verbatim shell strings
         } else { "$($childRenders)" }
         return if (options.quoted) { "\"$subshell\"" } else { subshell }
     }

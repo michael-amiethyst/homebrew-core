@@ -14,7 +14,6 @@ class ArgumentsMainTest : MainTest() {
 
     @Test
     fun argumentAllWorks() {
-        // TODO change ##() syntax to #l() and create #v() for strings
         val script = """
             ##(IFS=\" \")
             print(arguments[all])

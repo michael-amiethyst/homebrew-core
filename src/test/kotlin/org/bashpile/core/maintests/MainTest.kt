@@ -12,7 +12,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-// TODO 0.20.0 - run shellcheck on generated scripts (/build/shellcheck) in a GHA
+// TODO 0.20.0 -- run shellcheck on generated scripts (/build/shellcheck) in a GHA
 abstract class MainTest {
 
     companion object {

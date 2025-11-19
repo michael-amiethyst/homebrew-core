@@ -10,6 +10,7 @@ import kotlin.test.assertEquals
 /**
  * Tests Shell Strings and Shell Lines
  */
+// TODO 0.21.0 -- make $() a subshell string, l$() a loose subshell string and #() a verbatim shellstring
 class ShellStringMainTest : MainTest() {
 
     override val testName = "ShellStringTest"
@@ -71,7 +72,7 @@ class ShellStringMainTest : MainTest() {
 
     @Test
     fun getBast_looseShellstring_works() {
-        val script = "##(printf \"newline\"; exit 1)".createRender()
+        val script = "l#(printf \"newline\"; exit 1)".createRender()
         assertRenderEquals("""
             eval "${'$'}__bp_old_options"
             $(printf "newline"; exit 1)
