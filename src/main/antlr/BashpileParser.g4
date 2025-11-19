@@ -95,7 +95,7 @@ types    : Boolean | Integer | Float | String | List | Map | Reference;
 
 // shellString, Bashpile's version of a subshell
 shellString        : HashOParen shellStringContents* CParen;
-looseShellString   : DoubleHashOParen shellStringContents* CParen;
+looseShellString   : LHashOParen shellStringContents* CParen;
 shellStringContents: DollarOParen shellStringContents* CParen
                    | OParen shellStringContents* CParen
                    | ShellStringText
