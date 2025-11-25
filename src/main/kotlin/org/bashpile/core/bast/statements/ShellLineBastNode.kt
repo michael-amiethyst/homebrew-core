@@ -7,7 +7,9 @@ import org.bashpile.core.engine.TypeEnum
 import org.bashpile.core.bast.expressions.literals.TerminalBastNode
 import org.bashpile.core.engine.RenderOptions
 
-/** Represents a line of Bash, has no loose mode like [org.bashpile.core.bast.expressions.ShellStringBastNode] */
+/** Represents a line of Bash, has no loose mode like
+ * [org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode]
+ */
 class ShellLineBastNode(children: List<BastNode> = listOf()) : StatementBastNode(children), Subshell
 {
     constructor(contents: String) : this(TerminalBastNode(contents, TypeEnum.UNKNOWN).asList())

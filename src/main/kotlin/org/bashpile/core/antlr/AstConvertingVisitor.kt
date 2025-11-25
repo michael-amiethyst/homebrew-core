@@ -11,6 +11,9 @@ import org.bashpile.core.bast.expressions.arithmetic.FloatArithmeticBastNode
 import org.bashpile.core.bast.expressions.arithmetic.IntegerArithmeticBastNode
 import org.bashpile.core.bast.expressions.arithmetic.UnaryCrementArithmeticBastNode
 import org.bashpile.core.bast.expressions.literals.*
+import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
+import org.bashpile.core.bast.expressions.shellstrings.VerbatimShellStringBastNode
 import org.bashpile.core.bast.statements.*
 import org.bashpile.core.engine.TypeEnum.*
 
@@ -228,6 +231,10 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
 
     override fun visitLooseShellString(ctx: BashpileParser.LooseShellStringContext): BastNode {
         return LooseShellStringBastNode(ctx.shellStringContents().map { visit(it) })
+    }
+
+    override fun visitVerbatimShellString(ctx: BashpileParser.VerbatimShellStringContext): BastNode {
+        return VerbatimShellStringBastNode(ctx.shellStringContents().map { visit(it) })
     }
 
     override fun visitShellStringContents(ctx: BashpileParser.ShellStringContentsContext): BastNode {

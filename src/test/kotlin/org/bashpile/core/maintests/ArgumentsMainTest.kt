@@ -12,18 +12,25 @@ class ArgumentsMainTest : MainTest() {
             .assertRenderProduces("first\n", arguments = listOf("first"))
     }
 
+    // TODO arguments - create arguments[splat] and print with explicit format string
     @Test
     fun argumentAllWorks() {
+        // ensure Bash is behaving as expected
+        """
+            printf "$@\n"
+
+        """.trimIndent().assertRenderProduces(
+            "first\n", arguments = listOf("first", "second", "third"))
+
+        // ensure our Render is as expected
         val script = """
-            ##(IFS=\" \")
-            print(arguments[all])
-            
+            print(arguments[all] + "\n")
+
             """.trimIndent().createRender()
         assertRenderEquals("""
-            IFS=" "
-            printf "$@"
-            
+            printf "$@\n"
+
             """.trimIndent(), script
-        ).assertRenderProduces("first second third\n", arguments = listOf("first", "second", "third"))
+        ).assertRenderProduces("first\n", arguments = listOf("first", "second", "third"))
     }
 }

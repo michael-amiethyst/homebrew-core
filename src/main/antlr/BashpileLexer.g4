@@ -132,6 +132,7 @@ StringEscapeSequence: '\\' . | '\\' Newline;
 // tokens for modes
 
 LHashOParen  : 'l#(' -> pushMode(SHELL_STRING);
+VHashOParen  : 'v#(' -> pushMode(SHELL_STRING);
 HashOParen   : '#(' -> pushMode(SHELL_STRING);
 DollarOParen : '$(' -> pushMode(SHELL_STRING);
 

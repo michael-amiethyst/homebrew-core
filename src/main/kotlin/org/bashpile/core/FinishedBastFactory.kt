@@ -7,8 +7,8 @@ import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
 import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
-import org.bashpile.core.bast.expressions.LooseShellStringBastNode
-import org.bashpile.core.bast.expressions.ShellStringBastNode
+import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
 import org.bashpile.core.engine.TypeEnum.UNKNOWN

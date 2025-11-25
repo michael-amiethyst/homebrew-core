@@ -1,7 +1,7 @@
-package org.bashpile.core.bast.expressions
+package org.bashpile.core.bast.expressions.shellstrings
 
-import org.bashpile.core.engine.Subshell
 import org.bashpile.core.bast.BastNode
+import org.bashpile.core.engine.Subshell
 
 class LooseShellStringBastNode(children: List<BastNode> = listOf()) : ShellStringBastNode(children), Subshell {
     override fun replaceChildren(nextChildren: List<BastNode>): LooseShellStringBastNode {
