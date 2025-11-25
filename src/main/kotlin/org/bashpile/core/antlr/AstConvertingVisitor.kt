@@ -218,9 +218,18 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
     }
 
     override fun visitArgumentsBuiltinExpression(ctx: BashpileParser.ArgumentsBuiltinExpressionContext): BastNode {
-        // if the script has 'arguments[5]' then textInBrackets would be '5'
-        val textInBrackets = ctx.children[0].getChild(2).text
-        return ArgumentsBastNode(textInBrackets)
+        val argumentsCtx = ctx.argumentsBuiltin()
+        return if (argumentsCtx.NumberValues() != null) {
+            // if the script has 'arguments[5]' then textInBrackets would be '5'
+            val textInBrackets = ctx.children[0].getChild(2).text
+            ArgumentsBastNode(brackedText = textInBrackets)
+        } else if (argumentsCtx.All() != null) {
+            ArgumentsBastNode(all = true)
+        } else if (argumentsCtx.Splat() != null) {
+            ArgumentsBastNode(splat = true)
+        } else {
+            throw UnsupportedOperationException()
+        }
     }
 
     // Leaf nodes (parts of expressions)

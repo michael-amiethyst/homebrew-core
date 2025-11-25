@@ -44,6 +44,7 @@ Case     : 'case';
 Pass     : 'pass';
 Arguments: 'arguments';
 All      : 'all';
+Splat    : 'splat';
 Exported : 'exported';
 Readonly : 'readonly';
 ListOf   : 'listOf';

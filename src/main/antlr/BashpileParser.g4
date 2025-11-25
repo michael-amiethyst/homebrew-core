@@ -113,6 +113,6 @@ binaryPrimary: LessThan | LessThanOrEquals | MoreThan | MoreThanOrEquals | IsEqu
 combiningOperator: And | Or;
 
 // translates to $1, $2, etc
-argumentsBuiltin: Arguments OBracket (NumberValues | All) CBracket;
+argumentsBuiltin: Arguments OBracket (NumberValues | All | Splat) CBracket;
 
 listAccess: Id OBracket (Minus? NumberValues | All) CBracket;

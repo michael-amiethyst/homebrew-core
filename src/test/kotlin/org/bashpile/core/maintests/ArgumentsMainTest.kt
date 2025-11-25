@@ -12,9 +12,8 @@ class ArgumentsMainTest : MainTest() {
             .assertRenderProduces("first\n", arguments = listOf("first"))
     }
 
-    // TODO arguments - create arguments[splat] and print with explicit format string
     @Test
-    fun argumentAllWorks() {
+    fun argument_all_works() {
         // ensure Bash is behaving as expected
         """
             printf "$@\n"
@@ -32,5 +31,26 @@ class ArgumentsMainTest : MainTest() {
 
             """.trimIndent(), script
         ).assertRenderProduces("first\n", arguments = listOf("first", "second", "third"))
+    }
+
+    @Test
+    fun argument_splat_works() {
+        // ensure Bash is behaving as expected
+        """
+            printf "$*\n"
+
+        """.trimIndent().assertRenderProduces(
+            "first second third\n", arguments = listOf("first", "second", "third"))
+
+        // ensure our Render is as expected
+        val script = """
+            print(arguments[splat] + "\n")
+
+            """.trimIndent().createRender()
+        assertRenderEquals("""
+            printf "$*\n"
+
+            """.trimIndent(), script
+        ).assertRenderProduces("first second third\n", arguments = listOf("first", "second", "third"))
     }
 }
