@@ -6,13 +6,14 @@ import org.bashpile.core.antlr.AstConvertingVisitor.Companion.ENABLE_STRICT
 import org.bashpile.core.antlr.AstConvertingVisitor.Companion.OLD_OPTIONS
 import org.bashpile.core.bast.BastNode
 import org.bashpile.core.bast.InternalBastNode
-import org.bashpile.core.bast.expressions.ArithmeticBastNode
-import org.bashpile.core.bast.expressions.LooseShellStringBastNode
-import org.bashpile.core.bast.expressions.ShellStringBastNode
+import org.bashpile.core.bast.expressions.arithmetic.ArithmeticBastNode
+import org.bashpile.core.bast.expressions.shellstrings.LooseShellStringBastNode
+import org.bashpile.core.bast.expressions.shellstrings.ShellStringBastNode
 import org.bashpile.core.bast.statements.ShellLineBastNode
 import org.bashpile.core.bast.statements.VariableDeclarationBastNode
-import org.bashpile.core.TypeEnum.UNKNOWN
+import org.bashpile.core.engine.TypeEnum.UNKNOWN
 import org.bashpile.core.bast.expressions.VariableReferenceBastNode
+import org.bashpile.core.engine.Subshell
 
 
 /**
@@ -26,12 +27,8 @@ class FinishedBastFactory {
     fun transform(root: BastNode): BastNode {
         logger.info("Mermaid graph ---------------- initial: {}", root.mermaidGraph())
 
-        // flatten
-        val flattenedBast = root.flattenArithmetic()
-        logger.info("Mermaid graph --- arithmetic flattened: {}", flattenedBast.mermaidGraph())
-
         // unnest
-        val unnestedBast = flattenedBast.unnestSubshells()
+        val unnestedBast = root.unnestSubshells()
         logger.info("Mermaid graph ----- subshells unnested: {}", unnestedBast.mermaidGraph())
 
         // loosen
@@ -61,43 +58,26 @@ class FinishedBastFactory {
         }
     }
 
-    /** Replaces nested arithmetic nodes with internal nodes */
-    private fun BastNode.flattenArithmetic(inArithmetic: Boolean = this is ArithmeticBastNode): BastNode {
-        // it's needed to replace the nested ArithmeticBastNode (including floats with the Subshell interface)
-        // with a generic InternalBastNode.  This lets the unnesting logic work properly
-
-        val flattenedChildren = children.map {
-            it.flattenArithmetic(inArithmetic || this is ArithmeticBastNode)
-        }
-
-        return if (inArithmetic && this is ArithmeticBastNode) {
-            // with the recursive mapping it maps this nested ArithmeticBastNode to a generic InternalBastNode
-            InternalBastNode(flattenedChildren, majorType(), " ")
-        } else {
-            replaceChildren(flattenedChildren)
-        }
-    }
-
     /**
      * Returns a list of preambles to support unnesting.
+     * Not implemented in BastNode.render() because of complexity and testability.
+     *
      * @return An unnested version of the input tree.
      * @see /documentation/contributing/unnest.md
      */
     @VisibleForTesting
     internal fun BastNode.unnestSubshells(): BastNode {
         var unnestedCount = 0
-        val unnestedChildren = children.flatMap { statementNode ->
+        val unnestedStatements = children.flatMap { statementNode ->
             // the recursion is hidden in .allNodes(), it's linear from there
-            val nestedSubshells = statementNode.all().filter {
-                it is Subshell
+            val nestedSubshells = statementNode.allDescendants().filter {
+                it is Subshell && it !is ArithmeticBastNode // Arithmetic nodes render correctly if nested
             }.filter { subshells ->
                 subshells.parents().any { it is Subshell }
             }
             val variableDeclarationBastNodes = nestedSubshells.map { nestedSubshell ->
                 val id = "__bp_var${unnestedCount++}"
-                nestedSubshell.thaw()
-                    .replaceWith(VariableReferenceBastNode(id, UNKNOWN))
-                    .freeze()
+                nestedSubshell.mutatingReplaceWith(VariableReferenceBastNode(id, UNKNOWN))
                 VariableDeclarationBastNode(
                     id,
                     UNKNOWN,
@@ -106,7 +86,7 @@ class FinishedBastFactory {
             }
             variableDeclarationBastNodes + statementNode
         }
-        return replaceChildren(unnestedChildren)
+        return replaceChildren(unnestedStatements)
     }
 
     /** @return A loosened version of the input tree */
