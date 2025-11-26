@@ -54,8 +54,6 @@ class AstConvertingVisitor: BashpileParserBaseVisitor<BastNode>() {
         return ShellLineBastNode(ctx.children.map { visit(it) })
     }
 
-
-    // TODO arguments -- fix issue of unwinded statement in foreach loop going into wrong stackframe
     override fun visitForeachFileLineLoopStatement(ctx: BashpileParser.ForeachFileLineLoopStatementContext): BastNode {
         val antlrStatements = ctx.indentedStatements().statement()
         val children = antlrStatements.map { visit(it) }

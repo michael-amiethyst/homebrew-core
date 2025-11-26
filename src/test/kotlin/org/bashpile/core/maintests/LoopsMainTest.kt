@@ -280,4 +280,28 @@ class LoopsMainTest : MainTest() {
                 """.trimIndent()
             )
     }
+
+    @Test
+    fun foreach_fileLine_withNestedSubshells_works() {
+        val outerFilename = "src/test/resources/data/labeled_lines.txt"
+        val render = """
+            for(line: string in "$outerFilename"):
+                print(#(printf $(printf '.')))
+                
+            """.trimIndent().createRender()
+        assertRenderEquals(
+            """
+            cat "src/test/resources/data/labeled_lines.txt" | gsed -e 's/\r//g' | gsed -ze '/\n$/!s/$/\n$/g' | while IFS='' read -r line; do
+                declare __bp_var0
+                __bp_var0="$(printf '.')"
+                printf "$(ls ${'$'}{__bp_var0})"
+            done
+            """.trimIndent(), render
+        ).assertRenderProduces("""
+                row1
+                row2
+
+                """.trimIndent()
+            )
+    }
 }

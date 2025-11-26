@@ -38,7 +38,7 @@ abstract class MainTest {
     }
 
     protected fun assertRenderEquals(expectedBash: String, renderedBash: String): String {
-        assertTrue { renderedBash.startsWith(STRICT_HEADER) }
+        assertTrue("No STRICT_HEADER?") { renderedBash.startsWith(STRICT_HEADER) }
         assertEquals(STRICT_HEADER + expectedBash, renderedBash)
 
         val filename = Paths.get("$DIRECTORY_PREFIX/$testName${filenameCounter++}.bpc")

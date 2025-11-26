@@ -30,7 +30,7 @@ class ForeachFileLineLoopBashNode(
     }
 
     override fun replaceChildren(nextChildren: List<BastNode>): ForeachFileLineLoopBashNode {
-        return ForeachFileLineLoopBashNode(children.map { it.deepCopy() }, doubleQuotedFilepath, columns)
+        return ForeachFileLineLoopBashNode(nextChildren.map { it.deepCopy() }, doubleQuotedFilepath, columns)
     }
 
     override fun render(options: RenderOptions): String {
